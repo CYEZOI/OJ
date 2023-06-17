@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  centos:
+    image: test
+    container_name: ubuntu
+    tty: true
+    cap_add:
+      - ALL
+    volumes:
+      - ./test:/Judger
+    command: ["/bin/bash", "-c", "/bin/gcc /Judger/main.cpp -o /Judger/main -std=c++14 -O2 -lm -DONLINE_JUDGE -lstdc++ -lm; /Judger/main"]

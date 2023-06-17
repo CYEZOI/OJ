@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="module" src="https://unpkg.com/@fluentui/web-components">
+    </script>
+</head>
+
+<body>
+    <h4>Multi-expand</h4>
+    <fluent-accordion style="max-width: 350px;">
+        <fluent-accordion-item>
+            <span slot="heading">Item 1</span>
+            <div class="panel">
+                Panel one content
+            </div>
+        </fluent-accordion-item>
+        <fluent-accordion-item>
+            <span slot="heading">Item 2</span>
+            <div class="panel">
+                Panel 2 content
+            </div>
+        </fluent-accordion-item>
+        <fluent-accordion-item>
+            <span slot="heading">Item 3</span>
+            <div class="panel">
+                Panel 3 content
+            </div>
+        </fluent-accordion-item>
+    </fluent-accordion>
+    <h4>Single-expand</h4>
+    <fluent-accordion expand-mode="single">
+        <fluent-accordion-item>
+            <span slot="heading">Item 1</span>
+            <div class="panel">
+                Panel one content
+            </div>
+        </fluent-accordion-item>
+        <fluent-accordion-item>
+            <span slot="heading">Item 2</span>
+            <div class="panel">
+                Panel 2 content
+            </div>
+        </fluent-accordion-item>
+        <fluent-accordion-item>
+            <span slot="heading">Item 3</span>
+            <div class="panel">
+                Panel 3 content
+            </div>
+        </fluent-accordion-item>
+        <fluent-accordion-item>
+            <span slot="heading">Item 4</span>
+            <div class="panel">
+                Panel 4 content
+            </div>
+        </fluent-accordion-item>
+    </fluent-accordion>
+    <fluent-anchor appearance="">Anchor</fluent-anchor>
+    <fluent-badge appearance="accent">New</fluent-badge>
+    <fluent-breadcrumb>
+        <fluent-breadcrumb-item href="#">Home</fluent-breadcrumb-item>
+        <fluent-breadcrumb-item href="#">Next Level Down</fluent-breadcrumb-item>
+        <fluent-breadcrumb-item>Current Location</fluent-breadcrumb-item>
+    </fluent-breadcrumb>
+    <fluent-button appearance="accent">Learn more</fluent-button>
+    <fluent-card class="custom">
+        Custom size using CSS
+    </fluent-card>
+    <fluent-checkbox>Did you check this?</fluent-checkbox><br />
+    <fluent-checkbox checked disabled>Is this disabled?</fluent-checkbox><br />
+    <fluent-checkbox checked>Checked by default?</fluent-checkbox>
+    <h3>Default</h3>
+    <fluent-combobox placeholder="Select a graphics card">
+        <fluent-option value="1">GTX 1060</fluent-option>
+        <fluent-option value="2">GTX 1070</fluent-option>
+        <fluent-option value="3">GTX 1080</fluent-option>
+        <fluent-option value="4" disabled>GTX 1090</fluent-option>
+    </fluent-combobox>
+
+    <h3>With autocomplete</h3>
+    <fluent-combobox autocomplete="both" placeholder="Select a graphics card">
+        <fluent-option value="1">GTX 1060</fluent-option>
+        <fluent-option value="2">GTX 1070</fluent-option>
+        <fluent-option value="3">GTX 1080</fluent-option>
+        <fluent-option value="4" disabled>GTX 1090</fluent-option>
+    </fluent-combobox>
+
+    <h3>Disabled</h3>
+    <fluent-combobox disabled placeholder="Select an option">
+        <fluent-option value="1">Option 1</fluent-option>
+        <fluent-option value="2">Option 2</fluent-option>
+        <fluent-option value="3">Option 3</fluent-option>
+    </fluent-combobox>
+    <fluent-data-grid id="defaultGrid" style="max-height: 30em; overflow-y: auto;">
+    </fluent-data-grid>
+    <script>
+        document.getElementById("defaultGrid").rowsData = [{
+            item1: "value 1-1",
+            item2: "value 2-1"
+        }, {
+            item1: "value 1-2",
+            item2: "value 2-2"
+        }, {
+            item1: "value 1-3",
+            item2: "value 2-3"
+        },];
+    </script>
+    <h2>Dialog</h2>
+    <fluent-button appearance="accent" id="dialogOpener">Show Dialog</fluent-button>
+    <fluent-dialog id="defaultDialog" hidden trap-focus modal>
+        <div style="margin: 20px;">
+            <h2>Dialog with text and a button</h2>
+            <fluent-button id="dialogCloser" appearance="accent" tabindex="0">Dismiss</fluent-button>
+        </div>
+    </fluent-dialog>
+    <script>
+        document.getElementById("dialogOpener").addEventListener("click", () => {
+            document.getElementById("defaultDialog").show();
+        });
+        document.getElementById("dialogCloser").addEventListener("click", () => {
+            document.getElementById("defaultDialog").hide();
+        });
+    </script>Before the divider
+    <fluent-divider></fluent-divider>
+    After the divider
+    <fluent-flipper></fluent-flipper>
+    <fluent-horizontal-scroll>
+        <fluent-card>
+            Card 1
+        </fluent-card>
+        <fluent-card>
+            Card 2
+        </fluent-card>
+        <fluent-card>
+            Card 3
+        </fluent-card>
+        <fluent-card>
+            Card 4
+        </fluent-card>
+        <fluent-card>
+            Card 5
+        </fluent-card>
+        <fluent-card>
+            Card 6
+        </fluent-card>
+        <fluent-card>
+            Card 7
+        </fluent-card>
+        <fluent-card>
+            Card 8
+        </fluent-card>
+        <fluent-card>
+            Card 9
+        </fluent-card>
+        <fluent-card>
+            Card 10
+        </fluent-card>
+        <fluent-card>
+            Card 11
+        </fluent-card>
+        <fluent-card>
+            Card 12
+        </fluent-card>
+        <fluent-card>
+            Card 13
+        </fluent-card>
+        <fluent-card>
+            Card 14
+        </fluent-card>
+        <fluent-card>
+            Card 15
+        </fluent-card>
+        <fluent-card>
+            Card 16
+        </fluent-card>
+    </fluent-horizontal-scroll>
+    <fluent-listbox aria-labelledby="lb_label">
+        <fluent-option value="fn">Foxtrot November</fluent-option>
+        <fluent-option value="gs">Golf Sierra</fluent-option>
+        <fluent-option selected value="j">Juliet</fluent-option>
+        <fluent-option value="kr">Kilo Romeo</fluent-option>
+        <fluent-option value="l">Lima</fluent-option>
+        <fluent-option value="m">Mike</fluent-option>
+        <fluent-option disabled value="x">X-ray</fluent-option>
+    </fluent-listbox>
+    <fluent-number-field value="0">Number: </fluent-number-field>
+    <fluent-progress value="64"></fluent-progress>
+    <fluent-progress-ring></fluent-progress-ring>
+    <fluent-radio-group orientation="vertical">
+        <fluent-radio>18-24</fluent-radio>
+        <fluent-radio>25-33</fluent-radio>
+        <fluent-radio>34-44</fluent-radio>
+        <fluent-radio>45+</fluent-radio>
+    </fluent-radio-group>
+    <fluent-select title="Select a section">
+        <fluent-option value="1">Beginning</fluent-option>
+        <fluent-option value="2">Middle</fluent-option>
+        <fluent-option value="3">End</fluent-option>
+    </fluent-select>
+    <fluent-skeleton style="height: 50px; width: 250px" shape="rect" shimmer="false"></fluent-skeleton>
+    <fluent-slider min="0" max="100" value="50" step="5" style="max-width: 300px;" title="Set the temperature">
+        <fluent-slider-label>
+            0&#8451;
+        </fluent-slider-label>
+        <fluent-slider-label position="25">
+            25&#8451;
+        </fluent-slider-label>
+        <fluent-slider-label position="50">
+            50&#8451;
+        </fluent-slider-label>
+        <fluent-slider-label position="75">
+            75&#8451;
+        </fluent-slider-label>
+        <fluent-slider-label position="100">
+            100&#8451;
+        </fluent-slider-label>
+    </fluent-slider>
+    <fluent-switch>
+        <span slot="checked-message">On</span>
+        <span slot="unchecked-message">Off</span>
+        <label for="cap-switch">Captions:</label>
+    </fluent-switch>
+    <fluent-tabs activeid="entrees">
+        <fluent-tab id="apps">Appetizers</fluent-tab>
+        <fluent-tab id="entrees">Entrees</fluent-tab>
+        <fluent-tab id="desserts">Desserts</fluent-tab>
+        <fluent-tab-panel id="appsPanel">
+            <ol>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Stuffed artichokes</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Bruschetta</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Oven-baked polenta</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Salami and Fig Crostini with Ricotta</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Rosemary-Potato Focaccia with Goat Cheese
+                    </fluent-anchor>
+                </li>
+            </ol>
+        </fluent-tab-panel>
+        <fluent-tab-panel id="entreesPanel">
+            <ol>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Mushroom-Sausage Ragù</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Tomato Bread Soup with Steamed Mussels
+                    </fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Grilled Fish with Artichoke Caponata</-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Celery Root and Mushroom Lasagna</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Osso Buco with Citrus Gremolata</fluent-anchor>
+                </li>
+            </ol>
+        </fluent-tab-panel>
+        <fluent-tab-panel id="dessertsPanel">
+            <ol>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Tiramisu</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Spumoni</fluent-anchor>
+                </li>
+                <li>
+                    <fluent-anchor href="#" appearance="hypertext">Limoncello and Ice Cream with Biscotti
+                    </fluent-anchor>
+                </li>
+            </ol>
+        </fluent-tab-panel>
+    </fluent-tabs>
+    <fluent-tooltip id="tooltip" anchor="anchor-default">
+        Helpful text here
+    </fluent-tooltip>
+    <fluent-button appearance="accent" id="anchor-default" style="margin: 12px;" aria-describedby="tooltip">
+        Hover me
+    </fluent-button>
+    <h4>Default</h4>
+    <fluent-menu>
+        <fluent-menu-item>Undo</fluent-menu-item>
+        <fluent-menu-item>Redo</fluent-menu-item>
+        <fluent-divider></fluent-divider>
+        <fluent-menu-item role="menuitemcheckbox">Extensions</fluent-menu-item>
+        <fluent-menu-item role="menuitemcheckbox">Add ons</fluent-menu-item>
+        <fluent-divider></fluent-divider>
+        <fluent-menu-item role="menuitemradio">Start</fluent-menu-item>
+        <fluent-menu-item role="menuitemradio">End</fluent-menu-item>
+    </fluent-menu>
+    <fluent-text-area placeholder="Describe your experience">
+        How was your stay?
+    </fluent-text-area>
+    <fluent-text-field appearance="outline" placeholder="user@email.com">Email</fluent-text-field>
+    <fluent-tree-view>
+        Root
+        <fluent-tree-item>
+            Fruit
+            <fluent-tree-item>Pear</fluent-tree-item>
+            <fluent-tree-item>Mango</fluent-tree-item>
+            <fluent-tree-item>Guava</fluent-tree-item>
+            <fluent-tree-item>Pomegranate</fluent-tree-item>
+        </fluent-tree-item>
+        <fluent-tree-item>
+            Guitars
+            <fluent-tree-item>Fender</fluent-tree-item>
+            <fluent-tree-item>Gibson</fluent-tree-item>
+            <fluent-tree-item>Teisco</fluent-tree-item>
+            <fluent-tree-item>Martin</fluent-tree-item>
+        </fluent-tree-item>
+        <fluent-tree-item>Earth</fluent-tree-item>
+    </fluent-tree-view>
+</body>
+
+</html>

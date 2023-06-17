@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="module" src="https://unpkg.com/@fluentui/web-components">
+    </script>
+    <style>
+        fluent-card {
+            padding: 5px;
+        }
+
+        * {
+            margin: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <fluent-card class="custom">
+        <h3>Login</h3>
+        <fluent-text-field appearance="outline">Username</fluent-text-field>
+        <fluent-text-field type="password" appearance="outline">Password</fluent-text-field><br>
+        <fluent-divider></fluent-divider>
+        <fluent-checkbox checked>Remember me</fluent-checkbox>
+        <br>
+        <fluent-button appearance="accent" id="LoginButton">Login</fluent-button>
+        <fluent-progress-ring id="LoginProgress"
+            style="position: fixed; left: 50%; top: 40%; display: none;"></fluent-progress-ring>
+        <script>
+            document.getElementById("LoginButton").addEventListener("click", function () {
+                document.getElementById("LoginProgress").style.display = "inline-block";
+            });
+        </script>
+    </fluent-card>
+</body>
+
+</html>

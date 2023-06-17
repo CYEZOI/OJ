@@ -1,0 +1,140 @@
+[
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Database.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Database.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Database.cpp",
+  "output": "CMakeFiles/main.dir/Database.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/EmailVerifyCodes.cpp.o -c /home/langningc2009/Coding/Projects/OJ/EmailVerifyCodes.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/EmailVerifyCodes.cpp",
+  "output": "CMakeFiles/main.dir/EmailVerifyCodes.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/HTTPRequest.cpp.o -c /home/langningc2009/Coding/Projects/OJ/HTTPRequest.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/HTTPRequest.cpp",
+  "output": "CMakeFiles/main.dir/HTTPRequest.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/HTTPResponse.cpp.o -c /home/langningc2009/Coding/Projects/OJ/HTTPResponse.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/HTTPResponse.cpp",
+  "output": "CMakeFiles/main.dir/HTTPResponse.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/JudgeResult.cpp.o -c /home/langningc2009/Coding/Projects/OJ/JudgeResult.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/JudgeResult.cpp",
+  "output": "CMakeFiles/main.dir/JudgeResult.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/JudgingList.cpp.o -c /home/langningc2009/Coding/Projects/OJ/JudgingList.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/JudgingList.cpp",
+  "output": "CMakeFiles/main.dir/JudgingList.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Logger.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Logger.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Logger.cpp",
+  "output": "CMakeFiles/main.dir/Logger.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Problem.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Problem.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Problem.cpp",
+  "output": "CMakeFiles/main.dir/Problem.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Problems.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Problems.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Problems.cpp",
+  "output": "CMakeFiles/main.dir/Problems.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Regexes.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Regexes.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Regexes.cpp",
+  "output": "CMakeFiles/main.dir/Regexes.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Result.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Result.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Result.cpp",
+  "output": "CMakeFiles/main.dir/Result.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Settings.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Settings.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Settings.cpp",
+  "output": "CMakeFiles/main.dir/Settings.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Socket.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Socket.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Socket.cpp",
+  "output": "CMakeFiles/main.dir/Socket.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Submission.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Submission.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Submission.cpp",
+  "output": "CMakeFiles/main.dir/Submission.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Submissions.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Submissions.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Submissions.cpp",
+  "output": "CMakeFiles/main.dir/Submissions.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/TestCase.cpp.o -c /home/langningc2009/Coding/Projects/OJ/TestCase.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/TestCase.cpp",
+  "output": "CMakeFiles/main.dir/TestCase.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/TestGroup.cpp.o -c /home/langningc2009/Coding/Projects/OJ/TestGroup.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/TestGroup.cpp",
+  "output": "CMakeFiles/main.dir/TestGroup.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/TestGroupData.cpp.o -c /home/langningc2009/Coding/Projects/OJ/TestGroupData.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/TestGroupData.cpp",
+  "output": "CMakeFiles/main.dir/TestGroupData.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Tokens.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Tokens.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Tokens.cpp",
+  "output": "CMakeFiles/main.dir/Tokens.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Users.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Users.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Users.cpp",
+  "output": "CMakeFiles/main.dir/Users.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/Utilities.cpp.o -c /home/langningc2009/Coding/Projects/OJ/Utilities.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/Utilities.cpp",
+  "output": "CMakeFiles/main.dir/Utilities.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/WebDataProceed.cpp.o -c /home/langningc2009/Coding/Projects/OJ/WebDataProceed.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/WebDataProceed.cpp",
+  "output": "CMakeFiles/main.dir/WebDataProceed.cpp.o"
+},
+{
+  "directory": "/home/langningc2009/Coding/Projects/OJ/build",
+  "command": "g++  -I/usr/include/mysql  -Wall -g -std=gnu++14 -o CMakeFiles/main.dir/main.cpp.o -c /home/langningc2009/Coding/Projects/OJ/main.cpp",
+  "file": "/home/langningc2009/Coding/Projects/OJ/main.cpp",
+  "output": "CMakeFiles/main.dir/main.cpp.o"
+}
+]

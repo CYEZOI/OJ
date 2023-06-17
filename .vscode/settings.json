@@ -1,0 +1,11 @@
+{
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "cSpell.words": [
+        "AUTOINCREMENT",
+        "configor",
+        "sqlpp",
+        "TCID",
+        "UNJUDGED"
+    ],
+    "cmake.configureOnOpen": true
+}

@@ -1,0 +1,183 @@
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            padding: 5px;
+            cursor: none;
+        }
+
+        pre {
+            position: relative;
+            color: white;
+            font-family: "Courier New", Courier, monospace;
+            padding: 0;
+            margin: 0;
+            display: inline-block;
+            line-break: anywhere;
+            white-space: break-spaces;
+        }
+
+        #prefix {
+            top: -1px;
+        }
+
+        #current {
+            top: -1px;
+            left: -4px;
+        }
+
+        #cursor {
+            position: fixed;
+            background-color: white;
+        }
+
+        #cursor[blink] {
+            animation: blink 1s infinite cubic-bezier(0, 2.59, 1, 2.95);
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <pre id="content"></pre>
+    <br />
+    <pre id="prefix"></pre>
+    <pre id="current">1</pre>
+    <span id="cursor" blink></span>
+    <script>
+        var Prefix = "anonymous@OJ:~$ ";
+        var contentElement = document.getElementById("content");
+        var prefixElement = document.getElementById("prefix");
+        var currentElement = document.getElementById("current");
+        var cursorElement = document.getElementById("cursor");
+        prefixElement.innerHTML = Prefix;
+        var LineHeight = currentElement.offsetHeight;
+        currentElement.innerHTML = "";
+        cursorElement.style.height = LineHeight + "px";
+        cursorElement.style.width = LineHeight / 2 + "px";
+        var CapsLock = false;
+        window.onkeydown = function(e) {
+            var key = e.keyCode ? e.keyCode : e.which;
+            console.log(key);
+            if (key == 8) {
+                currentElement.innerHTML = currentElement.innerHTML.slice(0, -1);
+            } else if (key == 9) {
+                currentElement.innerHTML += "\t";
+            } else if (key == 13) {
+                contentElement.innerHTML += Prefix + currentElement.innerHTML + "\n";
+                var Data = GetResult(currentElement.innerHTML);
+                contentElement.innerHTML += Data + "\n";
+                currentElement.innerHTML = "";
+            } else if (key == 20) {
+                CapsLock = !CapsLock;
+            } else if (key == 32) {
+                currentElement.innerHTML += " ";
+            } else if (key >= 48 && key <= 57) {
+                var shiftKey = [")", "!", "@", "#", "$", "%", "^", "&", "*", "("];
+                var normalKey = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+                if (e.shiftKey) currentElement.innerHTML += shiftKey[key - 48];
+                else currentElement.innerHTML += normalKey[key - 48];
+            } else if (key >= 65 && key <= 90) {
+                if (e.ctrlKey) {
+                    if (key == 86) {
+                        navigator.clipboard.readText().then(function(text) {
+                            text = text.replaceAll("\r", "");
+                            text = text.split("\n");
+                            for (var i = 0; i < text.length; i++) {
+                                currentElement.innerHTML += text[i];
+                                window.onkeydown({
+                                    keyCode: 13
+                                });
+                            }
+                        });
+                    } else if (key == 82) {
+                        window.location.reload();
+                    } else {
+                        currentElement.innerHTML += "^" + String.fromCharCode(key);
+                    }
+                } else if (e.shiftKey || CapsLock) currentElement.innerHTML += String.fromCharCode(key);
+                else currentElement.innerHTML += String.fromCharCode(key + 32);
+            } else if (key >= 96 && key <= 111) {
+                var normalKey = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "+", "", "-", ".", "/"];
+                currentElement.innerHTML += normalKey[key - 96];
+            } else if (key >= 186 && key <= 192) {
+                var shiftKey = [":", "+", "<", "_", ">", "?", "~"];
+                var normalKey = [";", "=", ",", "-", ".", "/", "`"];
+                if (e.shiftKey) {
+                    currentElement.innerHTML += shiftKey[key - 186];
+                } else currentElement.innerHTML += normalKey[key - 186];
+            } else if (key >= 219 && key <= 222) {
+                var shiftKey = ["{", "|", "}", "\""];
+                var normalKey = ["[", "\\", "]", "'"];
+                if (e.shiftKey) {
+                    currentElement.innerHTML += shiftKey[key - 219];
+                } else currentElement.innerHTML += normalKey[key - 219];
+            } else if (key == 116 || key == 123) {
+                window.location.reload();
+            }
+            cursorElement.style.top = document.getElementById("content").offsetTop + document.getElementById("content").offsetHeight - 1 + "px";
+            cursorElement.style.left = currentElement.offsetLeft + currentElement.offsetWidth + "px";
+            return false;
+        }
+        window.onfocus = function() {
+            cursorElement.setAttribute("blink", "");
+        }
+        window.onblur = function() {
+            cursorElement.removeAttribute("blink");
+        }
+        window.onselectstart = function() {
+            return false;
+        }
+
+        function StopProcessing() {
+            prefixElement.innerHTML = "";
+            window.onblur();
+            window.onkeydown = window.onfocus = window.onblur = window.onselectstart = undefined;
+        }
+
+        function GetResult(Command) {
+            if (Command == "reload") {
+                StopProcessing();
+                window.location.reload();
+                return "Reloading...";
+            } else if (Command == "clear") {
+                contentElement.innerHTML = "";
+                return "";
+            } else if (Command == "exit") {
+                StopProcessing();
+                window.close();
+                return "Terminal exited";
+                // } else {
+                //     var Temp = new XMLHttpRequest;
+                //     Temp.open("GET", "http://localhost:8080/terminal?command=" + Command, false);
+                //     Temp.onreadystatechange = function() {
+                //         if (Temp.readyState == 4 && Temp.status == 200) {
+                //             return Temp.responseText;
+                //         }
+                //     }
+                //     Temp.send();
+            }
+            return "echo " + Command;
+        }
+
+        window.onkeydown({
+            keyCode: 0
+        });
+    </script>
+</body>
+
+</html>

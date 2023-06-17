@@ -1,0 +1,27 @@
+[33mW[2023-06-14 06:49:59.309][1010-1010] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-14 06:49:59.309][1010-1010] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/Coding/Projects/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[33mW[2023-06-14 06:50:05.302][1110-1110] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-14 06:50:05.302][1110-1110] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/Coding/Projects/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[33mW[2023-06-14 06:50:06.350][1110-1127] Not connected
+111: Connection refused
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Database.cpp:43 RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >)>)
+[0m

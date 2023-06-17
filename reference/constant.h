@@ -1,0 +1,15 @@
+const int langC = 1;
+const int langCpp = 2;
+const int langCpp11 = 3;
+const int langJava = 4;
+const int langCs = 5;
+const int langPython = 6;
+const int langPas = 7;
+const int executeSucceed = 0;
+const int executeCompileError = 1;
+const int executeRuntimeError = 2;
+const int executeTimeLimitExceeded = 3;
+const int executeMemoryLimitExceeded = 4;
+const int executeOutputLimitExceeded = 5;
+const int executeSystemError = 6;
+const int executeRestrictFunction = 7;
