@@ -14,8 +14,22 @@ void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK 
     std::string ClientName = std::to_string(Socket) + "(" + inet_ntoa(ClientAddress.sin_addr) + ":" + std::to_string(ntohs(ClientAddress.sin_port)) + ")";
 
     std::string RequestHTTPData = "";
+    fd_set ReadSet;
+    FD_ZERO(&ReadSet);
+    FD_SET(Socket, &ReadSet);
+    timeval TimeOut;
+    TimeOut.tv_sec = 1;
+    TimeOut.tv_usec = 0;
     while (true)
     {
+        int Result = select(Socket + 1, &ReadSet, NULL, NULL, &TimeOut);
+        if (Result == -1)
+        {
+            Logger.Error("Can not select from socket " + ClientName);
+            break;
+        }
+        if (Result == 0)
+            break;
         char Buffer[1024];
         int Length = recv(Socket, Buffer, 1024, 0);
         if (Length == -1)
@@ -50,7 +64,7 @@ SOCKET::SOCKET(CALL_BACK CallBack)
 {
     signal(SIGPIPE, SIG_IGN);
 
-    Port = Settings.GetSocketPort();
+    SETTINGS::GetSettings("SocketPort", Port);
 
     memset(&ServerAddress, 0, sizeof(struct sockaddr_in));
     ServerAddress.sin_port = htons(Port);

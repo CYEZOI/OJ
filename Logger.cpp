@@ -3,20 +3,20 @@
 #include <string.h>
 #include <unistd.h>
 
-LOGGER::LOGGER() { SetLogFileName("Log.log"); }
+LOGGER::LOGGER() { SetLogFilename("Log.log"); }
 LOGGER::~LOGGER() { fclose(LogFile); }
 
-void LOGGER::SetLogFileName(std::string LogFileName)
+void LOGGER::SetLogFilename(std::string LogFilename)
 {
-    LogFile = fopen(LogFileName.c_str(), "a+");
+    LogFile = fopen(LogFilename.c_str(), "a+");
     if (LogFile == nullptr)
     {
         LogFile = stdout;
-        this->LogFileName = "";
-        Error("Failed to open log file: " + LogFileName);
+        this->LogFilename = "";
+        Error("Failed to open log file: " + LogFilename);
     }
     else
-        this->LogFileName = LogFileName;
+        this->LogFilename = LogFilename;
 }
 
 void LOGGER::Output(std::string Type, std::string Style, std::string Data)

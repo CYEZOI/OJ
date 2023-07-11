@@ -20,7 +20,7 @@ private:
     std::string IOFilename;
 
     friend class PROBLEM_LIST;
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
     friend class SUBMISSION;
     friend class PROBLEMS;
     friend class SUBMISSIONS;

@@ -18,12 +18,11 @@
 #include <sys/ptrace.h>
 #include <sys/resource.h>
 
-RESULT SUBMISSION::UpdateAllResults(JUDGE_RESULT Result)
+void SUBMISSION::UpdateAllResults(JUDGE_RESULT Result)
 {
     this->Result = Result;
     for (size_t i = 0; i < TestGroups.size(); i++)
-        RETURN_IF_FAILED(TestGroups[i].UpdateAllResults(Result));
-    CREATE_RESULT(true, "Update all results success")
+        TestGroups[i].UpdateAllResults(Result);
 }
 RESULT SUBMISSION::RedirectIO()
 {
@@ -51,10 +50,10 @@ RESULT SUBMISSION::SetupEnvrionment()
             CREATE_RESULT(false, "Can not create dir for the new root")
     }
 
-    if (chown("./root", Settings.GetJudgeUserID(), Settings.GetJudgeUserGroupID()) == -1)
+    if (chown("./root", JudgeUserID, JudgeUserGroupID) == -1)
         CREATE_RESULT(false, "Can not change the owner of the new root")
 
-    if (chown("./tmp", Settings.GetJudgeUserID(), Settings.GetJudgeUserGroupID()) == -1)
+    if (chown("./tmp", JudgeUserID, JudgeUserGroupID) == -1)
         CREATE_RESULT(false, "Can not change the owner of the new root")
 
     if (mount("/usr", "./usr", "ext4", MS_BIND, nullptr) == -1)
@@ -126,25 +125,23 @@ RESULT SUBMISSION::RemoveEnvrionment()
 }
 RESULT SUBMISSION::ChangeUser()
 {
-    if (setgid(Settings.GetJudgeUserGroupID()) != 0)
+    if (setgid(JudgeUserGroupID) != 0)
         CREATE_RESULT(false, "Can not change gid")
-    if (setuid(Settings.GetJudgeUserID()) != 0)
+    if (setuid(JudgeUserID) != 0)
         CREATE_RESULT(false, "Can not change uid")
-    if (setresgid(Settings.GetJudgeUserGroupID(),
-                  Settings.GetJudgeUserGroupID(),
-                  Settings.GetJudgeUserGroupID()) != 0)
+    if (setresgid(JudgeUserGroupID,
+                  JudgeUserGroupID,
+                  JudgeUserGroupID) != 0)
         CREATE_RESULT(false, "Can not change real gid")
-    if (setresuid(Settings.GetJudgeUserID(),
-                  Settings.GetJudgeUserID(),
-                  Settings.GetJudgeUserID()) != 0)
+    if (setresuid(JudgeUserID,
+                  JudgeUserID,
+                  JudgeUserID) != 0)
         CREATE_RESULT(false, "Can not change real uid")
 
     CREATE_RESULT(true, "Changed uid and gid")
 }
 RESULT SUBMISSION::SetLimits()
 {
-    int TimeLimit = Settings.GetCompileTimeLimit();
-    int OutputLimit = Settings.GetCompileOutputLimit();
     struct rlimit Limit;
     Limit.rlim_cur = Limit.rlim_max = TimeLimit + 1;
     if (setrlimit(RLIMIT_CPU, &Limit))
@@ -166,20 +163,20 @@ RESULT SUBMISSION::SetLimits()
 }
 RESULT SUBMISSION::ChildProcess()
 {
-
-    std::vector<std::string> CompileCommands = {Settings.GetCompiler(),
-                                                "-fno-diagnostics-color",
-                                                "-fno-asm",
-                                                "-w",
-                                                "-lm",
-                                                "-fmax-errors=1",
-                                                "-std=c++14",
-                                                EnableO2 ? "-O2" : "-O1",
-                                                "--static",
-                                                "-DONLINE_JUDGE",
-                                                "-o",
-                                                "/main",
-                                                "/main.cpp"};
+    std::vector<std::string>
+        CompileCommands = {Compiler,
+                           "-fno-diagnostics-color",
+                           "-fno-asm",
+                           "-w",
+                           "-lm",
+                           "-fmax-errors=1",
+                           "-std=c++14",
+                           EnableO2 ? "-O2" : "-O1",
+                           "--static",
+                           "-DONLINE_JUDGE",
+                           "-o",
+                           "/main",
+                           "/main.cpp"};
 
     if (nice(19) != 19)
         CREATE_RESULT(false, "Can not change nice value")
@@ -197,8 +194,8 @@ RESULT SUBMISSION::ChildProcess()
         CompileArguments[i] = (char *)CompileCommands[i].c_str();
     }
     CompileArguments[CompileCommands.size()] = nullptr;
-    // execlp("ls", "ls", "-l", "/usr/lib/gcc/x86_64-linux-gnu/9/", nullptr);
-    execvp(Settings.GetCompiler().c_str(), CompileArguments);
+
+    execvp(Compiler.c_str(), CompileArguments);
 
     CREATE_RESULT(false, "Can not execute program")
 }
@@ -224,7 +221,7 @@ RESULT SUBMISSION::CreateFiles()
         CREATE_RESULT(false, "Can not open data file")
     LogFile.close();
 
-    if (chown((WorkDir + "/main.log").c_str(), Settings.GetJudgeUserID(), Settings.GetJudgeUserGroupID()) == -1)
+    if (chown((WorkDir + "/main.log").c_str(), JudgeUserID, JudgeUserGroupID) == -1)
         CREATE_RESULT(false, "Can not change group of compile log file")
 
     if (chmod((WorkDir + "/main.log").c_str(), 0760) == -1)
@@ -235,7 +232,7 @@ RESULT SUBMISSION::CreateFiles()
         CREATE_RESULT(false, "Can not open data file")
     OutputFile.close();
 
-    if (chown((WorkDir + "/main").c_str(), Settings.GetJudgeUserID(), Settings.GetJudgeUserGroupID()) == -1)
+    if (chown((WorkDir + "/main").c_str(), JudgeUserID, JudgeUserGroupID) == -1)
         CREATE_RESULT(false, "Can not change group of compile output file")
 
     if (chmod((WorkDir + "/main").c_str(), 0760) == -1)
@@ -297,7 +294,6 @@ RESULT SUBMISSION::RunTestGroups()
         CREATE_RESULT(true, "Submission is not compiled")
     if (Problem.IOFilename == "")
         Problem.IOFilename = std::to_string(SID);
-    UpdateAllResults(JUDGE_RESULT::JUDGING);
     for (size_t i = 0; i < TestGroups.size(); i++)
     {
         RETURN_IF_FAILED(TestGroups[i].Judge())
@@ -345,6 +341,13 @@ RESULT SUBMISSION::Judge()
     if (Result != JUDGE_RESULT::WAITING)
         CREATE_RESULT(false, "Submission has been judged")
 
+    RETURN_IF_FAILED(SETTINGS::GetSettings("JudgeUserID", JudgeUserID));
+    RETURN_IF_FAILED(SETTINGS::GetSettings("JudgeUserGroupID", JudgeUserGroupID));
+    RETURN_IF_FAILED(SETTINGS::GetSettings("Compiler", Compiler));
+    RETURN_IF_FAILED(SETTINGS::GetSettings("JudgeUsername", JudgeUsername));
+    RETURN_IF_FAILED(SETTINGS::GetSettings("CompileTimeLimit", TimeLimit));
+    RETURN_IF_FAILED(SETTINGS::GetSettings("CompileOutputLimit", OutputLimit));
+
     bool UpdateDatabaseSignal = true;
     std::thread UpdateDatabase(
         [this, &UpdateDatabaseSignal]()
@@ -352,13 +355,13 @@ RESULT SUBMISSION::Judge()
             while (UpdateDatabaseSignal)
             {
                 SUBMISSIONS::UpdateSubmission(this);
-                sleep(1);
+                usleep(500'000);
             }
         });
 
     UpdateAllResults(JUDGE_RESULT::FETCHED);
 
-    WorkDir = Settings.GetRunDir() + "/" + std::to_string(SID);
+    WorkDir = "/home/" + JudgeUsername + "/Run/" + std::to_string(SID);
     RETURN_IF_FAILED(UTILITIES::MakeDir(WorkDir))
 
     std::ofstream SourceFile = std::ofstream(WorkDir + "/main.cpp");

@@ -19,7 +19,7 @@ HTTP_REQUEST::HTTP_REQUEST(std::string Data)
     Version = Data.substr(VersionStartPosition, VersionEndPosition - VersionStartPosition);
 
     std::string Line;
-    for (size_t i = PathEndPosition + 1; i < Data.length(); i++)
+    for (size_t i = VersionEndPosition + 1; i < Data.length(); i++)
     {
         if (Data[i] == '\n')
         {

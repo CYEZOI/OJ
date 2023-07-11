@@ -8,18 +8,18 @@
 class LOGGER
 {
 private:
-    std::string LogFileName;
+    std::string LogFilename;
     FILE *LogFile = NULL;
     std::mutex OutputMutex;
     void Output(std::string Type, std::string Style, std::string Data);
 
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
 
 public:
     LOGGER();
     ~LOGGER();
 
-    void SetLogFileName(std::string LogFileName);
+    void SetLogFilename(std::string LogFilename);
 
     void Debug(std::string Data);
     void Info(std::string Data);

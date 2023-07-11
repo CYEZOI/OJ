@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/weui/2.5.16/style/weui.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/mode/clike/clike.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/edit/matchbrackets.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldcode.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/brace-fold.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/comment-fold.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/anyword-hint.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/katex.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/katex.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/contrib/auto-render.min.js"></script>
+    <link href="index.css" rel="stylesheet">
+    <script type="text/javascript" src="index.js"></script>
+</head>
+
+<body data-weui-theme="light">
+    <div class="weui-toptips weui-toptips_warn" id="ErrorAlert" style="display: none;"></div>
+    <div id="Content">
+        <div id="Error">
+            <div class="weui-msg">
+                <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+                <div class="weui-msg__text-area">
+                    <h2 class="weui-msg__title" id="ErrorTitle"></h2>
+                    <p class="weui-msg__desc" id="ErrorDescription"></p>
+                </div>
+                <div class="weui-msg__opr-area">
+                    <p class="weui-btn-area">
+                        <a class="weui-btn weui-btn_primary" id="ErrorButton"></a>
+                    </p>
+                </div>
+                <div class="weui-msg__tips-area">
+                    <p class="weui-msg__tips" id="ErrorTips"></p>
+                </div>
+            </div>
+        </div>
+        <div id="Login">
+            <div class="weui-form" id="LoginForm">
+                <div class="weui-form__text-area">
+                    <h2 class="weui-form__title" id="LoginTitle"></h2>
+                </div>
+                <div class="weui-form__control-area">
+                    <div class="weui-cells__group weui-cells__group_form">
+                        <div class="weui-cells">
+                            <label for="LoginUsernameInput" class="weui-cell" id="LoginUsernameLabel">
+                                <div class="weui-cell__hd"><span class="weui-label"></span></div>
+                                <div class="weui-cell__bd">
+                                    <input id="LoginUsernameInput" class="weui-input LoginInputs" />
+                                </div>
+                            </label>
+                            <label for="LoginPasswordInput" class="weui-cell" id="LoginPasswordLabel">
+                                <div class="weui-cell__hd"><span class="weui-label"></span></div>
+                                <div class="weui-cell__bd">
+                                    <input id="LoginPasswordInput" type="password" class="weui-input LoginInputs" />
+                                </div>
+                            </label>
+                        </div>
+                        <div class="weui-cells__tips">
+                            <a class="weui-link weui-wa-hotarea" id="LoginGoToRegister"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-form__opr-area">
+                    <a class="weui-btn weui-btn_primary weui-btn_disabled" disabled id="LoginSubmit"></a>
+                </div>
+            </div>
+        </div>
+        <div id="Register">
+            <div class="weui-form" id="RegisterForm">
+                <div class="weui-form__text-area">
+                    <h2 class="weui-form__title" id="RegisterTitle"></h2>
+                </div>
+                <div class="weui-form__control-area">
+                    <div class="weui-cells__group weui-cells__group_form">
+                        <div class="weui-cells">
+                            <label for="RegisterUsernameInput" class="weui-cell" id="RegisterUsernameLabel">
+                                <div class="weui-cell__hd"><span class="weui-label"></span></div>
+                                <div class="weui-cell__bd">
+                                    <input id="RegisterUsernameInput" class="weui-input RegisterInputs" />
+                                </div>
+                            </label>
+                            <label for="RegisterPasswordInput" class="weui-cell" id="RegisterPasswordLabel">
+                                <div class="weui-cell__hd"><span class="weui-label"></span></div>
+                                <div class="weui-cell__bd">
+                                    <input id="RegisterPasswordInput" type="password"
+                                        class="weui-input RegisterInputs" />
+                                </div>
+                            </label>
+                            <label for="RegisterPasswordInputAgain" class="weui-cell" id="RegisterPasswordLabelAgain">
+                                <div class="weui-cell__hd"><span class="weui-label"></span></div>
+                                <div class="weui-cell__bd">
+                                    <input id="RegisterPasswordInputAgain" type="password"
+                                        class="weui-input RegisterInputs" />
+                                </div>
+                            </label>
+                            <label for="RegisterEmailAddressInput" class="weui-cell" id="RegisterEmailAddressLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input id="RegisterEmailAddressInput" type="email"
+                                        class="weui-input RegisterInputs" />
+                                </div>
+                            </label>
+                            <div class="weui-cell weui-cell_vcode weui-cell_wrap">
+                                <div class="weui-cell__hd">
+                                    <label for="RegisterVerificationCode" class="weui-label"
+                                        id="RegisterVerificationCodeLabel"></label>
+                                </div>
+                                <div class="weui-cell__bd weui-flex">
+                                    <input class="weui-input weui-cell__control weui-cell__control_flex RegisterInputs"
+                                        type="text" id="RegisterVerificationCodeInput" maxlength="6" />
+                                    <button id="RegisterVerificationCodeButton"
+                                        class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn"></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui-cells__tips">
+                            <a class="weui-link weui-wa-hotarea" id="RegisterGoToLogin"></a>
+                        </div>
+                        <div class="weui-cells__tips">
+                            <a class="weui-link weui-wa-hotarea" id="RegisterShowTips"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-form__opr-area">
+                    <a class="weui-btn weui-btn_primary weui-btn_disabled" disabled id="RegisterSubmit"></a>
+                </div>
+            </div>
+        </div>
+        <div id="Submit">
+            <div class="weui-form" id="SubmitForm">
+                <div class="weui-form__text-area">
+                    <h2 class="weui-form__title" id="SubmitTitle"></h2>
+                </div>
+                <div class="weui-form__control-area">
+                    <div class="weui-cells__group weui-cells__group_form">
+                        <div class="weui-cells">
+                            <label for="SubmitProblemIDInput" class="weui-cell" id="SubmitProblemIDLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input id="SubmitProblemIDInput" type="text" class="weui-input SubmitInputs" />
+                                </div>
+                            </label>
+                            <label for="SubmitEnableO2Input" class="weui-cell weui-cell_switch"
+                                id="SubmitEnableO2Label">
+                                <div class="weui-cell__bd"></div>
+                                <div class="weui-cell__ft">
+                                    <input id="SubmitEnableO2Input" class="weui-switch" type="checkbox" />
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="weui-cells__group weui-cells__group_form">
+                        <div class="weui-cells__title" id="SubmitCodeTitle"></div>
+                        <div class="weui-cells">
+                            <div class="weui-cell" id="SubmitCodeInputLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <textarea id="SubmitCode" class="weui-textarea"></textarea>
+                                </div>
+                            </div>
+                            <div class="weui-cell weui-cell_uploader" id="SubmitCodeUploadLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <div class="weui-uploader">
+                                        <div class="weui-uploader__bd">
+                                            <div class="weui-uploader__input-box">
+                                                <input id="SubmitCodeUploader" class="weui-uploader__input"
+                                                    type="file" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-form__opr-area">
+                    <a class="weui-btn weui-btn_primary weui-btn_disabled" disabled id="SubmitSubmit"></a>
+                </div>
+            </div>
+        </div>
+        <div id="Submission">
+            <div class="weui-form" id="SubmissionForm">
+                <div class="weui-form__text-area">
+                    <h2 class="weui-form__title" id="SubmissionTitle"></h2>
+                </div>
+                <div class="weui-form__control-area">
+                    <div class="weui-cells__group weui-cells__group_form">
+                        <div class="weui-cells"><label for="SubmissionIDInput" class="weui-cell" id="SubmissionIDLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input id="SubmissionIDInput" readonly type="text" class="weui-input" />
+                                </div>
+                            </label>
+                            <label class="weui-cell weui-cell_vcode weui-cell_wrap" id="SubmissionStatusLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input id="SubmissionStatusInput" readonly type="text"
+                                        class="weui-input weui-cell__control weui-cell__control_flex" />
+                                    <i id="SubmissionStatusIcon" class="weui-icon_msg weui-icon-waiting"
+                                        style="height: 50px; width: 50px;"></i>
+                                    <a id="SubmissionRefresh"
+                                        class="weui-btn weui-btn_mini weui-btn_default weui-wa-hotarea weui-vcode-btn"><i
+                                            class="weui-mask-loading"></i></a>
+                                </div>
+                            </label>
+                            <label for="SubmissionResultInput" class="weui-cell" id="SubmissionResultLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label">Result</span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <div id="SubmissionJudgeResult">
+                                    </div>
+                                </div>
+                            </label><label for="SubmissionSouceCode" class="weui-cell" id="SubmissionSouceCodeLabel">
+                                <div class="weui-cell__hd">
+                                    <span class="weui-label"></span>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <textarea id="SubmissionSouceCode" class="weui-textarea"></textarea>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="Problem">
+            <article class="weui-article" id="ProblemData"></article>
+        </div>
+        <div id="Home">
+            <a class="weui-btn weui-btn_primary" id="HomeProblems"></a>
+            <a class="weui-btn weui-btn_primary" id="HomeSubmissions"></a>
+        </div>
+        <div id="Problems">
+            <article class="weui-article" id="ProblemsData">
+                <h1 id="ProblemsTitle"></h1>
+            </article>
+        </div>
+        <div id="Submissions">
+            <article class="weui-article" id="SubmissionsData">
+                <h1 id="SubmissionsTitle"></h1>
+            </article>
+        </div>
+    </div>
+    <div id="LoadingAlert" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <span class="weui-primary-loading weui-icon_toast">
+                <span class="weui-primary-loading__dot"></span>
+            </span>
+            <p class="weui-toast__content"></p>
+        </div>
+    </div>
+    <div id="SuccessAlert" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content"></p>
+        </div>
+    </div>
+    <div id="HalfScreenDialog" style="display: none;">
+        <div class="weui-mask"></div>
+        <div class="weui-half-screen-dialog">
+            <div class="weui-half-screen-dialog__hd">
+                <div class="weui-half-screen-dialog__hd__side">
+                    <button id="HalfScreenDialogCloseButton" class="weui-btn_icon weui-wa-hotarea"><i
+                            class="weui-icon-close-thin"></i></button>
+                </div>
+                <div class="weui-half-screen-dialog__hd__main">
+                    <strong class="weui-half-screen-dialog__title"></strong>
+                </div>
+            </div>
+            <div class="weui-half-screen-dialog__bd">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

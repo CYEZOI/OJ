@@ -39,7 +39,7 @@ RESULT PROBLEMS::JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST
                 TEST_CASE_DATA NewTestCase;
                 NewTestCase.TCID = TestCase["TCID"].as_integer();
                 NewTestCase.Input = TestCase["Input"].as_string();
-                NewTestCase.Answer = TestCase["Output"].as_string();
+                NewTestCase.Answer = TestCase["Answer"].as_string();
                 NewTestCase.TimeLimit = TestCase["TimeLimit"].as_integer();
                 NewTestCase.MemoryLimit = TestCase["MemoryLimit"].as_integer();
                 NewTestCase.Score = TestCase["Score"].as_integer();
@@ -84,7 +84,7 @@ RESULT PROBLEMS::UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedT
             for (auto &TestCase : TestGroup.TestCases)
                 NewTestGroup["TestCases"].push_back({{"TCID", TestCase.TCID},
                                                      {"Input", TestCase.Input},
-                                                     {"Output", TestCase.Answer},
+                                                     {"Answer", TestCase.Answer},
                                                      {"TimeLimit", TestCase.TimeLimit},
                                                      {"MemoryLimit", TestCase.MemoryLimit},
                                                      {"Score", TestCase.Score}});
@@ -99,6 +99,25 @@ RESULT PROBLEMS::UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedT
     CREATE_RESULT(true, "Success");
 }
 
+RESULT PROBLEMS::AddProblem(PROBLEM Problem)
+{
+    std::string SamplesJSON, TestGroupsJSON;
+    RETURN_IF_FAILED(SamplesToJSON(Problem.Samples, SamplesJSON));
+    RETURN_IF_FAILED(UnjudgedTestGroupsToJSON(Problem.TestGroups, TestGroupsJSON));
+    RETURN_IF_FAILED(DATABASE::INSERT("Problems")
+                         .Insert("PID", Problem.PID)
+                         .Insert("Title", Problem.Title)
+                         .Insert("IOFilename", Problem.IOFilename)
+                         .Insert("Description", Problem.Description)
+                         .Insert("Input", Problem.Input)
+                         .Insert("Output", Problem.Output)
+                         .Insert("Range", Problem.Range)
+                         .Insert("Hint", Problem.Hint)
+                         .Insert("Samples", SamplesJSON)
+                         .Insert("TestGroups", TestGroupsJSON)
+                         .Execute());
+    CREATE_RESULT(true, "Success");
+}
 RESULT PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Problems")
@@ -131,22 +150,29 @@ RESULT PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem)
                              }));
     CREATE_RESULT(true, "Success");
 }
-RESULT PROBLEMS::AddProblem(PROBLEM Problem)
+RESULT PROBLEMS::UpdateProblem(PROBLEM Problem)
 {
     std::string SamplesJSON, TestGroupsJSON;
     RETURN_IF_FAILED(SamplesToJSON(Problem.Samples, SamplesJSON));
     RETURN_IF_FAILED(UnjudgedTestGroupsToJSON(Problem.TestGroups, TestGroupsJSON));
-    RETURN_IF_FAILED(DATABASE::INSERT("Problems")
-                         .Insert("PID", Problem.PID)
-                         .Insert("Title", Problem.Title)
-                         .Insert("IOFilename", Problem.IOFilename)
-                         .Insert("Description", Problem.Description)
-                         .Insert("Input", Problem.Input)
-                         .Insert("Output", Problem.Output)
-                         .Insert("Range", Problem.Range)
-                         .Insert("Hint", Problem.Hint)
-                         .Insert("Samples", SamplesJSON)
-                         .Insert("TestGroups", TestGroupsJSON)
+    RETURN_IF_FAILED(DATABASE::UPDATE("Problems")
+                         .Set("Title", Problem.Title)
+                         .Set("IOFilename", Problem.IOFilename)
+                         .Set("Description", Problem.Description)
+                         .Set("Input", Problem.Input)
+                         .Set("Output", Problem.Output)
+                         .Set("Range", Problem.Range)
+                         .Set("Hint", Problem.Hint)
+                         .Set("Samples", SamplesJSON)
+                         .Set("TestGroups", TestGroupsJSON)
+                         .Where("PID", Problem.PID)
+                         .Execute());
+    CREATE_RESULT(true, "Success");
+}
+RESULT PROBLEMS::DeleteProblem(std::string PID)
+{
+    RETURN_IF_FAILED(DATABASE::DELETE("Problems")
+                         .Where("PID", PID)
                          .Execute());
     CREATE_RESULT(true, "Success");
 }

@@ -8,7 +8,7 @@ RESULT REGEXES::CheckUsername(std::string Username)
 }
 RESULT REGEXES::CheckPassword(std::string Password)
 {
-    if (!std::regex_match(Password, std::regex("^([^a-z]+|[^A-Z]+|[^0-9]+|[a-zA-Z0-9]+)$")))
+    if (!std::regex_match(Password, std::regex("^([^a-z]+|[^A-Z]+|[^0-9]+|[a-zA-Z0-9]+|)$")))
         CREATE_RESULT(true, "Password valid")
     CREATE_RESULT(false, "Password invalid")
 }
@@ -24,9 +24,9 @@ RESULT REGEXES::CheckEmailAddress(std::string EmailAddress)
         CREATE_RESULT(true, "Email address valid")
     CREATE_RESULT(false, "Email address invalid")
 }
-RESULT REGEXES::CheckVerifyCode(std::string VerifyCode)
+RESULT REGEXES::CheckVerificationCode(std::string VerificationCode)
 {
-    if (std::regex_match(VerifyCode, std::regex("^[0-9]{6}$")))
-        CREATE_RESULT(true, "Verify code valid")
-    CREATE_RESULT(false, "Verify code invalid")
+    if (std::regex_match(VerificationCode, std::regex("^[0-9]{6}$")))
+        CREATE_RESULT(true, "Verification code valid")
+    CREATE_RESULT(false, "Verification code invalid")
 }

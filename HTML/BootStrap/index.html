@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/2.11.7/umd/popper.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.js"></script>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/mode/clike/clike.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/edit/matchbrackets.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldcode.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/brace-fold.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/comment-fold.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/anyword-hint.js"></script>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/4.3.0/lib/marked.umd.js"></script>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/katex.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/katex.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/contrib/auto-render.js"></script>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.js"></script>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/vditor/3.9.2/index.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vditor/3.9.2/index.min.js"></script>
+</head>
+
+<body class="placeholder-glow">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="#">OJ</a>
+                <button class="navbar-toggler d-lg-none" data-bs-toggle="collapse" data-bs-target="#NavigateBar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="NavigateBar">
+                    <ul class="navbar-nav me-auto mt-2 mt-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Problems</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Submissions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Settings</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    </header>
+    <main>
+        <div class="container pt-2 pb-5" id="MainContainer">
+        </div>
+    </main>
+    <footer>
+        <!-- place footer here -->
+    </footer>
+    <div id="AlertList" class="position-fixed top-0 end-0 p-3 z-3 opacity-75"></div>
+    <div id="ToastList" class="toast-cotainer position-fixed bottom-0 end-0 p-3 z-3"> </div>
+
+    <script src="index.js"></script>
+    <link href="index.css" rel="stylesheet">
+</body>
+
+</html>

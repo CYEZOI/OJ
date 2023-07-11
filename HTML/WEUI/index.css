@@ -1,3 +1,12 @@
+* {
+    cursor: default;
+}
+
+.weui-btn,
+.Clickable,
+article>pre code {
+    cursor: pointer;
+}
 .TestGroups,
 .TestGroup {
     cursor: default;
@@ -234,6 +243,7 @@ article>pre code {
     padding: 3px 5px;
     border-radius: 3px;
 }
+
 table {
     border-collapse: collapse;
 }

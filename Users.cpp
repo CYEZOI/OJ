@@ -1,5 +1,6 @@
 #include "Users.hpp"
 #include "Utilities.hpp"
+#include "Privilege.hpp"
 
 RESULT USERS::CreateUser(std::string Username, std::string Password, std::string Email, std::string Nickname, int Privilege)
 {
@@ -26,6 +27,20 @@ RESULT USERS::CheckUsernameAvailable(std::string Username)
                              }));
     CREATE_RESULT(true, "Username available");
 }
+RESULT USERS::CheckEmailAvailable(std::string Email)
+{
+    RETURN_IF_FAILED(DATABASE::SELECT("Users")
+                         .Select("UID")
+                         .Where("Email", Email)
+                         .Execute(
+                             [](auto Data)
+                             {
+                                 if (Data.size() == 0)
+                                     CREATE_RESULT(true, "Email available");
+                                 CREATE_RESULT(false, "Email already exist");
+                             }));
+    CREATE_RESULT(true, "Email available");
+}
 RESULT USERS::CheckPasswordCorrect(std::string Username, std::string Password, int &UID)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Users")
@@ -42,19 +57,18 @@ RESULT USERS::CheckPasswordCorrect(std::string Username, std::string Password, i
                              }));
     CREATE_RESULT(true, "Login succeed")
 }
-RESULT IsAdmin(std::string Username)
+RESULT USERS::IsAdmin(int UID, bool &Result)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Users")
                          .Select("Privilege")
-                         .Where("Username", Username)
+                         .Where("UID", UID)
                          .Execute(
-                             [](auto Data)
+                             [&Result](auto Data)
                              {
                                  if (Data.size() == 0)
                                      CREATE_RESULT(false, "No such user");
-                                 if (atoi(Data[0]["Privilege"].c_str()) == 1)
-                                     CREATE_RESULT(true, "Admin");
-                                 CREATE_RESULT(false, "Not admin");
+                                 Result = (atoi(Data[0]["Privilege"].c_str()) == PRIVILEGE_LEVEL::ADMIN);
+                                 CREATE_RESULT(true, "Success");
                              }));
-    CREATE_RESULT(false, "Not admin");
+    CREATE_RESULT(true, "Success");
 }

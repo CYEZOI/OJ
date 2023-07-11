@@ -115,10 +115,3 @@ void CAPTCHA::Create()
 
     fclose(file);
 }
-
-int main()
-{
-    CAPTCHA Cap;
-    Cap.Create();
-    return 0;
-}

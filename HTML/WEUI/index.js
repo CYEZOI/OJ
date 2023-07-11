@@ -1,10 +1,11 @@
 var Texts = ["Request failed"];
+var SubmissionResultShortTexts = ["UKE", "AC", "PE", "WA", "TE", "ME", "OLE", "RE", "RF", "CE", "SE", "WT", "FC", "CP", "CPD", "JG", "JGD", "CMP", "SK", "RJ"];
 var Regexes = {
     "Username": /^[0-9a-zA-Z]{4,16}$/,
     "Password": /^([^a-z]+|[^A-Z]+|[^0-9]+|[a-zA-Z0-9]+)$/,
     "Nickname": /^.{4,16}$/,
     "EmailAddress": /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+$/,
-    "VerifyCode": /^[0-9]{6}$/
+    "VerificationCode": /^[0-9]{6}$/
 };
 const GetToken = () => {
     var Token = localStorage.getItem("Token");
@@ -47,8 +48,8 @@ const DisableButton = (Element) => {
 };
 const RequestAPI = (Action, Data, CallBack, SuccessCallback, FailCallback, ErrorCallback, AddToken = true) => {
     if (AddToken) {
-        Data["Token"] = GetToken();
-        if (Data["Token"] == null) {
+        Data.Token = GetToken();
+        if (Data.Token == null) {
             CallBack();
             ErrorCallback();
             ShowError("Login expired");
@@ -88,7 +89,7 @@ const SwitchPage = (Name, Data) => {
             PushedURL.searchParams.append(Key, Value);
         }
     }
-    history.pushState(Data, Name, PushedURL.toString());
+    history.pushState({ "Data": Data, "CurrentPage": Name }, Name, PushedURL.toString());
     LoadPage(Name, Data);
 };
 const MemoryToString = (Memory) => {
@@ -116,7 +117,7 @@ const LoadPage = (Name, Data) => {
             $("#ErrorButton").text(ErrorTexts[1]);
             $("#ErrorButton").off("click").on("click", (Event) => {
                 if (Event.currentTarget.classList.contains("weui-btn_disabled")) { return; }
-                location.href = new URL(location.href).origin;
+                location.href = new URL(location.href).origin + "/Home";
             });
         },
         "Login": () => {
@@ -198,9 +199,9 @@ const LoadPage = (Name, Data) => {
             $("#RegisterNicknameInput").attr("placeholder", RegisterTexts[26]);
             $("#RegisterEmailAddressLabel>.weui-cell__hd>span").text(RegisterTexts[7]);
             $("#RegisterEmailAddressInput").attr("placeholder", RegisterTexts[8]);
-            $("#RegisterVerifyCodeLabel").text(RegisterTexts[9]);
-            $("#RegisterVerifyCodeInput").attr("placeholder", RegisterTexts[10]);
-            $("#RegisterVerifyCodeButton").text(RegisterTexts[11]);
+            $("#RegisterVerificationCodeLabel").text(RegisterTexts[9]);
+            $("#RegisterVerificationCodeInput").attr("placeholder", RegisterTexts[10]);
+            $("#RegisterVerificationCodeButton").text(RegisterTexts[11]);
             $("#RegisterGoToLogin").text(RegisterTexts[12]);
             $("#RegisterShowTips").text(RegisterTexts[13]);
             $("#RegisterSubmit").text(RegisterTexts[14]);
@@ -254,15 +255,15 @@ const LoadPage = (Name, Data) => {
                     $("#RegisterEmailAddressLabel").addClass("weui-cell_warn");
                 }
             });
-            $("#RegisterVerifyCodeInput").off("input").on("input", () => { $("#RegisterVerifyCodeLabel").removeClass("weui-cell_warn"); });
-            $("#RegisterVerifyCodeInput").off("blur").on("blur", () => {
-                var VerifyCode = $("#RegisterVerifyCodeInput").val();
-                if (Regexes["VerifyCode"].test(VerifyCode) == false) {
+            $("#RegisterVerificationCodeInput").off("input").on("input", () => { $("#RegisterVerificationCodeLabel").removeClass("weui-cell_warn"); });
+            $("#RegisterVerificationCodeInput").off("blur").on("blur", () => {
+                var VerificationCode = $("#RegisterVerificationCodeInput").val();
+                if (Regexes["VerificationCode"].test(VerificationCode) == false) {
                     ShowError(RegisterTexts[19]);
-                    $("#RegisterVerifyCodeLabel").addClass("weui-cell_warn");
+                    $("#RegisterVerificationCodeLabel").addClass("weui-cell_warn");
                 }
             });
-            $("#RegisterVerifyCodeButton").off("click").on("click", (Event) => {
+            $("#RegisterVerificationCodeButton").off("click").on("click", (Event) => {
                 if (Event.currentTarget.classList.contains("weui-btn_disabled")) { return; }
                 var EmailAddress = $("#RegisterEmailAddressInput").val();
                 if (Regexes["EmailAddress"].test(EmailAddress) == false) {
@@ -270,7 +271,7 @@ const LoadPage = (Name, Data) => {
                     $("#RegisterEmailAddressLabel").addClass("weui-cell_warn");
                 } else {
                     ShowLoading(RegisterTexts[20]);
-                    RequestAPI("SendVerifyCode", { "EmailAddress": EmailAddress }, () => { HideLoading(); }, (Response) => { ShowSuccess(RegisterTexts[21]); }, () => { $("#RegisterEmailAddressLabel").addClass("weui-cell_warn"); }, () => { },
+                    RequestAPI("SendVerificationCode", { "EmailAddress": EmailAddress }, () => { HideLoading(); }, (Response) => { ShowSuccess(RegisterTexts[21]); }, () => { $("#RegisterEmailAddressLabel").addClass("weui-cell_warn"); }, () => { },
                         false);
                 }
             });
@@ -279,7 +280,7 @@ const LoadPage = (Name, Data) => {
                     $("#RegisterPasswordInput").val() &&
                     $("#RegisterPasswordInputAgain").val() &&
                     $("#RegisterEmailAddressInput").val() &&
-                    $("#RegisterVerifyCodeInput").val()) { EnableButton($("#RegisterSubmit")); } else { DisableButton($("#RegisterSubmit")); }
+                    $("#RegisterVerificationCodeInput").val()) { EnableButton($("#RegisterSubmit")); } else { DisableButton($("#RegisterSubmit")); }
             });
             $("#RegisterShowTips").off("click").on("click", (Event) => {
                 if (Event.currentTarget.classList.contains("weui-btn_disabled")) { return; }
@@ -296,7 +297,7 @@ const LoadPage = (Name, Data) => {
                 var PasswordAgain = $("#RegisterPasswordInputAgain").val();
                 var Nickname = $("#RegisterNicknameInput").val();
                 var EmailAddress = $("#RegisterEmailAddressInput").val();
-                var VerifyCode = $("#RegisterVerifyCodeInput").val();
+                var VerificationCode = $("#RegisterVerificationCodeInput").val();
                 if (Regexes["Username"].test(Username) == false) {
                     ShowError(RegisterTexts[15]);
                     $("#RegisterUsernameLabel").addClass("weui-cell_warn");
@@ -309,9 +310,9 @@ const LoadPage = (Name, Data) => {
                 } else if (Regexes["EmailAddress"].test(EmailAddress) == false) {
                     ShowError(RegisterTexts[18]);
                     $("#RegisterEmailAddressLabel").addClass("weui-cell_warn");
-                } else if (Regexes["VerifyCode"].test(VerifyCode) == false) {
+                } else if (Regexes["VerificationCode"].test(VerificationCode) == false) {
                     ShowError(RegisterTexts[18]);
-                    $("#RegisterVerifyCodeLabel").addClass("weui-cell_warn");
+                    $("#RegisterVerificationCodeLabel").addClass("weui-cell_warn");
                 } else {
                     ShowLoading(RegisterTexts[22]);
                     RequestAPI("Register", {
@@ -319,12 +320,12 @@ const LoadPage = (Name, Data) => {
                         "Password": Password,
                         "Nickname": Nickname,
                         "EmailAddress": EmailAddress,
-                        "VerifyCode": VerifyCode
+                        "VerificationCode": VerificationCode
                     }, () => { HideLoading(); }, (Response) => {
                         ShowSuccess(RegisterTexts[23]);
                         localStorage.setItem("Token", Response["Token"]);
                         setTimeout(() => { SwitchPage("Login", null); }, 1000);
-                    }, () => { $("#RegisterVerifyCodeLabel").addClass("weui-cell_warn"); }, () => { },
+                    }, () => { $("#RegisterVerificationCodeLabel").addClass("weui-cell_warn"); }, () => { },
                         false);
                 }
             });
@@ -384,7 +385,7 @@ const LoadPage = (Name, Data) => {
                     $("#SubmitProblemIDLabel").addClass("weui-cell_warn");
                 } else if (Code == "") { ShowError(SubmitTexts[10]); } else {
                     ShowLoading(SubmitTexts[11]);
-                    RequestAPI("Submit", {
+                    RequestAPI("AddSubmission", {
                         "PID": PID,
                         "EnableO2": EnableO2,
                         "Code": Code
@@ -403,7 +404,6 @@ const LoadPage = (Name, Data) => {
                 });
             }
             var SubmissionTexts = ["Submit record", "ID", "Status", "Refresh result", "Judging", "Judged"];
-            var SubmissionResultShortTexts = ["UKE", "AC", "PE", "WA", "TE", "ME", "OLE", "RE", "RF", "CE", "SE", "WT", "FC", "CP", "CPD", "JG", "JGD", "CMP", "SK", "RJ"];
             $(".TestGroup").off("click").on("click", (Event) => { Event.currentTarget.classList.toggle("HidedTestGroup"); });
             document.title = SubmissionTexts[0];
             $("#SubmissionTitle").text(SubmissionTexts[0]);
@@ -467,7 +467,8 @@ const LoadPage = (Name, Data) => {
             var ProblemTexts = [". ", "Description", "Input", "Output",
                 "Samples", "Sample", "Input", "Output", "Description", "Range", "Hint",
                 "Other", "Key", "Value", "Time limit", "Memory limit",
-                "Input filename", "Standard input", "Output filename", "Standard output"];
+                "Input filename", "Standard input", "Output filename", "Standard output",
+                "Submit"];
             RequestAPI("GetProblem", { "PID": Data["PID"] }, () => { }, (Response) => {
                 var MarkdownData = "# " + Response.PID + ProblemTexts[0] + Response.Title + "\n" +
                     "## " + ProblemTexts[1] + "\n" +
@@ -515,15 +516,16 @@ const LoadPage = (Name, Data) => {
                     "| Output filename | `" + (Response.OutputFilename == "" ? Response.OutputFilename : "Standard output") + "` |\n";
                 $("#ProblemData").html(marked.parse(MarkdownData));
                 $("#ProblemData").append($("<a class=\"weui-btn weui-btn_primary\" id=\"ProblemSubmit\"></a>"));
-                $("#ProblemSubmit").text("123");
-                renderMathInElement(document.body,
-                    {
-                        delimiters: [
-                            { left: "$$", right: "$$", display: true },
-                            { left: "$", right: "$", display: false }
-                        ]
-                    }
-                );
+                $("#ProblemSubmit").text(ProblemTexts[20]);
+                $("#ProblemSubmit").off("click").on("click", () => {
+                    SwitchPage("Submit", { "PID": Response.PID });
+                });
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ]
+                });
                 $("pre>code").off("click").on("click", (Event) => {
                     var InputElement = document.createElement("input");
                     InputElement.value = Event.currentTarget.innerText;
@@ -543,10 +545,11 @@ const LoadPage = (Name, Data) => {
             RequestAPI("GetProblems", {
                 "Page": 1
             }, () => { }, (Response) => {
+                $("#ProblemsData>table").remove();
                 $("#ProblemsData").append("<table></table>");
                 $("#ProblemsData>table").append("<tr><th>" + ProblemsTexts[1] + "</th><th>" + ProblemsTexts[2] + "</th></tr>");
                 Response["Problems"].map((Problem) => {
-                    var ProblemElement = $("<tr></tr>");
+                    var ProblemElement = $("<tr class=\"Cslickable\"></tr>");
                     ProblemElement.append($("<td>" + Problem.PID + "</td>"));
                     ProblemElement.append($("<td>" + Problem.Title + "</td>"));
                     ProblemElement.on("click", () => {
@@ -555,9 +558,50 @@ const LoadPage = (Name, Data) => {
                     $("#ProblemsData>table").append(ProblemElement);
                 });
             }, () => { }, () => { });
+        },
+        "Home": () => {
+            var HomeTexts = ["Problems", "Submissions"];
+            $("#HomeProblems").text(HomeTexts[0]);
+            $("#HomeSubmissions").text(HomeTexts[1]);
+            $("#HomeProblems").off("click").on("click", () => {
+                SwitchPage("Problems", {});
+            });
+            $("#HomeSubmissions").off("click").on("click", () => {
+                SwitchPage("Submissions", {});
+            });
+        },
+        "Submissions": () => {
+            var SubmissionsTexts = ["Submissions", "SID", "PID", "Result", "Time", "Memory", "CreateTime"];
+            $("#SubmissionsTitle").text(SubmissionsTexts[0]);
+            RequestAPI("GetSubmissions", { "Page": 1 }, () => { }, (Response) => {
+                $("#SubmissionsData>table").remove();
+                $("#SubmissionsData").append("<table></table>");
+                $("#SubmissionsData>table").append("<tr><th>" + SubmissionsTexts[1] + "</th><th>" + SubmissionsTexts[2] + "</th><th>" + SubmissionsTexts[3] + "</th><th>" + SubmissionsTexts[4] + "</th><th>" + SubmissionsTexts[5] + "</th><th>" + SubmissionsTexts[6] + "</th></tr>");
+                Response["Submissions"].map((Submission) => {
+                    var SubmissionElement = $("<tr></tr>");
+                    var SubmissionSubmission = $("<td class=\"Clickable\">" + Submission.SID + "</td>");
+                    SubmissionSubmission.off("click").on("click", () => {
+                        SwitchPage("Submission", { "SID": Submission.SID });
+                    })
+                    SubmissionElement.append(SubmissionSubmission);
+                    var SubmissionProblem = $("<td class=\"Clickable\">" + Submission.PID + "</td>");
+                    SubmissionProblem.off("click").on("click", () => {
+                        SwitchPage("Problem", { "PID": Submission.PID });
+                    });
+                    SubmissionElement.append(SubmissionProblem);
+                    SubmissionElement.append($("<td>" + SubmissionResultShortTexts[Submission.Result] + "</td>"));
+                    SubmissionElement.append($("<td>" + TimeToString(Submission.Time) + "</td>"));
+                    SubmissionElement.append($("<td>" + MemoryToString(Submission.Memory) + "</td>"));
+                    SubmissionElement.append($("<td>" + Submission.CreateTime + "</td>"));
+                    $("#SubmissionsData>table").append(SubmissionElement);
+                });
+            }, () => { }, () => { });
         }
     };
-    if (LoadPageCallbacks[Name]) { LoadPageCallbacks[Name](); } else {
+    if (LoadPageCallbacks[Name]) {
+        LoadPageCallbacks[Name]();
+    }
+    else {
         SwitchPage("Error", {
             "Message": "Not found",
             "URL": location.href
@@ -570,4 +614,10 @@ $(() => {
     new URL(location.href).searchParams.forEach((Value, Key) => { PageParams[Key] = Value; });
     LoadPage(PageName, PageParams);
     window.onselectstart = () => { return false; };
+    window.onpopstate = (Event) => {
+        if (Event.isTrusted) {
+            console.log(Event);
+            LoadPage(Event.state.CurrentPage, Event.state.Data);
+        }
+    };
 });

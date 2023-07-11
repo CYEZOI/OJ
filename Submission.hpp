@@ -28,7 +28,14 @@ private:
     time_t CreateTime;
     PROBLEM Problem;
 
-    RESULT UpdateAllResults(JUDGE_RESULT Result);
+    int JudgeUserID = 0;
+    int JudgeUserGroupID = 0;
+    std::string Compiler = "";
+    std::string JudgeUsername = "";
+    int TimeLimit = 1000;
+    int OutputLimit = 1024 * 1024 * 1024;
+
+    void UpdateAllResults(JUDGE_RESULT Result);
     RESULT RedirectIO();
     RESULT SetupEnvrionment();
     RESULT RemoveEnvrionment();
@@ -40,7 +47,7 @@ private:
     RESULT Compile();
     RESULT RunTestGroups();
 
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
     friend class JUDGING_LIST;
     friend class SUBMISSIONS;
 

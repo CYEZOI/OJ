@@ -1,0 +1,180 @@
+CheckTokenAvailable();
+if (Data.SID == null) {
+    SwitchPage("Home");
+}
+
+document.getElementsByTagName("h4")[0].innerHTML += " " + Data.SID;
+// let SubmissionSpinnerCollapse = new bootstrap.Collapse("#SubmissionSpinner", {
+//     toggle: false
+// });
+const ReloadData = () => {
+    // SubmissionSpinnerCollapse.show();
+    RequestAPI("GetSubmission", {
+        "SID": Number(Data.SID)
+    }, () => { }, (Response) => {
+        if (!Response.IsAdmin) {
+            SubmissionRejudgeButton.remove();
+            SubmissionEditButton.remove();
+            SubmissionDeleteButton.remove();
+        }
+        SubmissionData.innerHTML = "";
+        SubmissionData.className = "";
+        SubmissionGoToProblemButton.onclick = () => {
+            SwitchPage("Problem", {
+                "PID": Response.PID
+            });
+        };
+        SubmissionResubmitButton.onclick = () => {
+            SwitchPage("Submit", {
+                "PID": Response.PID
+            });
+        };
+        SubmissionRejudgeButton.onclick = () => {
+            if (Response.Result > 10) {
+                ShowModal("Rejudge Submission", "This submission is still running, are you sure to rejudge it?", () => {
+                    RequestAPI("RejudgeSubmission", {
+                        "SID": Number(Data.SID)
+                    }, () => { }, () => {
+                        ReloadData();
+                    }, () => { });
+                }, () => { });
+            }
+            else {
+                RequestAPI("RejudgeSubmission", {
+                    "SID": Number(Data.SID)
+                }, () => { }, () => {
+                    ReloadData();
+                }, () => { });
+            }
+        };
+        SubmissionEditButton.onclick = () => {
+            SwitchPage("EditSubmission", {
+                "SID": Response.SID
+            });
+        };
+        SubmissionDeleteButton.onclick = () => {
+            ShowModal("Delete Submission", "Are you sure to delete this submission?", () => {
+                RequestAPI("DeleteSubmission",
+                    {
+                        "SID": Number(Data.SID)
+                    }, () => { }, (Response) => {
+                        ShowSuccess("Delete Submission Success");
+                        SwitchPage("Submissions");
+                    }, () => { }, () => { });
+            }, () => { });
+        };
+
+        SubmissionData.classList.add("TestGroups");
+        SubmissionData.classList.add("JudgeResult" + SubmissionResultShortTexts[Response.Result]);
+        {
+            let SubmissionResult = document.createElement("div"); SubmissionData.appendChild(SubmissionResult);
+            SubmissionResult.classList.add("TestGroupsResult");
+            SubmissionResult.innerText = SubmissionResultShortTexts[Response.Result];
+            let SubmissionScore = document.createElement("div"); SubmissionData.appendChild(SubmissionScore);
+            SubmissionScore.classList.add("TestGroupsLimit");
+            SubmissionScore.innerText = Response.Score + "pts";
+            let SubmissionTime = document.createElement("div"); SubmissionData.appendChild(SubmissionTime);
+            SubmissionTime.classList.add("TestGroupsLimit");
+            SubmissionTime.innerText = TimeToString(Response.TimeSum);
+            let SubmissionMemory = document.createElement("div"); SubmissionData.appendChild(SubmissionMemory);
+            SubmissionMemory.classList.add("TestGroupsLimit");
+            SubmissionMemory.innerText = MemoryToString(Response.Memory);
+            Response.TestGroups.sort((a, b) => {
+                return (a.TGID > b.TGID ? 1 : -1);
+            });
+            var TestCaseCounter = 1;
+            Response.TestGroups.map((TestGroup) => {
+                let TestGroupElement = document.createElement("div"); SubmissionData.appendChild(TestGroupElement);
+                TestGroupElement.classList.add("TestGroup");
+                TestGroupElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestGroup.Result]);
+                {
+                    let TestGroupResult = document.createElement("div"); TestGroupElement.appendChild(TestGroupResult);
+                    TestGroupResult.classList.add("TestGroupResult");
+                    TestGroupResult.innerText = SubmissionResultShortTexts[TestGroup.Result];
+                    let TestGroupScore = document.createElement("div"); TestGroupElement.appendChild(TestGroupScore);
+                    TestGroupScore.classList.add("TestGroupLimit");
+                    TestGroupScore.innerText = TestGroup.Score + "pts";
+                    let TestGroupTime = document.createElement("div"); TestGroupElement.appendChild(TestGroupTime);
+                    TestGroupTime.classList.add("TestGroupLimit");
+                    TestGroupTime.innerText = TimeToString(TestGroup.TimeSum);
+                    let TestGroupNewLine = document.createElement("br"); TestGroupElement.appendChild(TestGroupNewLine);
+                    TestGroup.TestCases.sort((a, b) => { return (a.TCID > b.TCID ? 1 : -1); });
+                    TestGroup.TestCases.map((TestCase) => {
+                        let TestCaseElement = document.createElement("div"); TestGroupElement.appendChild(TestCaseElement);
+                        TestCaseElement.classList.add("TestCase");
+                        TestCaseElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestCase.Result]);
+                        if (TestCase.Description != "") {
+                            TestCaseElement.classList.add("WithDescription");
+                        }
+                        {
+                            let TestCaseInnerBox1 = document.createElement("div"); TestCaseElement.appendChild(TestCaseInnerBox1);
+                            TestCaseInnerBox1.classList.add("TestCaseInnerBox");
+                            {
+                                let TestCaseNumber = document.createElement("div"); TestCaseInnerBox1.appendChild(TestCaseNumber);
+                                TestCaseNumber.classList.add("TestCaseNumber");
+                                TestCaseNumber.innerText = TestCaseCounter;
+                                let TestCaseResult = document.createElement("div"); TestCaseInnerBox1.appendChild(TestCaseResult);
+                                TestCaseResult.classList.add("TestCaseResult");
+                                TestCaseResult.innerText = SubmissionResultShortTexts[TestCase.Result];
+                                let TestCaseTimeLimit = document.createElement("div"); TestCaseInnerBox1.appendChild(TestCaseTimeLimit);
+                                TestCaseTimeLimit.classList.add("TestCaseLimit");
+                                {
+                                    let TestCaseTimeValue = document.createElement("span"); TestCaseTimeLimit.appendChild(TestCaseTimeValue);
+                                    TestCaseTimeValue.innerText = TimeToString(TestCase.Time);
+                                    let TestCaseTimeLimitValue = document.createElement("span"); TestCaseTimeLimit.appendChild(TestCaseTimeLimitValue);
+                                    TestCaseTimeLimitValue.innerText = TimeToString(TestCase.TimeLimit);
+                                }
+                                let TestCaseMemoryLimit = document.createElement("div"); TestCaseInnerBox1.appendChild(TestCaseMemoryLimit);
+                                TestCaseMemoryLimit.classList.add("TestCaseLimit");
+                                {
+                                    let TestCaseMemoryValue = document.createElement("span"); TestCaseMemoryLimit.appendChild(TestCaseMemoryValue);
+                                    TestCaseMemoryValue.innerText = MemoryToString(TestCase.Memory);
+                                    let TestCaseMemoryLimitValue = document.createElement("span"); TestCaseMemoryLimit.appendChild(TestCaseMemoryLimitValue);
+                                    TestCaseMemoryLimitValue.innerText = MemoryToString(TestCase.MemoryLimit);
+                                }
+                            }
+                            let TestCaseInnerBox2 = document.createElement("div"); TestCaseElement.appendChild(TestCaseInnerBox2);
+                            TestCaseInnerBox2.classList.add("TestCaseInnerBox");
+                            {
+                                let TestCaseDescription = document.createElement("div"); TestCaseInnerBox2.appendChild(TestCaseDescription);
+                                TestCaseDescription.classList.add("TestCaseDescription");
+                                {
+                                    let TestCaseDescriptionValue = document.createElement("pre"); TestCaseDescription.appendChild(TestCaseDescriptionValue);
+                                    TestCaseDescriptionValue.innerText = TestCase.Description;
+                                }
+                            }
+                        }
+                        TestCaseCounter++;
+                    });
+                }
+            });
+        }
+        if (Response.Code != null && SubmissionCode.value == "") {
+            SubmissionCode.value = Response.Code;
+            CodeMirror.fromTextArea(SubmissionCode, {
+                lineNumbers: true,
+                foldGutter: true,
+                readOnly: true,
+                matchBrackets: true,
+                mode: "text/x-c++src",
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-Enter": () => {
+                        SubmitButton.click();
+                    }
+                },
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            });
+        }
+        if (Response.Result <= 10) {
+            // SubmissionSpinnerCollapse.hide();
+        }
+        else {
+            setTimeout(() => {
+                ReloadData();
+            }, 1000);
+        }
+    }, () => { }, () => { })
+};
+ReloadData();
+// SubmissionSpinnerCollapse.hide();

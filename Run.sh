@@ -6,12 +6,14 @@ for mount_point in (mount | awk '{print $3}')
     end
 end
 rm -f (find "/home/Judger/" -name "*.log")
+rm Log.log
+service mysql start
 echo "Cleaned"
 cd ./build
 make
 cd ../
 while true;
-    if [ (echo (netstat -anp | grep ":80")) = "" ]
+    if [ (echo (netstat -anp | grep "127.0.0.1:80")) = "" ]
         break
     end
 end

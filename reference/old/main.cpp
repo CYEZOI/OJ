@@ -51,10 +51,10 @@ public:
     string SourceCode = "";
     string IOFilename = "";
     string JudgeFolderName = "";
-    string StanderInputFileName = "Answer.in";
-    string UserOutputFileName = "Answer.out";
+    string StanderInputFilename = "Answer.in";
+    string UserOutputFilename = "Answer.out";
     string SourceCodeName = "main.cpp";
-    string ExecutableFileName = "main";
+    string ExecutableFilename = "main";
     bool Compiled = false;
     bool RunFinished = false;
     bool Accepted = false;
@@ -77,10 +77,10 @@ string JUDGE::MySystem(string Command, FILE *InputRedirect, FILE *OutputRedirect
     else if (pid == 0)
     {
         queue<string> TempArguments;
-        int FileNameStartPos = Command.find(" ");
-        string FileName = Command.substr(0, FileNameStartPos);
-        TempArguments.push(FileName);
-        Command = Command.substr(FileNameStartPos + 1, string::npos);
+        int FilenameStartPos = Command.find(" ");
+        string Filename = Command.substr(0, FilenameStartPos);
+        TempArguments.push(Filename);
+        Command = Command.substr(FilenameStartPos + 1, string::npos);
         while (Command != "")
         {
             int ArgumentStartPos = Command.find(" ");
@@ -111,7 +111,7 @@ string JUDGE::MySystem(string Command, FILE *InputRedirect, FILE *OutputRedirect
             dup2(fileno(OutputRedirect), STDERR_FILENO);
         }
         close(__fd[1]);
-        execvp(FileName.c_str(), Arguments);
+        execvp(Filename.c_str(), Arguments);
         cout << "FAILED " << errno << endl;
         delete Arguments;
         _exit(127);
@@ -160,8 +160,8 @@ void JUDGE::Init()
         SE;
     if (IOFilename != "")
     {
-        StanderInputFileName = IOFilename + ".in";
-        UserOutputFileName = IOFilename + ".out";
+        StanderInputFilename = IOFilename + ".in";
+        UserOutputFilename = IOFilename + ".out";
     }
     Status = 1;
 }
@@ -173,7 +173,7 @@ void *JUDGE::_Compile(void *This)
 }
 void JUDGE::__Compile()
 {
-    MySystem(string("gcc " + SourceCodeName + " -O2 -std=c++14 -lstdc++ -lm -DONLINE_JUDGE -o " + ExecutableFileName));
+    MySystem(string("gcc " + SourceCodeName + " -O2 -std=c++14 -lstdc++ -lm -DONLINE_JUDGE -o " + ExecutableFilename));
     Compiled = true;
     sleep(INT32_MAX);
 }
@@ -202,7 +202,7 @@ void JUDGE::Compile()
         return;
     }
     struct stat Temp;
-    if (stat(ExecutableFileName.c_str(), &Temp) != 0)
+    if (stat(ExecutableFilename.c_str(), &Temp) != 0)
     {
         for (unsigned int i = 0; i < TestPoints.size(); i++)
         {
@@ -222,14 +222,14 @@ void *JUDGE::_Judge(void *This)
 }
 void JUDGE::__Judge()
 {
-    FILE *InputFileRedirect = fopen(string(CurrentDir + JudgeFolderName + "/" + StanderInputFileName).c_str(), "r");
+    FILE *InputFileRedirect = fopen(string(CurrentDir + JudgeFolderName + "/" + StanderInputFilename).c_str(), "r");
     if (InputFileRedirect == NULL)
         return;
-    FILE *OutputFileRedirect = fopen(string(CurrentDir + JudgeFolderName + "/" + UserOutputFileName).c_str(), "w");
+    FILE *OutputFileRedirect = fopen(string(CurrentDir + JudgeFolderName + "/" + UserOutputFilename).c_str(), "w");
     if (OutputFileRedirect == NULL)
         return;
     int ExitNumber = 0;
-    MySystem(CurrentDir + JudgeFolderName + "/" + ExecutableFileName, InputFileRedirect, OutputFileRedirect, &ExitNumber);
+    MySystem(CurrentDir + JudgeFolderName + "/" + ExecutableFilename, InputFileRedirect, OutputFileRedirect, &ExitNumber);
     fclose(InputFileRedirect);
     fclose(OutputFileRedirect);
     TempExitNumberTransfer = ExitNumber;
@@ -242,7 +242,7 @@ void JUDGE::Judge()
         return;
     for (unsigned int i = 0; i < TestPoints.size(); i++)
     {
-        FILE *StanderInputFilePointer = fopen(StanderInputFileName.c_str(), "w");
+        FILE *StanderInputFilePointer = fopen(StanderInputFilename.c_str(), "w");
         if (StanderInputFilePointer == NULL)
             SE;
         if (fprintf(StanderInputFilePointer, "%s", TestPoints[i].StanderInput.c_str()) < 0)
@@ -284,7 +284,7 @@ void JUDGE::Judge()
             TestPoints[i].ErrorMessage = "Time limit exceeded. ";
             continue;
         }
-        FILE *UserOutputFilePointer = fopen(UserOutputFileName.c_str(), "r");
+        FILE *UserOutputFilePointer = fopen(UserOutputFilename.c_str(), "r");
         if (UserOutputFilePointer == NULL)
             SE;
         while (!feof(UserOutputFilePointer))

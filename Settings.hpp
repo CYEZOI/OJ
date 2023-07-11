@@ -3,6 +3,7 @@
 
 #include "Logger.hpp"
 #include "Result.hpp"
+#include "configor/json.hpp"
 
 class SETTINGS
 {
@@ -23,7 +24,7 @@ private:
     } SystemCalls[SystemCallCount] = {
         {-1, "read"},                   // 0
         {-1, "write"},                  // 1
-        {0, "open"},                    // 2
+        {0, "open"},                    // 2 ?
         {-1, "close"},                  // 3
         {-1, "stat"},                   // 4
         {-1, "fstat"},                  // 5
@@ -34,15 +35,15 @@ private:
         {-1, "mprotect"},               // 10
         {-1, "munmap"},                 // 11
         {-1, "brk"},                    // 12
-        {0, "rt_sigaction"},            // 13
-        {0, "rt_sigprocmask"},          // 14
+        {-1, "rt_sigaction"},           // 13
+        {-1, "rt_sigprocmask"},         // 14
         {0, "rt_sigreturn"},            // 15
         {0, "ioctl"},                   // 16
         {-1, "pread64"},                // 17
         {0, "pwrite64"},                // 18
         {0, "readv"},                   // 19
-        {0, "writev"},                  // 20
-        {1, "access"},                  // 21
+        {0, "writev"},                  // 20 ?
+        {-1, "access"},                 // 21
         {0, "pipe"},                    // 22
         {0, "select"},                  // 23
         {0, "sched_yield"},             // 24
@@ -60,7 +61,7 @@ private:
         {0, "getitimer"},               // 36
         {0, "alarm"},                   // 37
         {0, "setitimer"},               // 38
-        {0, "getpid"},                  // 39
+        {-1, "getpid"},                 // 39
         {0, "sendfile"},                // 40
         {0, "socket"},                  // 41
         {0, "connect"},                 // 42
@@ -77,14 +78,14 @@ private:
         {0, "socketpair"},              // 53
         {0, "setsockopt"},              // 54
         {0, "getsockopt"},              // 55
-        {0, "clone"},                   // 56
+        {-1, "clone"},                  // 56
         {0, "fork"},                    // 57
         {0, "vfork"},                   // 58
-        {1, "execve"},                  // 59
+        {1, "execve"},                  // 59 ?
         {0, "exit"},                    // 60
         {0, "wait4"},                   // 61
         {0, "kill"},                    // 62
-        {1, "uname"},                   // 63
+        {-1, "uname"},                  // 63
         {0, "semget"},                  // 64
         {0, "semop"},                   // 65
         {0, "semctl"},                  // 66
@@ -110,7 +111,7 @@ private:
         {0, "link"},                    // 86
         {0, "unlink"},                  // 87
         {0, "symlink"},                 // 88
-        {1, "readlink"},                // 89
+        {-1, "readlink"},               // 89
         {0, "chmod"},                   // 90
         {0, "fchmod"},                  // 91
         {0, "chown"},                   // 92
@@ -120,7 +121,7 @@ private:
         {0, "gettimeofday"},            // 96
         {0, "getrlimit"},               // 97
         {0, "getrusage"},               // 98
-        {0, "sysinfo"},                 // 99
+        {0, "sysinfo"},                 // 99 ?
         {0, "times"},                   // 100
         {0, "ptrace"},                  // 101
         {0, "getuid"},                  // 102
@@ -207,7 +208,7 @@ private:
         {0, "afs_syscall"},             // 183
         {0, "tuxcall"},                 // 184
         {0, "security"},                // 185
-        {0, "gettid"},                  // 186
+        {0, "gettid"},                  // 186 ?
         {0, "readahead"},               // 187
         {0, "setxattr"},                // 188
         {0, "lsetxattr"},               // 189
@@ -222,11 +223,11 @@ private:
         {0, "lremovexattr"},            // 198
         {0, "fremovexattr"},            // 199
         {0, "tkill"},                   // 200
-        {0, "time"},                    // 201
-        {0, "futex"},                   // 202
+        {-1, "time"},                   // 201
+        {-1, "futex"},                  // 202
         {0, "sched_setaffinity"},       // 203
         {0, "sched_getaffinity"},       // 204
-        {0, "set_thread_area"},         // 205
+        {0, "set_thread_area"},         // 205 ?
         {0, "io_setup"},                // 206
         {0, "io_destroy"},              // 207
         {0, "io_getevents"},            // 208
@@ -239,13 +240,13 @@ private:
         {0, "epoll_wait_old"},          // 215
         {0, "remap_file_pages"},        // 216
         {0, "getdents64"},              // 217
-        {0, "set_tid_address"},         // 218
+        {-1, "set_tid_address"},        // 218
         {0, "restart_syscall"},         // 219
         {0, "semtimedop"},              // 220
         {0, "fadvise64"},               // 221
         {0, "timer_create"},            // 222
         {0, "timer_settime"},           // 223
-        {0, "timer_gettime"},           // 224
+        {-1, "timer_gettime"},          // 224
         {0, "timer_getoverrun"},        // 225
         {0, "timer_delete"},            // 226
         {0, "clock_settime"},           // 227
@@ -255,13 +256,13 @@ private:
         {-1, "exit_group"},             // 231
         {0, "epoll_wait"},              // 232
         {0, "epoll_ctl"},               // 233
-        {0, "tgkill"},                  // 234
+        {0, "tgkill"},                  // 234 ?
         {0, "utimes"},                  // 235
         {0, "vserver"},                 // 236
         {0, "mbind"},                   // 237
         {0, "set_mempolicy"},           // 238
         {0, "get_mempolicy"},           // 239
-        {0, "mq_open"},                 // 240
+        {0, "mq_open"},                 // 240 ?
         {0, "mq_unlink"},               // 241
         {0, "mq_timedsend"},            // 242
         {0, "mq_timedreceive"},         // 243
@@ -273,7 +274,7 @@ private:
         {0, "request_key"},             // 249
         {0, "keyctl"},                  // 250
         {0, "ioprio_set"},              // 251
-        {0, "ioprio_get"},              // 252
+        {0, "ioprio_get"},              // 252 ?
         {0, "inotify_init"},            // 253
         {0, "inotify_add_watch"},       // 254
         {0, "inotify_rm_watch"},        // 255
@@ -283,20 +284,20 @@ private:
         {0, "mknodat"},                 // 259
         {0, "fchownat"},                // 260
         {0, "futimesat"},               // 261
-        {0, "newfstatat"},              // 262
+        {-1, "newfstatat"},             // 262
         {0, "unlinkat"},                // 263
         {0, "renameat"},                // 264
         {0, "linkat"},                  // 265
         {0, "symlinkat"},               // 266
         {0, "readlinkat"},              // 267
-        {0, "fchmodat"},                // 268
+        {0, "fchmodat"},                // 268 ?
         {0, "faccessat"},               // 269
         {0, "pselect6"},                // 270
         {0, "ppoll"},                   // 271
-        {0, "unshare"},                 // 272
-        {0, "set_robust_list"},         // 273
+        {0, "unshare"},                 // 272 ?
+        {-1, "set_robust_list"},        // 273
         {0, "get_robust_list"},         // 274
-        {0, "splice"},                  // 275
+        {0, "splice"},                  // 275 ?
         {0, "tee"},                     // 276
         {0, "sync_file_range"},         // 277
         {0, "vmsplice"},                // 278
@@ -323,7 +324,7 @@ private:
         {0, "recvmmsg"},                // 299
         {0, "fanotify_init"},           // 300
         {0, "fanotify_mark"},           // 301
-        {0, "prlimit64"},               // 302
+        {-1, "prlimit64"},              // 302
         {0, "name_to_handle_at"},       // 303
         {0, "open_by_handle_at"},       // 304
         {0, "clock_adjtime"},           // 305
@@ -339,7 +340,7 @@ private:
         {0, "sched_getattr"},           // 315
         {0, "renameat2"},               // 316
         {0, "seccomp"},                 // 317
-        {0, "getrandom"},               // 318
+        {-1, "getrandom"},              // 318
         {0, "memfd_create"},            // 319
         {0, "kexec_file_load"},         // 320
         {0, "bpf"},                     // 321
@@ -355,7 +356,7 @@ private:
         {0, "pkey_free"},               // 331
         {0, "statx"},                   // 332
         {0, "io_pgetevents"},           // 333
-        {0, "rseq"},                    // 334
+        {-1, "rseq"},                   // 334
         {0, "pidfd_send_signal"},       // 424
         {0, "io_uring_setup"},          // 425
         {0, "io_uring_enter"},          // 426
@@ -381,16 +382,19 @@ private:
         {0, "landlock_restrict_self"},  // 446
         {0, "memfd_secret"},            // 447
         {0, "process_mrelease"}         // 448
+
     };
     std::string Compiler = "/bin/g++";
     std::string RunDir;
 
     int SocketPort = 80;
+    std::string WebTheme;
     int CompileTimeLimit = 60 * 1000;
     int CompileOutputLimit = 128 * 1024 * 1024;
 
     std::string Email;
     std::string EmailPassword;
+    std::string EmailServer = "smtp://smtp-mail.outlook.com:587";
 
     class DATABASE_SETTINGS
     {
@@ -410,48 +414,57 @@ private:
         std::string GetPassword();
         std::string GetDatabaseName();
 
-        RESULT Set(std::string Host, int Port, std::string Username, std::string Password, std::string DatabaseName);
+        // RESULT Set(std::string Host, int Port, std::string Username, std::string Password, std::string DatabaseName);
     };
 
-    void CheckJudgeUser();
-    void GetJudgeUserIDByUserName();
-    // void GetJudgeUserGroupNameByGroupID();
-    void CheckCompiler();
+    // void CheckJudgeUser();
+    // void GetJudgeUserIDByUsername();
+    // // void GetJudgeUserGroupNameByGroupID();
+    // void CheckCompiler();
 
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
 
 public:
-    RESULT Save();
-    RESULT Load(std::string JudgeUser);
+    // RESULT Save();
+    // RESULT Load(std::string JudgeUser);
 
-    std::string GetBaseFolder();
-    std::string GetJudgeUser();
-    std::string GetSettingsBaseFolder();
-    int GetJudgeUserID();
-    // std::string GetJudgeUserGroup();
-    int GetJudgeUserGroupID();
-    bool IsBannedSystemCall(int SystemCall, int CallCount);
-    std::string GetSystemCallName(int SystemCall);
-    std::string GetCompiler();
-    std::string GetRunDir();
-    int GetSocketPort();
-    int GetCompileTimeLimit();
-    int GetCompileOutputLimit();
-    std::string GetEmail();
-    std::string GetEmailPassword();
+    // std::string GetBaseFolder();
+    // std::string GetJudgeUser();
+    // std::string GetSettingsBaseFolder();
+    // int GetJudgeUserID();
+    // // std::string GetJudgeUserGroup();
+    // int GetJudgeUserGroupID();
+    // bool IsBannedSystemCall(int SystemCall, int CallCount);
+    // std::string GetSystemCallName(int SystemCall);
+    // std::string GetCompiler();
+    // std::string GetRunDir();
+    // int GetSocketPort();
+    // std::string GetWebTheme();
+    // int GetCompileTimeLimit();
+    // int GetCompileOutputLimit();
+    // std::string GetEmail();
+    // std::string GetEmailPassword();
 
-    void SetJudgeUser(std::string JudgeUser);
-    void SetSystemCallAvailableCount(int SystemCall, int AvailableCount);
-    void SetCompiler(std::string Compiler);
-    void SetSocketPort(int SocketPort);
-    void SetCompileTimeLimit(int CompileTimeLimit);
-    void SetCompileOutputLimit(int CompileOutputLimit);
-    void SetEmail(std::string Email);
-    void SetEmailPassword(std::string EmailPassword);
+    // void SetJudgeUser(std::string JudgeUser);
+    // void SetSystemCallAvailableCount(int SystemCall, int AvailableCount);
+    // void SetCompiler(std::string Compiler);
+    // void SetSocketPort(int SocketPort);
+    // void SetWebTheme(std::string WebTheme);
+    // void SetCompileTimeLimit(int CompileTimeLimit);
+    // void SetCompileOutputLimit(int CompileOutputLimit);
+    // void SetEmail(std::string Email);
+    // void SetEmailPassword(std::string EmailPassword);
 
-    void CheckSettings();
+    // void CheckSettings();
 
     DATABASE_SETTINGS DatabaseSettings;
+
+    static RESULT GetSettings(std::string Key, std::string &Value);
+    static RESULT GetSettings(std::string Key, int &Value);
+    static RESULT GetSettings(configor::json &Value);
+    static RESULT SetSettings(std::string Key, std::string Value);
+    static RESULT SetSettings(std::string Key, int Value);
+    static RESULT SetSettings(configor::json Value);
 };
 
 extern SETTINGS Settings;

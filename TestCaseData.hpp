@@ -16,7 +16,7 @@ private:
     friend class PROBLEMS;
     friend class SUBMISSIONS;
     friend class TEST_CASE;
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
     friend class TEST_GROUP_DATA;
 };
 

@@ -1,0 +1,232 @@
+.TestGroups,
+.TestGroup {
+    cursor: default;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    max-height: 9999px;
+}
+
+.TestGroup.HidedTestGroup {
+    max-height: 15px;
+}
+
+.TestCase {
+    width: 100px;
+    height: 100px;
+    border-radius: 5px;
+    color: white;
+    margin: 5px;
+    display: inline-block;
+    position: relative;
+}
+
+.TestGroups,
+.TestGroup,
+.TestCase {
+    transition: 0.5s;
+}
+
+.TestGroups:hover,
+.TestGroup:hover,
+.TestCase:hover {
+    box-shadow: 0px 10px 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+.JudgeResultUKE {
+    background-color: rgba(0, 0, 255, 0.5);
+}
+
+.JudgeResultAC {
+    background-color: rgba(73, 205, 50, 0.5);
+}
+
+.JudgeResultPE {
+    background-color: rgba(255, 119, 142, 0.5);
+}
+
+.JudgeResultWA {
+    background-color: rgba(211, 20, 13, 0.5);
+}
+
+.JudgeResultTE {
+    background-color: rgba(12, 0, 102, 0.5);
+}
+
+.JudgeResultME {
+    background-color: rgba(83, 0, 167, 0.5);
+}
+
+.JudgeResultOLE {
+    background-color: rgba(131, 0, 167, 0.5);
+}
+
+.JudgeResultRE {
+    background-color: rgba(26, 38, 200, 0.5);
+}
+
+.JudgeResultRF {
+    background-color: rgba(0, 145, 130, 0.5);
+}
+
+.JudgeResultCE {
+    background-color: rgba(139, 116, 0, 0.5);
+}
+
+.JudgeResultSE {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.JudgeResultWT {
+    background-color: rgba(65, 0, 217, 0.5);
+}
+
+.JudgeResultFC {
+    background-color: rgba(76, 0, 255, 0.5);
+}
+
+.JudgeResultCP {
+    background-color: rgba(94, 25, 255, 0.5);
+}
+
+.JudgeResultCPD {
+    background-color: rgba(115, 56, 255, 0.5);
+}
+
+.JudgeResultJG {
+    background-color: rgba(132, 79, 255, 0.5);
+}
+
+.JudgeResultSK {
+    background-color: rgba(43, 43, 43, 0.5);
+}
+
+.JudgeResultRJ {
+    background-color: rgba(78, 0, 0, 0.5);
+}
+
+.TestCaseNumber {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    line-height: 15px;
+    font-size: 15px;
+    transition: 0.5s;
+    color: white;
+    vertical-align: top;
+}
+
+.TestGroupNumber {
+    position: relative;
+    display: inline-block;
+    color: white;
+    font-size: 15px;
+    line-height: 15px;
+    transition: 0.5s;
+    height: 15px;
+    left: 0px;
+    vertical-align: top;
+}
+
+.TestGroupsResult,
+.TestGroupResult {
+    position: relative;
+    display: inline-block;
+    color: white;
+    font-size: 15px;
+    line-height: 15px;
+    width: 25px;
+    font-weight: bold;
+    vertical-align: top;
+    margin: 0px 10px;
+}
+
+.TestGroupNumber::before,
+.TestCaseNumber::before {
+    content: "#";
+    line-height: 15px;
+    font-size: 15px;
+}
+
+.TestCaseResult {
+    position: relative;
+    text-align: center;
+    font-size: 20px;
+    line-height: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    transition: 0.5s;
+}
+
+.TestCase.WithDescription:hover>.TestCaseInnerBox:nth-child(1) {
+    opacity: 0;
+}
+
+.TestCaseInnerBox {
+    position: absolute;
+    padding: 5px;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    transition: 0.5s;
+}
+
+.TestCaseDescription {
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+    transition: 0.5s;
+    line-height: 14px;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.TestCaseDescription>pre {
+    white-space: break-spaces;
+}
+
+.TestCase.WithDescription:hover>.TestCaseInnerBox:nth-child(2)>.TestCaseDescription {
+    opacity: 1;
+}
+
+.TestCaseLimit {
+    position: relative;
+    margin-top: 3px;
+    height: 15px;
+    font-size: 13px;
+    line-height: 15px;
+    text-align: center;
+    transition: 0.5s;
+}
+
+.TestGroupsDescription {
+    color: white;
+    font-size: 15px;
+    line-height: 15px;
+    padding: 5px 10px;
+}
+
+.TestGroupsDescription>pre {
+    white-space: break-spaces;
+}
+
+.TestGroupsLimit,
+.TestGroupLimit {
+    position: relative;
+    height: 15px;
+    font-size: 15px;
+    line-height: 15px;
+    display: inline-block;
+    vertical-align: top;
+    padding-right: 10px;
+    color: white;
+}
+
+.TestCaseLimit>:first-child::after {
+    content: "/";
+}

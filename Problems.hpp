@@ -12,9 +12,13 @@ private:
     static RESULT SamplesToJSON(std::vector<SAMPLE> Samples, std::string &JSONData);
     static RESULT UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTestGroups, std::string &JSONData);
 
+    friend class API_PROCEED;
+
 public:
-    static RESULT GetProblem(std::string PID, PROBLEM &Problem);
     static RESULT AddProblem(PROBLEM Problem);
+    static RESULT GetProblem(std::string PID, PROBLEM &Problem);
+    static RESULT UpdateProblem(PROBLEM Problem);
+    static RESULT DeleteProblem(std::string PID);
 };
 
 #endif

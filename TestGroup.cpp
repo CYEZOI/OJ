@@ -7,25 +7,19 @@
 #include <algorithm>
 #include <dirent.h>
 
-RESULT TEST_GROUP::UpdateAllResults(JUDGE_RESULT Result)
-{
-    RETURN_IF_FAILED(SetResult(Result));
-    for (size_t i = 0; i < TestCases.size(); i++)
-        RETURN_IF_FAILED(TestCases[i].SetResult(Result));
-    CREATE_RESULT(true, "All results of test group " + std::to_string(TGID) + " of submission " + std::to_string(SID) + " updated")
-}
-RESULT TEST_GROUP::SetResult(JUDGE_RESULT Result)
+void TEST_GROUP::UpdateAllResults(JUDGE_RESULT Result)
 {
     this->Result = Result;
-    RETURN_IF_FAILED(SUBMISSIONS::UpdateTestGroup(this))
-    CREATE_RESULT(true, "Result of test group " + std::to_string(TGID) + " of submission " + std::to_string(SID) + " updated")
+    for (size_t i = 0; i < TestCases.size(); i++)
+        TestCases[i].Result = Result;
 }
 
 RESULT TEST_GROUP::Judge()
 {
-    SetResult(JUDGE_RESULT::JUDGING);
+    Result = JUDGE_RESULT::JUDGING;
     for (size_t i = 0; i < TestCases.size(); i++)
     {
+        TestCases[i].TGID = TGID;
         RETURN_IF_FAILED(TestCases[i].Judge());
         if (TestCases[i].Result == JUDGE_RESULT::ACCEPTED)
             TestCasesPassed++;
@@ -53,7 +47,8 @@ RESULT TEST_GROUP::Judge()
             SecondMaxCount = ResultCount[i];
             SecondMaxResult = (JUDGE_RESULT)i;
         }
-    SetResult((SecondMaxCount == 0 || MaxResult != JUDGE_RESULT::ACCEPTED) ? MaxResult : SecondMaxResult);
+
+    Result = (SecondMaxCount == 0 || MaxResult != JUDGE_RESULT::ACCEPTED) ? MaxResult : SecondMaxResult;
 
     CREATE_RESULT(true, "Test group " + std::to_string(TGID) + " of submission " + std::to_string(SID) + " judged")
 }

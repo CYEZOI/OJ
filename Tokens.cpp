@@ -46,3 +46,17 @@ RESULT TOKENS::DeleteToken(std::string TokenValue)
                          .Execute())
     CREATE_RESULT(true, "Delete token succeed");
 }
+RESULT TOKENS::GetUID(std::string TokenValue, int &UID)
+{
+    RETURN_IF_FAILED(DATABASE::SELECT("Tokens")
+                         .Select("UID")
+                         .Where("TokenValue", TokenValue)
+                         .Execute(
+                             [&UID](auto Data)
+                             {
+                                 CREATE_RESULT_IF_FALSE(Data.size() == 1, "Token invalid");
+                                 UID = std::stoi(Data[0]["UID"]);
+                                 CREATE_RESULT(true, "Get UID succeed");
+                             }))
+    CREATE_RESULT(true, "Get UID succeed");
+}

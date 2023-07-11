@@ -82,6 +82,13 @@
         }                                                                       \
     }
 
+#define THROW_STRING_ERROR_IF_FAILED(NewResult) \
+    {                                           \
+        RESULT _Result = (NewResult);           \
+        if (!_Result.Success)                   \
+            throw std::string(_Result.Message); \
+    }
+
 #include <string>
 #include <string.h>
 #include "Logger.hpp"

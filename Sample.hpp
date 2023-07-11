@@ -10,7 +10,7 @@ private:
     std::string Output;
     std::string Description;
 
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
     friend class PROBLEM;
     friend class PROBLEMS;
 };

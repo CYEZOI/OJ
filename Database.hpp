@@ -31,7 +31,7 @@ public:
         SELECT &Select(std::string Column);
         SELECT &Where(std::string Column, std::string Value);
         SELECT &Where(std::string Column, int Value);
-        SELECT &Order(std::string Column, bool Descending);
+        SELECT &Order(std::string Column, bool Ascending);
         SELECT &Limit(int Limits);
         SELECT &Offset(int Offsets);
         RESULT Execute(std::function<RESULT(std::vector<std::map<std::string, std::string>>)> Callback = nullptr);
@@ -62,6 +62,7 @@ public:
         DELETE(std::string TableName);
         ~DELETE();
         DELETE &Where(std::string Column, std::string Value);
+        DELETE &Where(std::string Column, int Value);
         RESULT Execute();
     };
     class UPDATE
@@ -79,6 +80,26 @@ public:
         UPDATE &Set(std::string Column, int Value);
         UPDATE &Where(std::string Column, std::string Value);
         UPDATE &Where(std::string Column, int Value);
+        RESULT Execute();
+    };
+    class SIZE
+    {
+    private:
+        sql::Connection *Connection;
+        std::string TableName;
+
+    public:
+        SIZE(std::string TableName);
+        RESULT Execute(std::function<void(int)> Callback = nullptr);
+    };
+    class TRUNCATE
+    {
+    private:
+        sql::Connection *Connection;
+        std::string TableName;
+
+    public:
+        TRUNCATE(std::string TableName);
         RESULT Execute();
     };
 

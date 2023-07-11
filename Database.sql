@@ -32,11 +32,11 @@ CREATE TABLE `Problems` (
     `TestCases` json NOT NULL
 );
 
-DROP TABLE IF EXISTS `EmailVerifyCodes`;
+DROP TABLE IF EXISTS `EmailVerificationCodes`;
 
-CREATE TABLE `EmailVerifyCodes`(
-    `EmailAddress` text NOT NULL,
-    `VerifyCode` varchar(32) NOT NULL,
+CREATE TABLE `EmailVerificationCodes`(
+    `EmailAddress` varchar(64) NOT NULL UNIQUE,
+    `VerificationCode` varchar(32) NOT NULL,
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -71,4 +71,22 @@ CREATE TABLE `Problems`(
     `Hint` text,
     `Samples` json,
     `TestGroups` json NOT NULL
+);
+
+DROP TABLE IF EXISTS `Settings`;
+
+CREATE TABLE `Settings`(
+    `Key` varchar(32) NOT NULL UNIQUE,
+    `Value` text NOT NULL
+);
+
+DROP TABLE IF EXISTS `Files`;
+
+CREATE TABLE `Files`(
+    `FID` int NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `UID` int NOT NULL,
+    `Filename` text NOT NULL,
+    `FileType` text NOT NULL,
+    `FileToken` varchar(32) NOT NULL UNIQUE,
+    `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

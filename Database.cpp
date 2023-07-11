@@ -19,9 +19,9 @@ DATABASE::SELECT &DATABASE::SELECT::Where(std::string Column, std::string Value)
     return *this;
 }
 DATABASE::SELECT &DATABASE::SELECT::Where(std::string Column, int Value) { return Where(Column, std::to_string(Value)); }
-DATABASE::SELECT &DATABASE::SELECT::Order(std::string Column, bool Descending)
+DATABASE::SELECT &DATABASE::SELECT::Order(std::string Column, bool Ascending)
 {
-    this->Orders.push_back({Column, Descending});
+    this->Orders.push_back({Column, Ascending});
     this->UseOrder = true;
     return *this;
 }
@@ -32,8 +32,6 @@ DATABASE::SELECT &DATABASE::SELECT::Limit(int Limits)
 }
 DATABASE::SELECT &DATABASE::SELECT::Offset(int Offsets)
 {
-    if (!UseOrder)
-        return *this;
     this->Offsets = Offsets;
     return *this;
 }
@@ -65,7 +63,7 @@ RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::
     {
         Query += " ORDER BY ";
         for (auto &Order : Orders)
-            Query += "`" + Order.first + "` " + (Order.second ? "DESC" : "ASC") + ", ";
+            Query += "`" + Order.first + "` " + (Order.second ? "ASC" : "DESC") + ", ";
         Query.erase(Query.end() - 2, Query.end());
     }
     if (Limits)
@@ -113,10 +111,7 @@ DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, std::string Value
     this->Values.push_back(Value);
     return *this;
 }
-DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, int Value)
-{
-    return Insert(Column, std::to_string(Value));
-}
+DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, int Value) { return Insert(Column, std::to_string(Value)); }
 RESULT DATABASE::INSERT::Execute(std::function<void(int)> Callback)
 {
     if (Connection == nullptr)
@@ -163,6 +158,10 @@ DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, std::string Value)
 {
     this->Conditions.push_back({Column, Value});
     return *this;
+}
+DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, int Value)
+{
+    return Where(Column, std::to_string(Value));
 }
 RESULT DATABASE::DELETE::Execute()
 {
@@ -237,6 +236,50 @@ RESULT DATABASE::UPDATE::Execute()
         PreparedStatement->execute();
         PreparedStatement->close();
         delete PreparedStatement;
+    }
+    catch (sql::SQLException &e)
+    {
+        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+    }
+    CREATE_RESULT(true, "Executed")
+}
+
+DATABASE::SIZE::SIZE(std::string TableName)
+{
+    this->Connection = DATABASE::CreateConnection();
+    this->TableName = TableName;
+}
+RESULT DATABASE::SIZE::Execute(std::function<void(int)> Callback)
+{
+    if (Connection == nullptr)
+        CREATE_RESULT(false, "Not connected")
+    try
+    {
+        sql::ResultSet *ResultSet(Connection->createStatement()->executeQuery("SELECT COUNT(*) FROM " + TableName));
+        ResultSet->next();
+        if (Callback != nullptr)
+            Callback(ResultSet->getInt(1));
+        ResultSet->close();
+        delete ResultSet;
+    }
+    catch (sql::SQLException &e)
+    {
+        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+    }
+    CREATE_RESULT(true, "Executed")
+}
+DATABASE::TRUNCATE::TRUNCATE(std::string TableName)
+{
+    this->Connection = DATABASE::CreateConnection();
+    this->TableName = TableName;
+}
+RESULT DATABASE::TRUNCATE::Execute()
+{
+    if (Connection == nullptr)
+        CREATE_RESULT(false, "Not connected")
+    try
+    {
+        Connection->createStatement()->execute("TRUNCATE TABLE " + TableName);
     }
     catch (sql::SQLException &e)
     {

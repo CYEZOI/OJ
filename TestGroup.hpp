@@ -22,17 +22,15 @@ private:
     int TimeSum = 0;
     int Memory = 0;
 
-    friend class WEB_DATA_PROCEED;
+    void UpdateAllResults(JUDGE_RESULT Result);
+
+    friend class API_PROCEED;
     friend class PROBLEM;
     friend class PROBLEMS;
     friend class SUBMISSION;
     friend class SUBMISSIONS;
 
 public:
-    RESULT UpdateAllResults(JUDGE_RESULT Result);
-
-    RESULT SetResult(JUDGE_RESULT Result);
-
     RESULT Judge();
 };
 

@@ -24,9 +24,13 @@ private:
     int Time = 0;
     int Memory = 0;
     int Score = 0;
-    int SystemCallCount[Settings.SystemCallCount] = {0};
     PROBLEM *Problem;
     TEST_CASE_DATA *UnjudgedTestCase;
+
+    int JudgeUserID = 0;
+    int JudgeUserGroupID = 0;
+    std::string JudgeUsername = "";
+    std::vector<int> SystemCallList;
 
     RESULT RedirectIO();
     RESULT SetupEnvrionment();
@@ -42,22 +46,13 @@ private:
     RESULT Compare();
 
     friend class TEST_GROUP;
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
     friend class PROBLEMS;
     friend class SUBMISSIONS;
     friend class SUBMISSION;
 
 public:
     RESULT Judge();
-
-    RESULT SetOutput(std::string Output);
-    RESULT SetStandardOutput(std::string StandardOutput);
-    RESULT SetStandardError(std::string StandardError);
-    RESULT SetResult(JUDGE_RESULT Result);
-    RESULT SetDescription(std::string Description);
-    RESULT SetTime(int Time);
-    RESULT SetMemory(int Memory);
-    RESULT SetScore(int Score);
 };
 
 #endif

@@ -70,6 +70,40 @@ RESULT SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::st
     CREATE_RESULT(true, "Success");
 }
 
+RESULT SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
+{
+    RETURN_IF_FAILED(DATABASE::SELECT("Submissions")
+                         .Select("PID")
+                         .Where("SID", Submission.SID)
+                         .Execute(
+                             [](auto Data)
+                             {
+                                 if (Data.size() != 0)
+                                     CREATE_RESULT(false, "Submission already exists");
+                                 CREATE_RESULT(true, "Submission not found");
+                             }));
+    std::string TestGroupsData;
+    RETURN_IF_FAILED(TestGroupsToJSON(Submission.TestGroups, TestGroupsData));
+    RETURN_IF_FAILED(DATABASE::INSERT("Submissions")
+                         .Insert("PID", Submission.PID)
+                         .Insert("UID", std::to_string(Submission.UID))
+                         .Insert("Code", Submission.Code)
+                         .Insert("Result", std::to_string(Submission.Result))
+                         .Insert("Description", Submission.Description)
+                         .Insert("Time", std::to_string(Submission.Time))
+                         .Insert("TimeSum", std::to_string(Submission.TimeSum))
+                         .Insert("Memory", std::to_string(Submission.Memory))
+                         .Insert("Score", std::to_string(Submission.Score))
+                         .Insert("EnableO2", std::to_string(Submission.EnableO2))
+                         .Insert("TestGroups", TestGroupsData)
+                         .Execute(
+                             [&Submission](int SID)
+                             {
+                                 Submission.SID = SID;
+                                 CREATE_RESULT(true, "Adding submission success");
+                             }));
+    CREATE_RESULT(true, "Adding submission success");
+}
 RESULT SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Submissions")
@@ -130,73 +164,31 @@ RESULT SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
                              }));
     CREATE_RESULT(true, "Loading submission success");
 }
-RESULT SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
+RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
 {
-    RETURN_IF_FAILED(DATABASE::SELECT("Submissions")
-                         .Select("PID")
-                         .Where("SID", Submission.SID)
-                         .Execute(
-                             [](auto Data)
-                             {
-                                 if (Data.size() != 0)
-                                     CREATE_RESULT(false, "Submission already exists");
-                                 CREATE_RESULT(true, "Submission not found");
-                             }));
     std::string TestGroupsData;
     RETURN_IF_FAILED(TestGroupsToJSON(Submission.TestGroups, TestGroupsData));
-    RETURN_IF_FAILED(DATABASE::INSERT("Submissions")
-                         .Insert("PID", Submission.PID)
-                         .Insert("UID", std::to_string(Submission.UID))
-                         .Insert("Code", Submission.Code)
-                         .Insert("Result", std::to_string(Submission.Result))
-                         .Insert("Description", Submission.Description)
-                         .Insert("Time", std::to_string(Submission.Time))
-                         .Insert("TimeSum", std::to_string(Submission.TimeSum))
-                         .Insert("Memory", std::to_string(Submission.Memory))
-                         .Insert("Score", std::to_string(Submission.Score))
-                         .Insert("EnableO2", std::to_string(Submission.EnableO2))
-                         .Insert("TestGroups", TestGroupsData)
-                         .Execute(
-                             [&Submission](int SID)
-                             {
-                                 Submission.SID = SID;
-                                 CREATE_RESULT(true, "Adding submission success");
-                             }));
-    CREATE_RESULT(true, "Adding submission success");
-}
-RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION *Submission)
-{
-    std::string TestGroupsData;
-    RETURN_IF_FAILED(TestGroupsToJSON(Submission->TestGroups, TestGroupsData));
     RETURN_IF_FAILED(DATABASE::UPDATE("Submissions")
-                         .Set("PID", Submission->PID)
-                         .Set("UID", Submission->UID)
-                         .Set("Code", Submission->Code)
-                         .Set("Result", Submission->Result)
-                         .Set("Description", Submission->Description)
-                         .Set("Time", Submission->Time)
-                         .Set("TimeSum", Submission->TimeSum)
-                         .Set("Memory", Submission->Memory)
-                         .Set("Score", Submission->Score)
-                         .Set("EnableO2", Submission->EnableO2)
+                         .Set("PID", Submission.PID)
+                         .Set("UID", Submission.UID)
+                         .Set("Code", Submission.Code)
+                         .Set("Result", Submission.Result)
+                         .Set("Description", Submission.Description)
+                         .Set("Time", Submission.Time)
+                         .Set("TimeSum", Submission.TimeSum)
+                         .Set("Memory", Submission.Memory)
+                         .Set("Score", Submission.Score)
+                         .Set("EnableO2", Submission.EnableO2)
                          .Set("TestGroups", TestGroupsData)
-                         .Where("SID", Submission->SID)
+                         .Where("SID", Submission.SID)
                          .Execute());
     CREATE_RESULT(true, "Updating submission success");
 }
-RESULT SUBMISSIONS::UpdateTestGroup(TEST_GROUP *TestGroup)
+RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION *Submission) { return UpdateSubmission(*Submission); }
+RESULT SUBMISSIONS::DeleteSubmission(int SID)
 {
-    // SUBMISSION Submission;
-    // RETURN_IF_FAILED(GetSubmission(TestGroup->SID, Submission));
-    // Submission.TestGroups[TestGroup->TGID] = *TestGroup;
-    // RETURN_IF_FAILED(UpdateSubmission(Submission));
-    CREATE_RESULT(true, "Updating test group success");
-}
-RESULT SUBMISSIONS::UpdateTestCase(TEST_CASE *TestCase)
-{
-    // SUBMISSION Submission;
-    // RETURN_IF_FAILED(GetSubmission(TestCase->SID, Submission));
-    // Submission.TestGroups[TestCase->TGID].TestCases[TestCase->TCID] = *TestCase;
-    // RETURN_IF_FAILED(UpdateSubmission(Submission));
-    CREATE_RESULT(true, "Updating test case success");
+    RETURN_IF_FAILED(DATABASE::DELETE("Submissions")
+                         .Where("SID", SID)
+                         .Execute());
+    CREATE_RESULT(true, "Success");
 }

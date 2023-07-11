@@ -1,0 +1,49 @@
+<h5>Basic settings modify</h5>
+<table class="table table-hover" id="SettingsData">
+    <thead>
+        <td class="col-4">Name</td>
+        <td class="col-8">Value</td>
+    </thead>
+    <tbody></tbody>
+</table>
+<h5>System call modify</h5>
+<input type="number" class="form-control mb-2" id="SettingsSystemCallIDInput" placeholder="System call ID">
+<div class="row align-items-center">
+    <div class="mb-3 col-2">
+        <label for="SettingsSystemCallID" class="form-label">System call ID</label>
+        <input type="text" class="form-control disabled" id="SettingsSystemCallID" disabled>
+    </div>
+    <div class="mb-3 col-2">
+        <label for="SettingsSystemCallName" class="form-label">System call name</label>
+        <input type="text" class="form-control" id="SettingsSystemCallName" disabled>
+    </div>
+    <div class="mb-3 col-6">
+        <label for="SettingsSystemCallStatus" class="form-label">System call status</label>
+        <div id="SettingsSystemCallStatus" class="row">
+            <div class="col-2">
+                <input type="radio" class="btn-check" name="options-outlined" id="SettingsSystemCallAllowed" disabled>
+                <label class="btn btn-outline-success" for="SettingsSystemCallAllowed">Allowed</label>
+            </div>
+            <div class="col-2">
+                <input type="radio" class="btn-check" name="options-outlined" id="SettingsSystemCallBanned" disabled>
+                <label class="btn btn-outline-danger" for="SettingsSystemCallBanned">Banned</label>
+            </div>
+            <div class="col-4">
+                <input type="radio" class="btn-check" name="options-outlined" id="SettingsSystemCallAllowedForTimes"
+                    disabled>
+                <label class="btn btn-outline-warning" for="SettingsSystemCallAllowedForTimes">Allowed for
+                    times</label>
+            </div>
+            <div class="col-4">
+                <input type="number" class="form-control" id="SettingsSystemCallAllowedForTimesInput"
+                    placeholder="Allow times" min="0" disabled>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3 col-2">
+        <label for="SettingsSystemCallReference" class="form-label">System call reference</label>
+        <button role="button" class="btn btn-primary" id="SettingsSystemCallReference" disabled>Reference</button>
+    </div>
+</div>
+<h5>System call modify</h5>
+<button type="button" class="btn btn-primary" id="SettingsSave">Save</button>

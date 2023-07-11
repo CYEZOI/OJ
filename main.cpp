@@ -19,8 +19,7 @@ int main()
     // return 0;
 
     srand(time(NULL));
-    OUTPUT_IF_FAILED(Settings.Load("Judger"));
-    Settings.CheckSettings();
+    // OUTPUT_IF_FAILED(Settings.Load("Judger"));
     JudgingList.Init();
 
     new SOCKET(

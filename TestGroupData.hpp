@@ -14,7 +14,7 @@ private:
     friend class PROBLEMS;
     friend class SUBMISSIONS;
     friend class TEST_CASE;
-    friend class WEB_DATA_PROCEED;
+    friend class API_PROCEED;
 
 public:
     void AddTestCase(std::string Input, std::string Answer, int TimeLimit, int MemoryLimit, int Score);

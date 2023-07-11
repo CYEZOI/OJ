@@ -11,8 +11,9 @@ private:
 public:
     static RESULT CreateUser(std::string Username, std::string Password, std::string Email, std::string Nickname = "", int Privilege = 0);
     static RESULT CheckUsernameAvailable(std::string Username);
+    static RESULT CheckEmailAvailable(std::string Email);
     static RESULT CheckPasswordCorrect(std::string Username, std::string Password, int &UID);
-    static RESULT IsAdmin(std::string Username);
+    static RESULT IsAdmin(int UID, bool &Result);
 };
 
 #endif
