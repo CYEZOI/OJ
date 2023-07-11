@@ -84,7 +84,9 @@ const SwitchPage = (Name, Data) => {
     PushedURL.pathname = "/" + Name;
     PushedURL.search = "";
     if (Data) {
-        for (const [Key, Value] of Object.entries(Data)) { PushedURL.searchParams.append(Key, Value); }
+        for (const [Key, Value] of Object.entries(Data)) {
+            PushedURL.searchParams.append(Key, Value);
+        }
     }
     history.pushState(Data, Name, PushedURL.toString());
     LoadPage(Name, Data);
@@ -532,6 +534,25 @@ const LoadPage = (Name, Data) => {
                     document.execCommand("copy");
                     ShowSuccess("Copied");
                     InputElement.remove();
+                });
+            }, () => { }, () => { });
+        },
+        "Problems": () => {
+            var ProblemsTexts = ["Problems", "PID", "Title"];
+            $("#ProblemsTitle").text(ProblemsTexts[0]);
+            RequestAPI("GetProblems", {
+                "Page": 1
+            }, () => { }, (Response) => {
+                $("#ProblemsData").append("<table></table>");
+                $("#ProblemsData>table").append("<tr><th>" + ProblemsTexts[1] + "</th><th>" + ProblemsTexts[2] + "</th></tr>");
+                Response["Problems"].map((Problem) => {
+                    var ProblemElement = $("<tr></tr>");
+                    ProblemElement.append($("<td>" + Problem.PID + "</td>"));
+                    ProblemElement.append($("<td>" + Problem.Title + "</td>"));
+                    ProblemElement.on("click", () => {
+                        SwitchPage("Problem", { "PID": Problem.PID });
+                    });
+                    $("#ProblemsData>table").append(ProblemElement);
                 });
             }, () => { }, () => { });
         }

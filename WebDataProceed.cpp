@@ -173,6 +173,31 @@ configor::json WEB_DATA_PROCEED::GetProblem(std::string PID)
     ResponseJSON["Data"]["IOFilename"] = Problem.IOFilename;
     return ResponseJSON;
 }
+configor::json WEB_DATA_PROCEED::GetProblems(int Page)
+{
+    configor::json ResponseJSON = BaseJSON;
+    RETURN_JSON_IF_FAILED(DATABASE::SELECT("Problems")
+                              .Select("PID")
+                              .Select("Title")
+                              .Offset((Page - 1) * 10)
+                              .Limit(10)
+                              .Execute(
+                                  [&ResponseJSON](auto Data)
+                                  {
+                                      ResponseJSON["Success"] = true;
+                                      configor::json::array_type Problems;
+                                      for (auto i : Data)
+                                      {
+                                          configor::json TempProblem;
+                                          TempProblem["PID"] = i["PID"];
+                                          TempProblem["Title"] = i["Title"];
+                                          Problems.push_back(TempProblem);
+                                      }
+                                      ResponseJSON["Data"]["Problems"] = Problems;
+                                      CREATE_RESULT(true, "Get problems success");
+                                  }));
+    return ResponseJSON;
+}
 
 void WEB_DATA_PROCEED::TestAddProblem()
 {
@@ -241,7 +266,7 @@ void WEB_DATA_PROCEED::TestAddProblem()
 
 HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
 {
-    std::string BasicFolder = "/home/langningc2009/Coding/Projects/OJ/HTML";
+    std::string BasicFolder = "/home/langningc2009/OJ/HTML";
     HTTP_RESPONSE HTTPResponse;
     if (HTTPRequest.Path == "/api")
     {
@@ -332,6 +357,16 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                         ResponseJSON["Message"] = "Invalid token";
                     else
                         ResponseJSON = GetProblem(RequestJSON["Data"]["PID"].as_string());
+                }
+                else if (RequestJSON["Action"].as_string() == "GetProblems")
+                {
+                    if (!CheckTypes(RequestJSON, {{"Page", configor::config_value_type::number_integer},
+                                                  {"Token", configor::config_value_type::string}}))
+                        ResponseJSON["Message"] = "Invalid parameters";
+                    else if (CheckTokenAvailable(RequestJSON["Data"]["Token"].as_string())["Success"].as_bool() == false)
+                        ResponseJSON["Message"] = "Invalid token";
+                    else
+                        ResponseJSON = GetProblems(RequestJSON["Data"]["Page"].as_integer());
                 }
                 else
                     ResponseJSON["Message"] = "No such action";

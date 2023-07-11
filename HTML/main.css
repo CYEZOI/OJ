@@ -228,35 +228,36 @@
 .TestCaseLimit>:first-child::after {
     content: "/";
 }
+
 article>pre code {
     background-color: gainsboro;
     padding: 3px 5px;
     border-radius: 3px;
 }
-article table {
+table {
     border-collapse: collapse;
 }
 
-article table td,
-article table th {
+table td,
+table th {
     border: 1px solid black;
     padding: 3px 5px;
 }
 
-article table td:last-child,
-article table th:last-child {
+table td:last-child,
+table th:last-child {
     border-right: none;
 }
 
-article table td:first-child,
-article table th:first-child {
+table td:first-child,
+table th:first-child {
     border-left: none;
 }
 
-article table tr:last-child td {
+table tr:last-child td {
     border-bottom: none;
 }
 
-article table tr:first-child th {
+table tr:first-child th {
     border-top: none;
 }

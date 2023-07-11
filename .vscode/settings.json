@@ -7,5 +7,6 @@
         "TCID",
         "UNJUDGED"
     ],
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "cph.general.saveLocation": ""
 }

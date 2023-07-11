@@ -19,6 +19,7 @@ private:
     configor::json GetSubmission(int SID);
     configor::json Submit(std::string PID, bool EnableO2, std::string Code);
     configor::json GetProblem(std::string PID);
+    configor::json GetProblems(int Page);
 
     void TestAddProblem();
     void TestSubmit();

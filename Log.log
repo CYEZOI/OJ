@@ -25,3 +25,94 @@ Call trace:
 Call trace: 
 /home/langningc2009/Coding/Projects/OJ/Database.cpp:43 RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >)>)
 [0m
+[33mW[2023-06-20 16:14:06.570][1659-1659] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:14:06.571][1659-1659] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/Coding/Projects/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/Coding/Projects/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[33mW[2023-06-20 16:16:47.540][2885-2885] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:16:47.540][2885-2885] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[33mW[2023-06-20 16:16:53.551][3018-3018] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:16:53.551][3018-3018] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[33mW[2023-06-20 16:21:24.668][3018-3714] Can not open file /home/langningc2009/Coding/Projects/OJ/HTML/main.html
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:21:25.737][3018-3715] Can not open file /home/langningc2009/Coding/Projects/OJ/HTML/main.html
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:22:45.103][14753-14753] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:22:45.103][14753-14753] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[33mW[2023-06-20 16:23:57.650][14753-14805] Token expired
+0: Success
+Call trace: 
+/home/langningc2009/OJ/Tokens.cpp:37 TOKENS::CheckToken(std::string)::<lambda(auto:2)> [with auto:2 = std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]
+[0m
+[33mW[2023-06-20 16:23:57.651][14753-14805] Token expired
+0: Success
+Call trace: 
+/home/langningc2009/OJ/Tokens.cpp:37 TOKENS::CheckToken(std::string)::<lambda(auto:2)> [with auto:2 = std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]
+/home/langningc2009/OJ/Database.cpp:93 RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >)>)
+[0m
+[33mW[2023-06-20 16:23:57.651][14753-14805] Token expired
+0: Success
+Call trace: 
+/home/langningc2009/OJ/Tokens.cpp:37 TOKENS::CheckToken(std::string)::<lambda(auto:2)> [with auto:2 = std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >]
+/home/langningc2009/OJ/Database.cpp:93 RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char> > >)>)
+/home/langningc2009/OJ/Tokens.cpp:30 static RESULT TOKENS::CheckToken(std::string)
+[0m
+[31mE[2023-06-20 16:25:07.783][14753-14920] Can not send to socket 5(127.0.0.1:48928), 32: Broken pipe[0m
+[33mW[2023-06-20 16:34:55.241][16636-16636] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+[0m
+[33mW[2023-06-20 16:34:55.242][16636-16636] Can not open file /home/Judger/Settings/SystemCalls
+2: No such file or directory
+Call trace: 
+/home/langningc2009/OJ/Utilities.cpp:138 static RESULT UTILITIES::LoadFile(std::string, std::string&)
+/home/langningc2009/OJ/Settings.cpp:36 RESULT SETTINGS::Load(std::string)
+[0m
+[31mE[2023-06-20 16:35:13.713][16636-16682] Can not send to socket 5(127.0.0.1:41460), 32: Broken pipe[0m
+[31mE[2023-06-20 16:35:23.722][16636-16733] Can not send to socket 8(127.0.0.1:54448), 32: Broken pipe[0m
+[31mE[2023-06-20 16:35:48.904][16636-16780] Can not send to socket 5(127.0.0.1:39092), 32: Broken pipe[0m
+[31mE[2023-06-20 16:37:19.105][16636-16947] Can not send to socket 5(127.0.0.1:60446), 32: Broken pipe[0m
+[31mE[2023-06-20 16:37:39.602][16636-17023] Can not send to socket 5(127.0.0.1:45572), 32: Broken pipe[0m
+[31mE[2023-06-20 19:05:33.769][16636-21976] Can not send to socket 5(127.0.0.1:36706), 32: Broken pipe[0m
+[31mE[2023-06-20 19:08:30.059][16636-22668] Can not send to socket 10(127.0.0.1:48882), 32: Broken pipe[0m

@@ -1,0 +1,8 @@
+# Ignore files without extension
+*
+!*.*
+!*/
+
+# Ingore generated and temp files
+build/
+**/*.log
