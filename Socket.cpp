@@ -70,6 +70,8 @@ SOCKET::SOCKET(CALL_BACK CallBack)
     ServerAddress.sin_port = htons(Port);
     ServerAddress.sin_addr.s_addr = INADDR_ANY;
     ServerAddress.sin_family = AF_INET;
+    setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &ServerAddress, sizeof(ServerAddress));
+    setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEPORT, &ServerAddress, sizeof(ServerAddress));
 
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (ListenSocket == -1)

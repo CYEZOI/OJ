@@ -64,14 +64,11 @@ RequestAPI("GetSettings", {}, () => { },
             }
         }
         SystemCallList = String(Response.Settings.SystemCallList).split(",");
-        SettingsSystemCallIDInput.min = 0;
-        SettingsSystemCallIDInput.max = SystemCallList.length;
+        SettingsSystemCallID.min = 0;
+        SettingsSystemCallID.max = SystemCallList.length;
     }, () => { }, () => { })
-SettingsSystemCallIDInput.oninput = () => {
-    let SystemCallID = SettingsSystemCallIDInput.value;
-    SettingsSystemCallID.value = SystemCallID;
+const SetData = (SystemCallID) => {
     if (SystemCallsNames[SystemCallID] == undefined) {
-        SettingsSystemCallName.value = (SystemCallID == "" ? "" : "No such system call");
         SettingsSystemCallAllowed.disabled = true;
         SettingsSystemCallBanned.disabled = true;
         SettingsSystemCallAllowedForTimes.disabled = true;
@@ -79,10 +76,11 @@ SettingsSystemCallIDInput.oninput = () => {
         SettingsSystemCallReference.disabled = true;
         return;
     }
+    SettingsSystemCallID.value = SystemCallID;
+    SettingsSystemCallName.value = SystemCallsNames[SystemCallID];
     SettingsSystemCallAllowed.disabled = false;
     SettingsSystemCallBanned.disabled = false;
     SettingsSystemCallAllowedForTimes.disabled = false;
-    SettingsSystemCallName.value = SystemCallsNames[SystemCallID];
     SettingsSystemCallReference.disabled = false;
     if (SystemCallList[SystemCallID] == -1) {
         SettingsSystemCallAllowed.checked = true;
@@ -109,11 +107,13 @@ SettingsSystemCallIDInput.oninput = () => {
     SettingsSystemCallAllowed.onchange = () => {
         if (SettingsSystemCallAllowed.checked) {
             SystemCallList[SystemCallID] = -1;
+            SettingsSystemCallAllowedForTimesInput.disabled = true;
         }
     };
     SettingsSystemCallBanned.onchange = () => {
         if (SettingsSystemCallBanned.checked) {
             SystemCallList[SystemCallID] = 0;
+            SettingsSystemCallAllowedForTimesInput.disabled = true;
         }
     }
     SettingsSystemCallAllowedForTimes.onchange = () => {
@@ -121,10 +121,22 @@ SettingsSystemCallIDInput.oninput = () => {
             SystemCallList[SystemCallID] = SettingsSystemCallAllowedForTimesInput.value;
             SettingsSystemCallAllowedForTimesInput.disabled = false;
         }
-        else {
-            SettingsSystemCallAllowedForTimesInput.disabled = true;
+    }
+};
+SettingsSystemCallID.oninput = () => {
+    let SystemCallID = SettingsSystemCallID.value;
+    SetData(SystemCallID);
+}
+SettingsSystemCallName.oninput = () => {
+    let SystemCallName = SettingsSystemCallName.value;
+    let SystemCallID = -1;
+    for (let i = 0; i < SystemCallsNames.length; i++) {
+        if (SystemCallsNames[i] == SystemCallName) {
+            SystemCallID = i;
+            break;
         }
     }
+    SetData(SystemCallID);
 }
 SettingsSave.onclick = () => {
     AddLoading(SettingsSave);

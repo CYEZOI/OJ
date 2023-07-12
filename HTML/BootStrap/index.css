@@ -1,4 +1,4 @@
-.TestGroups,
+.Submission,
 .TestGroup {
     cursor: default;
     margin: 10px;
@@ -22,13 +22,13 @@
     position: relative;
 }
 
-.TestGroups,
+.Submission,
 .TestGroup,
 .TestCase {
     transition: 0.5s;
 }
 
-.TestGroups:hover,
+.Submission:hover,
 .TestGroup:hover,
 .TestCase:hover {
     box-shadow: 0px 10px 10px 10px rgba(0, 0, 0, 0.1);
@@ -129,7 +129,7 @@
     vertical-align: top;
 }
 
-.TestGroupsResult,
+.SubmissionResult,
 .TestGroupResult {
     position: relative;
     display: inline-block;
@@ -204,18 +204,18 @@
     transition: 0.5s;
 }
 
-.TestGroupsDescription {
+.SubmissionDescription {
     color: white;
     font-size: 15px;
     line-height: 15px;
     padding: 5px 10px;
 }
 
-.TestGroupsDescription>pre {
+.SubmissionDescription>pre {
     white-space: break-spaces;
 }
 
-.TestGroupsLimit,
+.SubmissionLimit,
 .TestGroupLimit {
     position: relative;
     height: 15px;

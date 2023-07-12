@@ -110,12 +110,27 @@ RequestAPI("GetSubmissions", {
                         SubmissionRejudgeButton.classList.add("btn", "btn-warning");
                         SubmissionRejudgeButton.innerText = "Rejudge";
                         SubmissionRejudgeButton.onclick = () => {
-                            RequestAPI("RejudgeSubmission", {
-                                "SID": Number(Response.Submissions[i].SID)
-                            }, () => { }, () => {
-                                SwitchPage("Submission", {
-                                    "SID": Response.Submissions[i].SID
-                                });
+                            ShowModal("Rejudge Submission", "Are you sure to rejudge it?", () => {
+                                if (Response.Result > 10) {
+                                    ShowModal("Rejudge Submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
+                                        RequestAPI("RejudgeSubmission", {
+                                            "SID": Number(Data.SID)
+                                        }, () => { }, () => {
+                                            SwitchPage("Submission", {
+                                                "SID": Response.Submissions[i].SID
+                                            });
+                                        }, () => { });
+                                    }, () => { });
+                                }
+                                else {
+                                    RequestAPI("RejudgeSubmission", {
+                                        "SID": Number(Data.SID)
+                                    }, () => { }, () => {
+                                        SwitchPage("Submission", {
+                                            "SID": Response.Submissions[i].SID
+                                        });
+                                    }, () => { });
+                                }
                             }, () => { });
                         };
                         let SubmissionEditButton = document.createElement("button"); SubmissionOperationButtonGroup.appendChild(SubmissionEditButton);

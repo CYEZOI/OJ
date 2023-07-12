@@ -382,11 +382,12 @@ void API_PROCEED::TestAddProblem()
     SampleList.push_back(TestSample);
     TestProblem.PID = "1000";
     TestProblem.Title = "Add";
+    TestProblem.IOFilename = "Add";
     TestProblem.Description = "**Add** two numbers $a$ and $b$";
     TestProblem.Input = "two numbers in _one line_";
     TestProblem.Output = "one number";
     TestProblem.Samples = SampleList;
-    TestProblem.Hint = "$$1<=a,b<=1000$$";
+    TestProblem.Range = "$1<=a,b<=1000$";
     TEST_GROUP_DATA TestGroup1;
     TestGroup1.TGID = 0;
     TestGroup1.AddTestCase("1 2", "3", 1000, 1024 * 1024 * 1024, 100);
@@ -429,15 +430,6 @@ void API_PROCEED::TestAddProblem()
     TestGroup4.AddTestCase("1357924680 -2468013579", "-1110088899", 1000, 1024 * 1024 * 1024, 100);
     TestGroup4.AddTestCase("1122334455 -6677889900", "-5555555445", 1000, 1024 * 1024 * 1024, 100);
     TestProblem.TestGroups.push_back(TestGroup4);
-    // UNJUDGED_TEST_GROUP TestGroup5; // WA
-    // TestGroup5.AddTestCase("1 1", "3", 1000, 1024 * 1024 * 1024, 100);
-    // TestProblem.TestGroups.push_back(TestGroup5);
-    // UNJUDGED_TEST_GROUP TestGroup6; // TLE
-    // TestGroup6.AddTestCase("1 2", "3", 1, 1024 * 1024 * 1024, 100);
-    // TestProblem.TestGroups.push_back(TestGroup6);
-    // UNJUDGED_TEST_GROUP TestGroup7; // MLE
-    // TestGroup7.AddTestCase("1 2", "3", 1000, 1, 100);
-    // TestProblem.TestGroups.push_back(TestGroup7);
     PROBLEMS::AddProblem(TestProblem);
 }
 configor::json API_PROCEED::Proceed(configor::json Request)

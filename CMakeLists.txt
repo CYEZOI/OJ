@@ -13,7 +13,6 @@ add_executable(main
     Files.cpp
     HTTPRequest.cpp
     HTTPResponse.cpp
-    JudgeResult.cpp
     JudgingList.cpp
     Logger.cpp
     Problem.cpp

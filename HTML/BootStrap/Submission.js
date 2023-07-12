@@ -4,11 +4,11 @@ if (Data.SID == null) {
 }
 
 document.getElementsByTagName("h4")[0].innerHTML += " " + Data.SID;
-// let SubmissionSpinnerCollapse = new bootstrap.Collapse("#SubmissionSpinner", {
-//     toggle: false
-// });
+let SubmissionSpinnerCollapse = new bootstrap.Collapse("#SubmissionSpinner", {
+    toggle: false
+});
 const ReloadData = () => {
-    // SubmissionSpinnerCollapse.show();
+    SubmissionSpinnerCollapse.show();
     RequestAPI("GetSubmission", {
         "SID": Number(Data.SID)
     }, () => { }, (Response) => {
@@ -30,22 +30,24 @@ const ReloadData = () => {
             });
         };
         SubmissionRejudgeButton.onclick = () => {
-            if (Response.Result > 10) {
-                ShowModal("Rejudge Submission", "This submission is still running, are you sure to rejudge it?", () => {
+            ShowModal("Rejudge Submission", "Are you sure to rejudge it?", () => {
+                if (Response.Result > 10) {
+                    ShowModal("Rejudge Submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
+                        RequestAPI("RejudgeSubmission", {
+                            "SID": Number(Data.SID)
+                        }, () => { }, () => {
+                            ReloadData();
+                        }, () => { });
+                    }, () => { });
+                }
+                else {
                     RequestAPI("RejudgeSubmission", {
                         "SID": Number(Data.SID)
                     }, () => { }, () => {
                         ReloadData();
                     }, () => { });
-                }, () => { });
-            }
-            else {
-                RequestAPI("RejudgeSubmission", {
-                    "SID": Number(Data.SID)
-                }, () => { }, () => {
-                    ReloadData();
-                }, () => { });
-            }
+                }
+            }, () => { });
         };
         SubmissionEditButton.onclick = () => {
             SwitchPage("EditSubmission", {
@@ -64,20 +66,20 @@ const ReloadData = () => {
             }, () => { });
         };
 
-        SubmissionData.classList.add("TestGroups");
+        SubmissionData.classList.add("Submission");
         SubmissionData.classList.add("JudgeResult" + SubmissionResultShortTexts[Response.Result]);
         {
             let SubmissionResult = document.createElement("div"); SubmissionData.appendChild(SubmissionResult);
-            SubmissionResult.classList.add("TestGroupsResult");
+            SubmissionResult.classList.add("SubmissionResult");
             SubmissionResult.innerText = SubmissionResultShortTexts[Response.Result];
             let SubmissionScore = document.createElement("div"); SubmissionData.appendChild(SubmissionScore);
-            SubmissionScore.classList.add("TestGroupsLimit");
+            SubmissionScore.classList.add("SubmissionLimit");
             SubmissionScore.innerText = Response.Score + "pts";
             let SubmissionTime = document.createElement("div"); SubmissionData.appendChild(SubmissionTime);
-            SubmissionTime.classList.add("TestGroupsLimit");
+            SubmissionTime.classList.add("SubmissionLimit");
             SubmissionTime.innerText = TimeToString(Response.TimeSum);
             let SubmissionMemory = document.createElement("div"); SubmissionData.appendChild(SubmissionMemory);
-            SubmissionMemory.classList.add("TestGroupsLimit");
+            SubmissionMemory.classList.add("SubmissionLimit");
             SubmissionMemory.innerText = MemoryToString(Response.Memory);
             Response.TestGroups.sort((a, b) => {
                 return (a.TGID > b.TGID ? 1 : -1);
@@ -148,6 +150,12 @@ const ReloadData = () => {
                     });
                 }
             });
+            let SubmissionDescription = document.createElement("div"); SubmissionData.appendChild(SubmissionDescription);
+            SubmissionDescription.classList.add("SubmissionDescription");
+            {
+                let SubmissionDescriptionValue = document.createElement("pre"); SubmissionDescription.appendChild(SubmissionDescriptionValue);
+                SubmissionDescriptionValue.innerText = Response.Description;
+            }
         }
         if (Response.Code != null && SubmissionCode.value == "") {
             SubmissionCode.value = Response.Code;
@@ -167,7 +175,7 @@ const ReloadData = () => {
             });
         }
         if (Response.Result <= 10) {
-            // SubmissionSpinnerCollapse.hide();
+            SubmissionSpinnerCollapse.hide();
         }
         else {
             setTimeout(() => {
@@ -177,4 +185,4 @@ const ReloadData = () => {
     }, () => { }, () => { })
 };
 ReloadData();
-// SubmissionSpinnerCollapse.hide();
+SubmissionSpinnerCollapse.hide();

@@ -27,7 +27,4 @@ enum JUDGE_RESULT
     REJECTED
 };
 
-std::string GetJudgeResultString(JUDGE_RESULT JudgeResult);
-std::string GetJudgeResultColorString(JUDGE_RESULT JudgeResult);
-
 #endif

@@ -88,24 +88,14 @@ RequestAPI("GetProblem",
                 SampleInput.classList.add("col-6");
                 {
                     let InputTextArea = document.createElement("textarea"); SampleInput.appendChild(InputTextArea);
-                    CodeMirror.fromTextArea(InputTextArea, {
-                        cursorBlinkRate: 0,
-                        gutters: ["CodeMirror-linenumbers"],
-                        lineNumbers: true,
-                        readOnly: true
-                    }).setSize("100%", "auto");
+                    InputTextArea.classList.add("form-control");
                     InputTextArea.innerText = Sample.Input;
                 }
                 let SampleOutput = document.createElement("div"); SampleData.appendChild(SampleOutput);
                 SampleOutput.classList.add("col-6");
                 {
                     let OutputTextArea = document.createElement("textarea"); SampleOutput.appendChild(OutputTextArea);
-                    CodeMirror.fromTextArea(OutputTextArea, {
-                        cursorBlinkRate: 0,
-                        gutters: ["CodeMirror-linenumbers"],
-                        lineNumbers: true,
-                        readOnly: true
-                    }).setSize("100%", "auto");
+                    OutputTextArea.classList.add("form-control");
                     OutputTextArea.innerText = Sample.Output;
                 }
                 if (Sample.Description != "") {
@@ -117,6 +107,15 @@ RequestAPI("GetProblem",
         });
         Samples.removeChild(Samples.lastChild);
         CreateAccordion("Samples", Samples.outerHTML, "Samples");
+        let Textarea = document.querySelectorAll("textarea.form-control");
+        for (let i = 0; i < Textarea.length; i++) {
+            CodeMirror.fromTextArea(Textarea[i], {
+                cursorBlinkRate: 0,
+                gutters: ["CodeMirror-linenumbers"],
+                lineNumbers: true,
+                readOnly: true
+            }).setSize("100%", "auto");
+        }
 
         if (Response.Range != "") {
             CreateAccordion("Range", Response.Range, "Range");

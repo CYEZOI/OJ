@@ -55,7 +55,7 @@ const CreateVditorEditor = (Editor, Content) => {
         }
     })
 }
-const ShowModal = (Title, Body, PrimaryButtonOnClick, SecondaryButtonOnClick, PrimaryButtonText = "Yes", SecondaryButtonText = "No") => {
+const ShowModal = (Title, Body, PrimaryButtonOnClick, SecondaryButtonOnClick, PrimaryButtonColor = "danger", SecondaryButtonColor = "secondary") => {
     let Modal = document.createElement("div"); document.body.appendChild(Modal);
     Modal.id = "Modal";
     Modal.classList.add("modal");
@@ -86,10 +86,10 @@ const ShowModal = (Title, Body, PrimaryButtonOnClick, SecondaryButtonOnClick, Pr
                 {
                     let SecondaryButton = document.createElement("button"); ModalFooter.appendChild(SecondaryButton);
                     SecondaryButton.classList.add("btn");
-                    SecondaryButton.classList.add("btn-secondary");
+                    SecondaryButton.classList.add("btn-" + SecondaryButtonColor);
                     SecondaryButton.type = "button";
                     SecondaryButton.setAttribute("data-bs-dismiss", "modal");
-                    SecondaryButton.innerText = SecondaryButtonText;
+                    SecondaryButton.innerText = "No";
                     SecondaryButton.onclick = () => {
                         SecondaryButtonOnClick();
                         setTimeout(() => {
@@ -98,10 +98,10 @@ const ShowModal = (Title, Body, PrimaryButtonOnClick, SecondaryButtonOnClick, Pr
                     };
                     let PrimaryButton = document.createElement("button"); ModalFooter.appendChild(PrimaryButton);
                     PrimaryButton.classList.add("btn");
-                    PrimaryButton.classList.add("btn-primary");
+                    PrimaryButton.classList.add("btn-" + PrimaryButtonColor);
                     PrimaryButton.type = "button";
                     PrimaryButton.setAttribute("data-bs-dismiss", "modal");
-                    PrimaryButton.innerText = PrimaryButtonText;
+                    PrimaryButton.innerText = "Yes";
                     PrimaryButton.onclick = () => {
                         PrimaryButtonOnClick();
                         setTimeout(() => {

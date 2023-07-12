@@ -288,13 +288,16 @@ RESULT TEST_CASE::CheckSystemCall()
     if (ptrace(PTRACE_GETREGS, ProcessID, nullptr, &Regs) == -1)
         CREATE_RESULT(true, "Can not get registers")
     int CallID = (unsigned int)Regs.orig_rax % SystemCallList.size();
+    std::cout << "CallID: " << CallID << "  SystemCallList[CallID]: " << SystemCallList[CallID] << std::endl;
     if (SystemCallList[CallID] == 0)
     {
         Result = JUDGE_RESULT::RESTRICTED_FUNCTION;
         Description = "Child process tried to execute system call " + std::to_string(CallID);
+        kill(ProcessID, SIGKILL);
         CREATE_RESULT(false, "The system call is banned")
     }
-    SystemCallList[CallID]--;
+    else
+        SystemCallList[CallID]--;
     if (ptrace(PTRACE_SYSCALL, ProcessID, nullptr, nullptr) != 0)
         CREATE_RESULT(false, "Can not trace system calls")
     CREATE_RESULT(true, "No banned system call");
@@ -356,8 +359,9 @@ RESULT TEST_CASE::Run()
     else
     {
         this->ProcessID = ProcessID;
-        ParentProcess();
-        RemoveEnvrionment();
+        OUTPUT_IF_FAILED(ParentProcess());
+        kill(ProcessID, SIGKILL);
+        OUTPUT_IF_FAILED(RemoveEnvrionment());
     }
 
     CREATE_RESULT(true, "Run ended");
