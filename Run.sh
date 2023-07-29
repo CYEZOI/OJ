@@ -7,6 +7,7 @@ for mount_point in (mount | awk '{print $3}')
 end
 rm -f (find "/home/Judger/" -name "*.log") Log.log ./build/main
 service mysql start > /dev/null
+cmake -B build
 cd ./build
 make
 cd ../
