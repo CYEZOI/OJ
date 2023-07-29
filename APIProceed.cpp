@@ -72,8 +72,19 @@ configor::json API_PROCEED::Register(std::string Username, std::string Password,
     RETURN_JSON_IF_FAILED(EMAIL_Verification_CODES::DeleteEmailVerificationCode(EmailAddress))
     RETURN_JSON_IF_FAILED(USERS::CheckUsernameAvailable(Username))
     RETURN_JSON_IF_FAILED(USERS::CheckEmailAvailable(EmailAddress))
-    RETURN_JSON_IF_FAILED(USERS::CreateUser(Username, Password, EmailAddress, ""))
+    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Password, EmailAddress, ""))
     CREATE_JSON(true, "Register success");
+}
+configor::json API_PROCEED::GetUser(int UID)
+{
+    configor::json ResponseJSON = BaseJSON;
+    USER User;
+    RETURN_JSON_IF_FAILED(USERS::GetUser(UID, User))
+    ResponseJSON["Success"] = true;
+    ResponseJSON["Data"]["Username"] = User.Username;
+    ResponseJSON["Data"]["Email"] = User.Email;
+    ResponseJSON["Data"]["Nickname"] = User.Nickname;
+    return ResponseJSON;
 }
 
 configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups)
@@ -206,6 +217,7 @@ configor::json API_PROCEED::AddSubmission(std::string PID, bool EnableO2, std::s
     SUBMISSION Submission;
     RETURN_JSON_IF_FAILED(Submission.Set(Code, PID))
     Submission.EnableO2 = EnableO2;
+    Submission.UID = UID;
     RETURN_JSON_IF_FAILED(SUBMISSIONS::AddSubmission(Submission))
     RETURN_JSON_IF_FAILED(JudgingList.Add(Submission))
     configor::json ResponseJSON = BaseJSON;
@@ -220,47 +232,68 @@ configor::json API_PROCEED::GetSubmission(int SID)
     RETURN_JSON_IF_FAILED(SUBMISSIONS::GetSubmission(SID, Submission))
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
+    ResponseJSON["Data"]["EnableO2"] = Submission.EnableO2;
     ResponseJSON["Data"]["Result"] = (int)Submission.Result;
     ResponseJSON["Data"]["Description"] = Submission.Description;
     ResponseJSON["Data"]["PID"] = Submission.PID;
+    ResponseJSON["Data"]["UID"] = Submission.UID;
     if (IsAdmin || Submission.UID == UID)
-    {
         ResponseJSON["Data"]["Code"] = Submission.Code;
-    }
     ResponseJSON["Data"]["Time"] = Submission.Time;
     ResponseJSON["Data"]["TimeSum"] = Submission.TimeSum;
     ResponseJSON["Data"]["Memory"] = Submission.Memory;
     ResponseJSON["Data"]["Score"] = Submission.Score;
-    configor::json::array_type TestGroups;
+    std::string TestGroupsString;
+    SUBMISSIONS::TestGroupsToJSON(Submission.TestGroups, TestGroupsString);
+    ResponseJSON["Data"]["TestGroups"] = TestGroupsString;
+    configor::json::array_type TestGroupsLimits;
     for (auto i : Submission.TestGroups)
     {
         configor::json TempTestGroup;
         TempTestGroup["TGID"] = i.TGID;
-        TempTestGroup["Score"] = i.Score;
-        TempTestGroup["Result"] = (int)i.Result;
-        TempTestGroup["TestCasesPassed"] = i.TestCasesPassed;
-        TempTestGroup["Time"] = i.Time;
-        TempTestGroup["TimeSum"] = i.TimeSum;
-        TempTestGroup["Memory"] = i.Memory;
-        TempTestGroup["TestCases"].array({});
-        configor::json::array_type TestCases;
+        configor::json::array_type TestCasesLimits;
         for (auto j : i.TestCases)
         {
             configor::json TempTestCase;
             TempTestCase["TCID"] = j.TCID;
-            TempTestCase["Result"] = (int)j.Result;
-            TempTestCase["Description"] = j.Description;
-            TempTestCase["Time"] = j.Time;
             TempTestCase["TimeLimit"] = j.UnjudgedTestCase->TimeLimit;
-            TempTestCase["Memory"] = j.Memory;
             TempTestCase["MemoryLimit"] = j.UnjudgedTestCase->MemoryLimit;
-            TempTestCase["Score"] = j.Score;
-            TestCases.push_back(TempTestCase);
+            TestCasesLimits.push_back(TempTestCase);
         }
-        TempTestGroup["TestCases"] = TestCases;
-        TestGroups.push_back(TempTestGroup);
+        TempTestGroup["TestCasesLimits"] = TestCasesLimits;
+        TestGroupsLimits.push_back(TempTestGroup);
     }
-    ResponseJSON["Data"]["TestGroups"] = TestGroups;
+    ResponseJSON["Data"]["TestGroupsLimits"] = TestGroupsLimits;
+    // configor::json::array_type TestGroups;
+    // for (auto i : Submission.TestGroups)
+    // {
+    //     configor::json TempTestGroup;
+    //     TempTestGroup["TGID"] = i.TGID;
+    //     TempTestGroup["Score"] = i.Score;
+    //     TempTestGroup["Result"] = (int)i.Result;
+    //     TempTestGroup["TestCasesPassed"] = i.TestCasesPassed;
+    //     TempTestGroup["Time"] = i.Time;
+    //     TempTestGroup["TimeSum"] = i.TimeSum;
+    //     TempTestGroup["Memory"] = i.Memory;
+    //     TempTestGroup["TestCases"].array({});
+    //     configor::json::array_type TestCases;
+    //     for (auto j : i.TestCases)
+    //     {
+    //         configor::json TempTestCase;
+    //         TempTestCase["TCID"] = j.TCID;
+    //         TempTestCase["Result"] = (int)j.Result;
+    //         TempTestCase["Description"] = j.Description;
+    //         TempTestCase["Time"] = j.Time;
+    //         TempTestCase["TimeLimit"] = j.UnjudgedTestCase->TimeLimit;
+    //         TempTestCase["Memory"] = j.Memory;
+    //         TempTestCase["MemoryLimit"] = j.UnjudgedTestCase->MemoryLimit;
+    //         TempTestCase["Score"] = j.Score;
+    //         TestCases.push_back(TempTestCase);
+    //     }
+    //     TempTestGroup["TestCases"] = TestCases;
+    //     TestGroups.push_back(TempTestGroup);
+    // }
+    // ResponseJSON["Data"]["TestGroups"] = TestGroups;
     return ResponseJSON;
 }
 configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, std::string Code, int Result, std::string Description, int Time, int TimeSum, int Memory, int Score, bool EnableO2, std::string TestGroups)
@@ -268,6 +301,7 @@ configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, 
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     SUBMISSION Submission;
+    Submission.SID = SID;
     Submission.PID = PID;
     Submission.UID = UID;
     Submission.Code = Code;
@@ -505,7 +539,14 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                     RETURN_JSON_IF_FAILED(TOKENS::GetUID(Token, UID));
                     RETURN_JSON_IF_FAILED(USERS::IsAdmin(UID, IsAdmin));
 
-                    if (Action == "AddProblem")
+                    if (Action == "GetUser")
+                    {
+                        if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
+                            ResponseJSON["Message"] = "Invalid parameters";
+                        else
+                            ResponseJSON = GetUser(Data["UID"].as_integer());
+                    }
+                    else if (Action == "AddProblem")
                     {
                         if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
                                                {"Title", configor::config_value_type::string},

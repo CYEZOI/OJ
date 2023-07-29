@@ -2,7 +2,7 @@
 #include "Utilities.hpp"
 #include "Privilege.hpp"
 
-RESULT USERS::CreateUser(std::string Username, std::string Password, std::string Email, std::string Nickname, int Privilege)
+RESULT USERS::AddUser(std::string Username, std::string Password, std::string Email, std::string Nickname, int Privilege)
 {
     RETURN_IF_FAILED(DATABASE::INSERT("Users")
                          .Insert("Username", Username)
@@ -67,7 +67,30 @@ RESULT USERS::IsAdmin(int UID, bool &Result)
                              {
                                  if (Data.size() == 0)
                                      CREATE_RESULT(false, "No such user");
-                                 Result = (atoi(Data[0]["Privilege"].c_str()) == PRIVILEGE_LEVEL::ADMIN);
+                                 Result = (atoi(Data[0]["Privilege"].c_str()) == PRIVILEGE_LEVEL::PRIVILEGE_LEVEL_ADMIN);
+                                 CREATE_RESULT(true, "Success");
+                             }));
+    CREATE_RESULT(true, "Success");
+}
+RESULT USERS::GetUser(int UID, USER &User)
+{
+    RETURN_IF_FAILED(DATABASE::SELECT("Users")
+                         .Select("UID")
+                         .Select("Username")
+                         .Select("Email")
+                         .Select("Nickname")
+                         .Select("Privilege")
+                         .Where("UID", UID)
+                         .Execute(
+                             [&User](auto Data)
+                             {
+                                 if (Data.size() == 0)
+                                     CREATE_RESULT(false, "No such user");
+                                 User.UID = atoi(Data[0]["UID"].c_str());
+                                 User.Username = Data[0]["Username"];
+                                 User.Email = Data[0]["Email"];
+                                 User.Nickname = Data[0]["Nickname"];
+                                 User.Privilege = atoi(Data[0]["Privilege"].c_str());
                                  CREATE_RESULT(true, "Success");
                              }));
     CREATE_RESULT(true, "Success");

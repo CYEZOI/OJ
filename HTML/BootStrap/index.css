@@ -26,84 +26,13 @@
 .TestGroup,
 .TestCase {
     transition: 0.5s;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
 }
 
 .Submission:hover,
 .TestGroup:hover,
 .TestCase:hover {
-    box-shadow: 0px 10px 10px 10px rgba(0, 0, 0, 0.1);
-}
-
-.JudgeResultUKE {
-    background-color: rgba(0, 0, 255, 0.5);
-}
-
-.JudgeResultAC {
-    background-color: rgba(73, 205, 50, 0.5);
-}
-
-.JudgeResultPE {
-    background-color: rgba(255, 119, 142, 0.5);
-}
-
-.JudgeResultWA {
-    background-color: rgba(211, 20, 13, 0.5);
-}
-
-.JudgeResultTE {
-    background-color: rgba(12, 0, 102, 0.5);
-}
-
-.JudgeResultME {
-    background-color: rgba(83, 0, 167, 0.5);
-}
-
-.JudgeResultOLE {
-    background-color: rgba(131, 0, 167, 0.5);
-}
-
-.JudgeResultRE {
-    background-color: rgba(26, 38, 200, 0.5);
-}
-
-.JudgeResultRF {
-    background-color: rgba(0, 145, 130, 0.5);
-}
-
-.JudgeResultCE {
-    background-color: rgba(139, 116, 0, 0.5);
-}
-
-.JudgeResultSE {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.JudgeResultWT {
-    background-color: rgba(65, 0, 217, 0.5);
-}
-
-.JudgeResultFC {
-    background-color: rgba(76, 0, 255, 0.5);
-}
-
-.JudgeResultCP {
-    background-color: rgba(94, 25, 255, 0.5);
-}
-
-.JudgeResultCPD {
-    background-color: rgba(115, 56, 255, 0.5);
-}
-
-.JudgeResultJG {
-    background-color: rgba(132, 79, 255, 0.5);
-}
-
-.JudgeResultSK {
-    background-color: rgba(43, 43, 43, 0.5);
-}
-
-.JudgeResultRJ {
-    background-color: rgba(78, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.2);
 }
 
 .TestCaseNumber {

@@ -114,7 +114,7 @@ RequestAPI("GetSubmissions", {
                                 if (Response.Result > 10) {
                                     ShowModal("Rejudge Submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
                                         RequestAPI("RejudgeSubmission", {
-                                            "SID": Number(Data.SID)
+                                            "SID": Number(Response.Submissions[i].SID)
                                         }, () => { }, () => {
                                             SwitchPage("Submission", {
                                                 "SID": Response.Submissions[i].SID
@@ -124,7 +124,7 @@ RequestAPI("GetSubmissions", {
                                 }
                                 else {
                                     RequestAPI("RejudgeSubmission", {
-                                        "SID": Number(Data.SID)
+                                        "SID": Number(Response.Submissions[i].SID)
                                     }, () => { }, () => {
                                         SwitchPage("Submission", {
                                             "SID": Response.Submissions[i].SID
@@ -139,7 +139,7 @@ RequestAPI("GetSubmissions", {
                         SubmissionEditButton.innerText = "Edit";
                         SubmissionEditButton.onclick = () => {
                             SwitchPage("EditSubmission", {
-                                "SID": Number(Response.Submissions[i].SID)
+                                "SID": Response.Submissions[i].SID
                             });
                         };
                         let SubmissionDeleteButton = document.createElement("button"); SubmissionOperationButtonGroup.appendChild(SubmissionDeleteButton);

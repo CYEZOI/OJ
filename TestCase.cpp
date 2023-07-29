@@ -240,7 +240,6 @@ RESULT TEST_CASE::CheckSignal()
         {
             Result = JUDGE_RESULT::RUNTIME_ERROR;
             Description = "Received an unknown signal";
-            ;
             CREATE_RESULT(false, "Can not recognize signal");
         }
         Result = JUDGE_RESULT::JUDGED;
@@ -288,7 +287,6 @@ RESULT TEST_CASE::CheckSystemCall()
     if (ptrace(PTRACE_GETREGS, ProcessID, nullptr, &Regs) == -1)
         CREATE_RESULT(true, "Can not get registers")
     int CallID = (unsigned int)Regs.orig_rax % SystemCallList.size();
-    std::cout << "CallID: " << CallID << "  SystemCallList[CallID]: " << SystemCallList[CallID] << std::endl;
     if (SystemCallList[CallID] == 0)
     {
         Result = JUDGE_RESULT::RESTRICTED_FUNCTION;
@@ -415,17 +413,11 @@ RESULT TEST_CASE::Compare()
         Description = "Do not output to stderr if you do so. ";
     }
     else if (Output == UnjudgedTestCase->Answer)
-    {
         Result = JUDGE_RESULT::ACCEPTED;
-        Description = "Accepted";
-    }
     else
     {
         if (FixedOutput == FixedAnswer)
-        {
             Result = JUDGE_RESULT::PRESENTATION_ERROR;
-            Description = "Presentation error";
-        }
         else if (Output == "" && StandardOutput != "")
         {
             Result = JUDGE_RESULT::RUNTIME_ERROR;
@@ -437,10 +429,7 @@ RESULT TEST_CASE::Compare()
             Description = "Output is empty, checking if the program output it's data to a wrong file";
         }
         else
-        {
             Result = JUDGE_RESULT::WRONG_ANSWER;
-            Description = "Wrong answer";
-        }
     }
     CREATE_RESULT(true, "Compared");
 }

@@ -11,13 +11,24 @@ RESULT SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROU
         for (auto TestGroup : JSON)
         {
             int TGID = TestGroup["TGID"].as_integer();
+            while (TestGroups.size() <= TGID)
+                TestGroups.push_back({});
+            TestGroups[TGID].TGID = TGID;
+            TestGroups[TGID].PID = PID;
+            TestGroups[TGID].SID = SID;
             TestGroups[TGID].Result = (JUDGE_RESULT)TestGroup["Result"].as_integer();
             TestGroups[TGID].Time = TestGroup["Time"].as_integer();
             TestGroups[TGID].TimeSum = TestGroup["TimeSum"].as_integer();
             TestGroups[TGID].Memory = TestGroup["Memory"].as_integer();
+            TestGroups[TGID].Score = TestGroup["Score"].as_integer();
             for (auto TestCase : TestGroup["TestCases"])
             {
                 int TCID = TestCase["TCID"].as_integer();
+                while (TestGroups[TGID].TestCases.size() <= TCID)
+                    TestGroups[TGID].TestCases.push_back({});
+                TestGroups[TGID].TestCases[TCID].TCID = TCID;
+                TestGroups[TGID].TestCases[TCID].PID = PID;
+                TestGroups[TGID].TestCases[TCID].SID = SID;
                 TestGroups[TGID].TestCases[TCID].Output = TestCase["Output"].as_string();
                 TestGroups[TGID].TestCases[TCID].StandardOutput = TestCase["StandardOutput"].as_string();
                 TestGroups[TGID].TestCases[TCID].StandardError = TestCase["StandardError"].as_string();
@@ -48,6 +59,7 @@ RESULT SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::st
             NewTestGroup["Time"] = TestGroup.Time;
             NewTestGroup["TimeSum"] = TestGroup.TimeSum;
             NewTestGroup["Memory"] = TestGroup.Memory;
+            NewTestGroup["Score"] = TestGroup.Score;
             NewTestGroup["TestCases"] = configor::json::array({});
             for (auto &TestCase : TestGroup.TestCases)
                 NewTestGroup["TestCases"].push_back({{"TCID", TestCase.TCID},

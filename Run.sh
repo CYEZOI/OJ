@@ -5,17 +5,13 @@ for mount_point in (mount | awk '{print $3}')
         umount "$mount_point"
     end
 end
-rm -f (find "/home/Judger/" -name "*.log")
-rm Log.log
-service mysql start
-echo "Cleaned"
+rm -f (find "/home/Judger/" -name "*.log") Log.log ./build/main
+service mysql start > /dev/null
 cd ./build
 make
 cd ../
-while true;
-    if [ (echo (netstat -anp | grep "127.0.0.1:80")) = "" ]
-        break
-    end
+if test -f "./build/main"
+    clear
+    ./build/main
+    cat Log.log
 end
-echo "Start running program..."
-./build/main

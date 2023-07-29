@@ -23,6 +23,7 @@ public:
     configor::json CheckEmailAvailable(std::string EmailAddress);
     configor::json SendVerificationCode(std::string EmailAddress);
     configor::json Login(std::string Username, std::string Password);
+    configor::json GetUser(int UID);
 
     configor::json AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups);
     configor::json GetProblem(std::string PID);

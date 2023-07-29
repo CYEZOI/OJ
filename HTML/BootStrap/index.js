@@ -1,4 +1,6 @@
 const SubmissionResultShortTexts = ["UKE", "AC", "PE", "WA", "TE", "ME", "OLE", "RE", "RF", "CE", "SE", "WT", "FC", "CP", "CPD", "JG", "JGD", "CMP", "SK", "RJ"];
+const SubmissionResultTexts = ["Unknown Error", "Accepted", "Presentation Error", "Wrong Answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Output Limit Exceeded", "Runtime Error", "Restricted Function", "Compilation Error", "System Error", "Waiting", "Fetched", "Compiling", "Compiled", "Judging", "Judged", "Comparing", "Skipped", "Rejected"];
+const SubmissionResultColors = ["#0000FF", "#49CD32", "#FF778E", "#D3140D", "#0C0066", "#5300A7", "#8300A7", "#1A26C8", "#009182", "#8B7400", "#000000", "#4100D9", "#4C00FF", "#5E19FF", "#7340FF", "#844FFF", "#967FFF", "#A87DFF", "#4B4B4B", "#4E0000"];
 const Regexes = {
     "Username": /^[0-9a-zA-Z]{4,16}$/,
     "Password": /^([^a-z]+|[^A-Z]+|[^0-9]+|[a-zA-Z0-9]+|)$/,
@@ -254,6 +256,10 @@ const RequestAPI = async (Action, Data, CallBack, SuccessCallback, FailCallback,
             ShowError("Request failed: " + Response.status + " " + Response.statusText);
             ErrorCallback();
         }
+    }).catch((Error) => {
+        CallBack();
+        ShowError("Request failed: " + Error);
+        ErrorCallback();
     });
 };
 const SwitchPage = async (Path, Data = {}, PushState = true) => {
@@ -320,12 +326,17 @@ const CheckTokenAvailable = () => {
     }, () => { }, false);
 };
 (() => {
+    if (SubmissionResultShortTexts.length != SubmissionResultTexts.length || SubmissionResultShortTexts.length != SubmissionResultColors.length) {
+        MainContainer.innerHTML = "System error: SubmissionResultShortTexts, SubmissionResultTexts and SubmissionResultColors have different length";
+        return;
+    }
     for (let i = 0; i < NavigateBar.children[0].children.length; i++) {
         NavigateBar.children[0].children[i].children[0].onclick = () => {
             SwitchPage(NavigateBar.children[0].children[i].children[0].innerText);
         };
     }
-    SwitchPage("Login");
+    CheckTokenAvailable();
+    SwitchPage("Home");
 })();
 onpopstate = (Event) => {
     if (Event.isTrusted && Event.state != null) {

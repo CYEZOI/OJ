@@ -51,7 +51,7 @@ const ReloadData = () => {
         };
         SubmissionEditButton.onclick = () => {
             SwitchPage("EditSubmission", {
-                "SID": Response.SID
+                "SID": Data.SID
             });
         };
         SubmissionDeleteButton.onclick = () => {
@@ -67,7 +67,8 @@ const ReloadData = () => {
         };
 
         SubmissionData.classList.add("Submission");
-        SubmissionData.classList.add("JudgeResult" + SubmissionResultShortTexts[Response.Result]);
+        // SubmissionData.classList.add("JudgeResult" + SubmissionResultShortTexts[Response.Result]);
+        SubmissionData.style.backgroundColor = SubmissionResultColors[Response.Result];
         {
             let SubmissionResult = document.createElement("div"); SubmissionData.appendChild(SubmissionResult);
             SubmissionResult.classList.add("SubmissionResult");
@@ -81,14 +82,19 @@ const ReloadData = () => {
             let SubmissionMemory = document.createElement("div"); SubmissionData.appendChild(SubmissionMemory);
             SubmissionMemory.classList.add("SubmissionLimit");
             SubmissionMemory.innerText = MemoryToString(Response.Memory);
+            Response.TestGroups = JSON.parse(Response.TestGroups);
             Response.TestGroups.sort((a, b) => {
+                return (a.TGID > b.TGID ? 1 : -1);
+            });
+            Response.TestGroupsLimits.sort((a, b) => {
                 return (a.TGID > b.TGID ? 1 : -1);
             });
             var TestCaseCounter = 1;
             Response.TestGroups.map((TestGroup) => {
                 let TestGroupElement = document.createElement("div"); SubmissionData.appendChild(TestGroupElement);
                 TestGroupElement.classList.add("TestGroup");
-                TestGroupElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestGroup.Result]);
+                // TestGroupElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestGroup.Result]);
+                TestGroupElement.style.backgroundColor = SubmissionResultColors[TestGroup.Result];
                 {
                     let TestGroupResult = document.createElement("div"); TestGroupElement.appendChild(TestGroupResult);
                     TestGroupResult.classList.add("TestGroupResult");
@@ -104,7 +110,8 @@ const ReloadData = () => {
                     TestGroup.TestCases.map((TestCase) => {
                         let TestCaseElement = document.createElement("div"); TestGroupElement.appendChild(TestCaseElement);
                         TestCaseElement.classList.add("TestCase");
-                        TestCaseElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestCase.Result]);
+                        // TestCaseElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestCase.Result]);
+                        TestCaseElement.style.backgroundColor = SubmissionResultColors[TestCase.Result];
                         if (TestCase.Description != "") {
                             TestCaseElement.classList.add("WithDescription");
                         }
@@ -124,7 +131,7 @@ const ReloadData = () => {
                                     let TestCaseTimeValue = document.createElement("span"); TestCaseTimeLimit.appendChild(TestCaseTimeValue);
                                     TestCaseTimeValue.innerText = TimeToString(TestCase.Time);
                                     let TestCaseTimeLimitValue = document.createElement("span"); TestCaseTimeLimit.appendChild(TestCaseTimeLimitValue);
-                                    TestCaseTimeLimitValue.innerText = TimeToString(TestCase.TimeLimit);
+                                    TestCaseTimeLimitValue.innerText = TimeToString(Response.TestGroupsLimits[TestGroup.TGID].TestCasesLimits[TestCase.TCID].TimeLimit);
                                 }
                                 let TestCaseMemoryLimit = document.createElement("div"); TestCaseInnerBox1.appendChild(TestCaseMemoryLimit);
                                 TestCaseMemoryLimit.classList.add("TestCaseLimit");
@@ -132,7 +139,7 @@ const ReloadData = () => {
                                     let TestCaseMemoryValue = document.createElement("span"); TestCaseMemoryLimit.appendChild(TestCaseMemoryValue);
                                     TestCaseMemoryValue.innerText = MemoryToString(TestCase.Memory);
                                     let TestCaseMemoryLimitValue = document.createElement("span"); TestCaseMemoryLimit.appendChild(TestCaseMemoryLimitValue);
-                                    TestCaseMemoryLimitValue.innerText = MemoryToString(TestCase.MemoryLimit);
+                                    TestCaseMemoryLimitValue.innerText = MemoryToString(Response.TestGroupsLimits[TestGroup.TGID].TestCasesLimits[TestCase.TCID].MemoryLimit);
                                 }
                             }
                             let TestCaseInnerBox2 = document.createElement("div"); TestCaseElement.appendChild(TestCaseInnerBox2);

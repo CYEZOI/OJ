@@ -105,7 +105,9 @@ RequestAPI("GetProblem",
             }
             let HorizontalLine = document.createElement("hr"); Samples.appendChild(HorizontalLine);
         });
-        Samples.removeChild(Samples.lastChild);
+        if (Samples.children.length != 0) {
+            Samples.removeChild(Samples.lastChild);
+        }
         CreateAccordion("Samples", Samples.outerHTML, "Samples");
         let Textarea = document.querySelectorAll("textarea.form-control");
         for (let i = 0; i < Textarea.length; i++) {
