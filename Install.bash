@@ -1,7 +1,12 @@
 #!/bin/bash
 # Basic checks
+if [ ! -f /etc/os-release ] || [ $(cat /etc/os-release | grep -c "Ubuntu") -eq 0 ]; then
+    echo "This script only supports Ubuntu."
+    exit
+fi
 if [ $(id -u) -ne 0 ]; then
     sudo $0
+    exit
 fi
 cd ~
 
@@ -55,7 +60,7 @@ mysql -u $DatabaseUsername -p$DatabasePassword OJ <./OJ/Database.sql
 dialog --title "Create admin account" --no-cancel --no-kill --inputbox "Please enter the username of the admin account." 20 60 2>./AdminUsername
 AdminUsername=$(cat ./AdminUsername)
 FirstTime=1
-while [ "$AdminPassword" != "$AdminPasswordAgain" ]; do
+while [ $FirstTime -eq 1 ] || [ "$AdminPassword" != "$AdminPasswordAgain" ]; do
     if [ $FirstTime -eq 0 ]; then
         dialog --title "Create admin account" --no-cancel --no-kill --msgbox "The passwords you entered are not the same. Please try again." 20 60
     fi
