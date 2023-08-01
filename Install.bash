@@ -3,12 +3,22 @@
 if [ ! -f /etc/os-release ] || [ $(cat /etc/os-release | grep -c "Ubuntu") -eq 0 ]; then
     echo "This script only supports Ubuntu."
     exit
-fi
-if [ $(id -u) -ne 0 ]; then
-    sudo $0
+elif [ $(id -u) -ne 0 ]; then
+    sudo $0 $(whoami) $HOME
+    exit
+elif [ $# -ne 2 ]; then
+    echo "Usage: $0 <username> <home directory>"
+    echo "       <username> is the username of the user you want to install OJ for."
+    echo "       <home directory> is the home directory of the user you want to install OJ for."
+    echo ""
+    echo "Note: Please run this script as root or with sudo."
+    echo "      The username must be a non-root user."
+    echo "      The user and the home directory must exist."
+    echo "      The home directory must be an absolute path."
     exit
 fi
-cd ~
+LastDir=$(pwd)
+cd $2
 
 # Change apt source
 cp /etc/apt/sources.list /etc/apt/sources.list.bak
@@ -18,8 +28,8 @@ apt update
 apt upgrade -y
 
 # Install packages
-sudo apt install fish dialog g++ make cmake git libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev -y
-sudo chsh --shell /usr/bin/fish $(whoami)
+apt install fish dialog g++ make cmake git libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev -y
+chsh --shell /usr/bin/fish $1
 
 # Clone repo
 # git clone https://github.com/langningchen/OJ.git --depth 1
@@ -48,9 +58,9 @@ echo "3306" >/etc/OJ/DatabasePort
 echo "$DatabaseUsername" >/etc/OJ/DatabaseUsername
 echo "$DatabasePassword" >/etc/OJ/DatabasePassword
 echo "OJ" >/etc/OJ/DatabaseName
-echo "CREATE USER $DatabaseUsername IDENTIFIED BY \"$DatabasePassword\";" >>./Database.sql
 echo "CREATE DATABASE OJ;" >>./Database.sql
-echo "GRANT ALL ON OJ.* TO $DatabaseUsername@localhost;" >>./Database.sql
+echo "CREATE USER $DatabaseUsername IDENTIFIED BY \"$DatabasePassword\";" >>./Database.sql
+echo "GRANT ALL ON OJ.* TO $DatabaseUsername;" >>./Database.sql
 echo "FLUSH PRIVILEGES;" >>./Database.sql
 mysql <./Database.sql
 rm -f ./Database.sql
@@ -152,10 +162,10 @@ echo "INSERT INTO \`Settings\` (\`Key\`, \`Value\`) VALUES ('JudgeUsername', 'Ju
 echo "INSERT INTO \`Settings\` (\`Key\`, \`Value\`) VALUES ('SocketPort', '80');" >>./Initiate.sql
 echo "INSERT INTO \`Settings\` (\`Key\`, \`Value\`) VALUES ('SystemCallList', '-1,-1,0,-1,-1,-1,0,0,-1,-1,-1,-1,-1,-1,-1,0,0,-1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1,0,0,0,-1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0');" >>./Initiate.sql
 echo "INSERT INTO \`Settings\` (\`Key\`, \`Value\`) VALUES ('WebTheme', 'BootStrap');" >>./Initiate.sql
-mysql -u $DatabaseUsername -p$DatabasePassword <./Initiate.sql
+mysql -u $DatabaseUsername -p$DatabasePassword OJ <./Initiate.sql
 rm -f ./Initiate.sql
 
-# Compile and run
+# Compile
 cd ./OJ
 cmake -B build
 cd ./build
@@ -164,6 +174,7 @@ cd ../
 
 # End
 echo "Installation complete."
+echo "Your ($1's) default shell has been changed to the fish shell."
 echo "Please run \"$(pwd)/Run.sh\" to start the server."
 echo "You can check the log in \"$(pwd)/Log.log\"."
 echo "After the server is started, you can visit the website at \"http://localhost\"."
@@ -173,3 +184,4 @@ echo "Please save the database username and password in a safe place and do not 
 echo ""
 echo "Thank you for using this OJ."
 echo "Have a nice day!"
+cd $LastDir
