@@ -1,5 +1,4 @@
-#ifndef SUBMISSION_HPP
-#define SUBMISSION_HPP
+#pragma once
 
 #include "TestGroup.hpp"
 #include "Logger.hpp"
@@ -55,5 +54,3 @@ public:
     RESULT Set(std::string Code, std::string PID);
     RESULT Judge();
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef EMAIL_Verification_CODES_HPP
-#define EMAIL_Verification_CODES_HPP
+#pragma once
 
 #include "Result.hpp"
 
@@ -10,5 +9,3 @@ public:
     static RESULT CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode);
     static RESULT DeleteEmailVerificationCode(std::string EmailAddress);
 };
-
-#endif

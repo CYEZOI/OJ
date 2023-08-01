@@ -1,5 +1,4 @@
-#ifndef JUDGE_RESULT_HPP
-#define JUDGE_RESULT_HPP
+#pragma once
 
 #include <string>
 
@@ -26,5 +25,3 @@ enum JUDGE_RESULT
     SKIPPED,
     REJECTED
 };
-
-#endif

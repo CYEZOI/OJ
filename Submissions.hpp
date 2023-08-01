@@ -1,5 +1,4 @@
-#ifndef SUBMISSIONS_HPP
-#define SUBMISSIONS_HPP
+#pragma once
 
 #include "Database.hpp"
 #include "Submission.hpp"
@@ -20,5 +19,3 @@ public:
     static RESULT UpdateSubmission(SUBMISSION *Submission);
     static RESULT DeleteSubmission(int SID);
 };
-
-#endif

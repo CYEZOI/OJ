@@ -1,5 +1,4 @@
-#ifndef HTTP_REQUEST_HPP
-#define HTTP_REQUEST_HPP
+#pragma once
 
 #include "Logger.hpp"
 #include <string>
@@ -21,5 +20,3 @@ private:
 public:
     HTTP_REQUEST(std::string Data);
 };
-
-#endif

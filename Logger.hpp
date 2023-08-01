@@ -1,5 +1,4 @@
-#ifndef LOGGER_HPP
-#define LOGGER_HPP
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -29,5 +28,3 @@ public:
 };
 
 extern LOGGER Logger;
-
-#endif

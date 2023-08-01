@@ -1,5 +1,4 @@
-#ifndef PRIVILEGE_HPP
-#define PRIVILEGE_HPP
+#pragma once
 
 enum PRIVILEGE_LEVEL
 {
@@ -8,5 +7,3 @@ enum PRIVILEGE_LEVEL
     PRIVILEGE_LEVEL_GUEST,
     PRIVILEGE_LEVEL_BANNED
 };
-
-#endif

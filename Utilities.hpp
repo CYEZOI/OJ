@@ -1,5 +1,4 @@
-#ifndef UTILITIES_HPP
-#define UTILITIES_HPP
+#pragma once
 
 #include <vector>
 #include "Logger.hpp"
@@ -32,5 +31,3 @@ public:
     static RESULT SendEmail(std::string To, std::string Subject, std::string Body);
     static time_t StringToTime(std::string String);
 };
-
-#endif

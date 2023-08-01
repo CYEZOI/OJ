@@ -10,18 +10,9 @@
 
 int main()
 {
-    // Settings.CheckSettings();
-    // PROBLEM Problem;
-    // Problem.Load("1000");
-    // PROBLEMS::Load();
-    // AddProblem();
-    // Settings.Save();
-    // return 0;
-
     srand(time(NULL));
-    // OUTPUT_IF_FAILED(Settings.Load("Judger"));
+    OUTPUT_IF_FAILED(Settings.Init());
     JudgingList.Init();
-
     new SOCKET(
         [](std::string RequestHTTPData) -> std::string
         {

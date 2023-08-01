@@ -1,5 +1,4 @@
-#ifndef WEB_DATA_PROCEED_HPP
-#define WEB_DATA_PROCEED_HPP
+#pragma once
 
 #include <string>
 #include "HTTPRequest.hpp"
@@ -11,5 +10,3 @@ class WEB_DATA_PROCEED
 public:
     HTTP_RESPONSE Proceed(HTTP_REQUEST HTTPRequest);
 };
-
-#endif

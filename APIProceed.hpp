@@ -1,5 +1,4 @@
-#ifndef API_PROCEED_HPP
-#define API_PROCEED_HPP
+#pragma once
 
 #include <string>
 #include "configor/json.hpp"
@@ -46,4 +45,3 @@ public:
 public:
     configor::json Proceed(configor::json Request);
 };
-#endif

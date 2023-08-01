@@ -1,5 +1,4 @@
-#ifndef TOKENS_HPP
-#define TOKENS_HPP
+#pragma once
 
 #include "Result.hpp"
 
@@ -11,5 +10,3 @@ public:
     static RESULT DeleteToken(std::string TokenValue);
     static RESULT GetUID(std::string TokenValue, int &UID);
 };
-
-#endif

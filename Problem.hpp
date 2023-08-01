@@ -1,5 +1,4 @@
-#ifndef PROBLEM_HPP
-#define PROBLEM_HPP
+#pragma once
 
 #include "Sample.hpp"
 #include "TestGroupData.hpp"
@@ -30,5 +29,3 @@ public:
     bool
     operator<(const PROBLEM &Compare) const;
 };
-
-#endif

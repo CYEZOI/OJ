@@ -1,5 +1,4 @@
-#ifndef TEST_GROUP_DATA_HPP
-#define TEST_GROUP_DATA_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -19,5 +18,3 @@ private:
 public:
     void AddTestCase(std::string Input, std::string Answer, int TimeLimit, int MemoryLimit, int Score);
 };
-
-#endif

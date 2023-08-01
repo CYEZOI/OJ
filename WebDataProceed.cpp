@@ -16,9 +16,10 @@
 
 HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
 {
+    std::string BasicFolder = "/home/langningc2009/OJ/HTML";
     std::string WebTheme = "";
     SETTINGS::GetSettings("WebTheme", WebTheme);
-    std::string BasicFolder = "/home/langningc2009/OJ/HTML";
+    std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
     if (HTTPRequest.Path == "/api")
     {

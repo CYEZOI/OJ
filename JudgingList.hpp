@@ -1,5 +1,4 @@
-#ifndef JUDGING_LIST_HPP
-#define JUDGING_LIST_HPP
+#pragma once
 
 #include <queue>
 #include "Logger.hpp"
@@ -16,5 +15,3 @@ public:
 };
 
 extern JUDGING_LIST JudgingList;
-
-#endif

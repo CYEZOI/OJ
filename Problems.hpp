@@ -1,5 +1,4 @@
-#ifndef PROBLEMS_HPP
-#define PROBLEMS_HPP
+#pragma once
 
 #include "Result.hpp"
 #include "Problem.hpp"
@@ -20,5 +19,3 @@ public:
     static RESULT UpdateProblem(PROBLEM Problem);
     static RESULT DeleteProblem(std::string PID);
 };
-
-#endif

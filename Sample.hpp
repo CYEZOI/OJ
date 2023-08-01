@@ -1,5 +1,4 @@
-#ifndef SAMPLE_HPP
-#define SAMPLE_HPP
+#pragma once
 
 #include <string>
 
@@ -14,5 +13,3 @@ private:
     friend class PROBLEM;
     friend class PROBLEMS;
 };
-
-#endif

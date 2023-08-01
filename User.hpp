@@ -1,5 +1,4 @@
-#ifndef USER_HPP
-#define USER_HPP
+#pragma once
 
 #include <string>
 
@@ -12,5 +11,3 @@ public:
     std::string Nickname;
     int Privilege;
 };
-
-#endif

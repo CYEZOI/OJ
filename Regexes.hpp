@@ -1,5 +1,4 @@
-#ifndef REGEXES_HPP
-#define REGEXES_HPP
+#pragma once
 
 #include <regex>
 #include "Result.hpp"
@@ -13,5 +12,3 @@ public:
     static RESULT CheckEmailAddress(std::string EmailAddress);
     static RESULT CheckVerificationCode(std::string VerificationCode);
 };
-
-#endif

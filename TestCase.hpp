@@ -1,5 +1,4 @@
-#ifndef TEST_CASE_HPP
-#define TEST_CASE_HPP
+#pragma once
 
 #include "Result.hpp"
 #include "Settings.hpp"
@@ -54,5 +53,3 @@ private:
 public:
     RESULT Judge();
 };
-
-#endif

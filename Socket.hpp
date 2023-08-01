@@ -1,5 +1,4 @@
-#ifndef SOCKET_HPP
-#define SOCKET_HPP
+#pragma once
 
 #include "Logger.hpp"
 #include <string>
@@ -21,5 +20,3 @@ public:
     SOCKET(CALL_BACK CallBack);
     ~SOCKET();
 };
-
-#endif

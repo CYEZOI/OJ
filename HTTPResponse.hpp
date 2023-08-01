@@ -1,5 +1,4 @@
-#ifndef HTTP_RESPONSE_HPP
-#define HTTP_RESPONSE_HPP
+#pragma once
 
 #include "Logger.hpp"
 #include <string>
@@ -88,5 +87,3 @@ public:
 
     std::string Stringify();
 };
-
-#endif

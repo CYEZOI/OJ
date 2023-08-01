@@ -1,5 +1,4 @@
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
+#pragma once
 
 #include <mysql_connection.h>
 #include <mysql_driver.h>
@@ -106,5 +105,3 @@ public:
     static sql::Connection *CreateConnection();
     static void CloseConnection(sql::Connection *Connection);
 };
-
-#endif

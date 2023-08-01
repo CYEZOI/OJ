@@ -1,5 +1,4 @@
-#ifndef TEST_CASE_DATA_HPP
-#define TEST_CASE_DATA_HPP
+#pragma once
 
 #include <string>
 
@@ -19,5 +18,3 @@ private:
     friend class API_PROCEED;
     friend class TEST_GROUP_DATA;
 };
-
-#endif

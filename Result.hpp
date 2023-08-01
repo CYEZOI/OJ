@@ -1,5 +1,4 @@
-#ifndef RESULT_HPP
-#define RESULT_HPP
+#pragma once
 
 #define CREATE_RESULT(Success, Message)                                                                                                                                                                                                                \
     {                                                                                                                                                                                                                                                  \
@@ -105,5 +104,3 @@ public:
     RESULT();
     RESULT(bool Success, std::string Message, std::string DebugMessage);
 };
-
-#endif

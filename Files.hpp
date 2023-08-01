@@ -1,5 +1,4 @@
-#ifndef FILES_HPP
-#define FILES_HPP
+#pragma once
 
 #include "Result.hpp"
 
@@ -14,5 +13,3 @@ public:
     static RESULT UploadFile(std::string Filename, std::string FileContent, std::string FileType, int UID, int &FID);
     static RESULT DeleteFile(int FID);
 };
-
-#endif

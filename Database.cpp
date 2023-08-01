@@ -294,10 +294,10 @@ sql::Connection *DATABASE::CreateConnection()
     try
     {
         sql::Driver *Driver = sql::mysql::get_mysql_driver_instance();
-        Connection = Driver->connect(Settings.DatabaseSettings.GetHost().c_str(),
-                                     Settings.DatabaseSettings.GetUsername().c_str(),
-                                     Settings.DatabaseSettings.GetPassword().c_str());
-        Connection->setSchema(Settings.DatabaseSettings.GetDatabaseName().c_str());
+        Connection = Driver->connect(Settings.DatabaseHost.c_str(),
+                                     Settings.DatabaseUsername.c_str(),
+                                     Settings.DatabasePassword.c_str());
+        Connection->setSchema(Settings.DatabaseName.c_str());
     }
     catch (sql::SQLException &e)
     {

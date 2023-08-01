@@ -1,5 +1,4 @@
-#ifndef TEST_GROUP_HPP
-#define TEST_GROUP_HPP
+#pragma once
 
 #include "TestCase.hpp"
 #include "Logger.hpp"
@@ -33,5 +32,3 @@ private:
 public:
     RESULT Judge();
 };
-
-#endif

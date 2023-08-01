@@ -1,92 +1,64 @@
-DROP TABLE IF EXISTS `Users`;
-
-CREATE TABLE `Users` (
-    `UID` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `Username` varchar(32) NOT NULL UNIQUE,
-    `Password` varchar(32) NOT NULL,
-    `Nickname` varchar(32),
-    `Email` text NOT NULL,
-    `Privilege` int UNSIGNED NOT NULL DEFAULT 0
-);
-
-DROP TABLE IF EXISTS `Tokens`;
-
-CREATE TABLE `Tokens` (
-    `TID` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `TokenValue` varchar(32) NOT NULL UNIQUE,
-    `UID` int UNSIGNED NOT NULL,
+CREATE TABLE `EmailVerificationCodes` (
+    `EmailAddress` VARCHAR(64) NOT NULL UNIQUE,
+    `VerificationCode` VARCHAR(32) NOT NULL,
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS `Problems`;
+CREATE TABLE `Files` (
+    `FID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `UID` INT NOT NULL,
+    `Filename` TEXT NOT NULL,
+    `FileType` TEXT NOT NULL,
+    `FileToken` VARCHAR(32) NOT NULL UNIQUE,
+    `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE `Problems` (
-    `PID` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `Title` varchar(32) NOT NULL UNIQUE,
-    `Description` text NOT NULL,
-    `Input` text,
-    `Output` text,
-    `Range` text,
-    `Hint` text,
-    `Samples` json,
-    `TestCases` json NOT NULL
+    `PID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `Title` VARCHAR(32) NOT NULL UNIQUE,
+    `IOFilename` TEXT NOT NULL,
+    `Description` TEXT NOT NULL,
+    `Input` TEXT,
+    `Output` TEXT NOT NULL,
+    `Range` TEXT,
+    `Hint` TEXT,
+    `Samples` TEXT,
+    `TestGroups` TEXT NOT NULL
 );
 
-DROP TABLE IF EXISTS `EmailVerificationCodes`;
+CREATE TABLE `Settings` (
+    `Key` VARCHAR(32) NOT NULL UNIQUE,
+    `Value` TEXT NOT NULL
+);
 
-CREATE TABLE `EmailVerificationCodes`(
-    `EmailAddress` varchar(64) NOT NULL UNIQUE,
-    `VerificationCode` varchar(32) NOT NULL,
+CREATE TABLE `Submissions` (
+    `SID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `PID` INT UNSIGNED NOT NULL,
+    `UID` INT UNSIGNED NOT NULL,
+    `Code` TEXT NOT NULL,
+    `Result` INT UNSIGNED NOT NULL DEFAULT '0',
+    `Description` TEXT,
+    `Time` INT UNSIGNED NOT NULL DEFAULT '0',
+    `TimeSum` INT UNSIGNED NOT NULL DEFAULT '0',
+    `Memory` INT UNSIGNED NOT NULL DEFAULT '0',
+    `Score` INT UNSIGNED NOT NULL DEFAULT '0',
+    `EnableO2` tinyint(1) NOT NULL DEFAULT '0',
+    `TestGroups` TEXT,
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS `Submissions`;
-
-CREATE TABLE `Submissions`(
-    `SID` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `PID` int UNSIGNED NOT NULL,
-    `UID` int UNSIGNED NOT NULL,
-    `Code` text NOT NULL,
-    `Result` int UNSIGNED NOT NULL DEFAULT 0,
-    `Description` text,
-    `Time` int UNSIGNED NOT NULL DEFAULT 0,
-    `TimeSum` int UNSIGNED NOT NULL DEFAULT 0,
-    `Memory` int UNSIGNED NOT NULL DEFAULT 0,
-    `Score` int UNSIGNED NOT NULL DEFAULT 0,
-    `EnableO2` bool NOT NULL DEFAULT false,
-    `TestGroups` json,
+CREATE TABLE `Tokens` (
+    `TID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `TokenValue` VARCHAR(32) NOT NULL UNIQUE,
+    `UID` INT UNSIGNED NOT NULL,
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS `Problems`;
-
-CREATE TABLE `Problems`(
-    `PID` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `Title` varchar(32) NOT NULL UNIQUE,
-    `IOFilename` text NOT NULL,
-    `Description` text NOT NULL,
-    `Input` text,
-    `Output` text NOT NULL,
-    `Range` text,
-    `Hint` text,
-    `Samples` json,
-    `TestGroups` json NOT NULL
-);
-
-DROP TABLE IF EXISTS `Settings`;
-
-CREATE TABLE `Settings`(
-    `Key` varchar(32) NOT NULL UNIQUE,
-    `Value` text NOT NULL
-);
-
-DROP TABLE IF EXISTS `Files`;
-
-CREATE TABLE `Files`(
-    `FID` int NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `UID` int NOT NULL,
-    `Filename` text NOT NULL,
-    `FileType` text NOT NULL,
-    `FileToken` varchar(32) NOT NULL UNIQUE,
-    `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE `Users` (
+    `UID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `Username` VARCHAR(32) NOT NULL UNIQUE,
+    `Password` VARCHAR(32) NOT NULL,
+    `Nickname` VARCHAR(32) NOT NULL,
+    `Email` TEXT NOT NULL,
+    `Privilege` INT UNSIGNED NOT NULL
 );
