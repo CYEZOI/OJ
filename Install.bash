@@ -180,6 +180,7 @@ cd ../../
 echo "Installation complete."
 echo "Your ($1's) default shell has been changed to the fish shell."
 echo "Please start the server by running \"$(pwd)/OJ/Run.fish\" with the fish shell and root user."
+echo "Before starting the server, please change the working dir to \"$(pwd)/OJ\"."
 echo "You can check the log in \"$(pwd)/OJ/Log.log\"."
 echo "After the server is started, you can visit the website at \"http://localhost\"."
 echo "Please go to \"https://github.com/langningchen/OJ\" for more information or to report bugs."
