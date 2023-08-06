@@ -177,8 +177,6 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
         HTTPResponse.SetBody(Data);
         HTTPResponse.SetHeader("Content-Type", "text/css");
     }
-    else if (HTTPRequest.Path == "/TestAddProblem")
-        API_PROCEED::TestAddProblem();
     else if (HTTPRequest.Path == "/Shutdown")
         exit(0);
     else

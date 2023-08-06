@@ -2,6 +2,7 @@
 
 #include <string>
 #include "configor/json.hpp"
+#include "Role.hpp"
 
 class API_PROCEED
 {
@@ -17,12 +18,17 @@ public:
 
     configor::json CheckTokenAvailable(std::string Token);
 
-    configor::json Register(std::string Username, std::string Password, std::string EmailAddress, std::string VerificationCode);
     configor::json CheckUsernameAvailable(std::string Username);
     configor::json CheckEmailAvailable(std::string EmailAddress);
     configor::json SendVerificationCode(std::string EmailAddress);
     configor::json Login(std::string Username, std::string Password);
+    configor::json Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode);
+    configor::json AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role);
     configor::json GetUser(int UID);
+    configor::json UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role);
+    configor::json DeleteUser(int UID);
+    configor::json GetUsers(int Page);
+    configor::json HashPassword(std::string OriginalPassword);
 
     configor::json AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups);
     configor::json GetProblem(std::string PID);
@@ -39,8 +45,6 @@ public:
 
     configor::json GetSettings();
     configor::json SetSettings(configor::json SettingsJSON);
-
-    static void TestAddProblem();
 
 public:
     configor::json Proceed(configor::json Request);

@@ -48,11 +48,11 @@
             "type": "pickString",
             "description": "Command to run",
             "options": [
-                "GetQuestionDetail",
+                "GetProblemDetail",
                 "SubmitCode",
                 "GetAnswerOrTips"
             ],
-            "default": "GetQuestionDetail"
+            "default": "GetProblemDetail"
         }
     ],
     "version": "2.0.0"

@@ -100,7 +100,7 @@ RequestAPI("GetProblems", {
                         ProblemOperationDeleteButton.classList.add("btn-danger");
                         ProblemOperationDeleteButton.innerText = "Delete";
                         ProblemOperationDeleteButton.onclick = () => {
-                            ShowModal("Delete Problem", "Are you sure to delete this problem?", () => {
+                            ShowModal("Delete problem", "Are you sure to delete this problem?", () => {
                                 RequestAPI("DeleteProblem",
                                     {
                                         "PID": String(Response.Problems[i].PID)

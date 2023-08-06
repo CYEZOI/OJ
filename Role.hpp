@@ -1,0 +1,9 @@
+#pragma once
+
+enum USER_ROLE
+{
+    USER_ROLE_ADMIN,
+    USER_ROLE_USER,
+    USER_ROLE_GUEST,
+    USER_ROLE_BANNED
+};

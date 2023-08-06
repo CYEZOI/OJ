@@ -2,7 +2,7 @@
 
 #include "Result.hpp"
 
-class EMAIL_Verification_CODES
+class EMAIL_VERIFICATION_CODES
 {
 public:
     static RESULT CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode);

@@ -2,7 +2,7 @@
 #include "Database.hpp"
 #include "Utilities.hpp"
 
-RESULT EMAIL_Verification_CODES::CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode)
+RESULT EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("EmailVerificationCodes")
                          .Select("CreateTime")
@@ -12,7 +12,7 @@ RESULT EMAIL_Verification_CODES::CreateEmailVerificationCode(std::string EmailAd
                              {
                                  if (Data.size() != 0)
                                  {
-                                     RETURN_IF_FALSE(UTILITIES::StringToTime(Data[0]["CreateTime"]) + 60 <= time(NULL), "Email Verification code already exists")
+                                     RETURN_IF_FALSE(UTILITIES::StringToTime(Data[0]["CreateTime"]) + 60 <= time(NULL), "Email verification code already exists")
                                      RETURN_IF_FAILED(DATABASE::DELETE("EmailVerificationCodes")
                                                           .Where("EmailAddress", EmailAddress)
                                                           .Execute())
@@ -29,7 +29,7 @@ RESULT EMAIL_Verification_CODES::CreateEmailVerificationCode(std::string EmailAd
                          .Execute())
     CREATE_RESULT(true, "Create email Verification code succeed");
 }
-RESULT EMAIL_Verification_CODES::CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode)
+RESULT EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("EmailVerificationCodes")
                          .Select("CreateTime")
@@ -44,7 +44,7 @@ RESULT EMAIL_Verification_CODES::CheckEmailVerificationCode(std::string EmailAdd
                              }))
     CREATE_RESULT(true, "Verification code valid");
 }
-RESULT EMAIL_Verification_CODES::DeleteEmailVerificationCode(std::string EmailAddress)
+RESULT EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(std::string EmailAddress)
 {
     RETURN_IF_FAILED(DATABASE::DELETE("EmailVerificationCodes")
                          .Where("EmailAddress", EmailAddress)

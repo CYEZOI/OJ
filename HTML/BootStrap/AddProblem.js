@@ -72,7 +72,7 @@ const CreateSampleRow = (SamplesTableBody, Index) => {
             DeleteButton.classList.add("btn-danger");
             DeleteButton.innerHTML = "Delete";
             DeleteButton.onclick = () => {
-                ShowModal("Delete Sample", "Are you sure to delete this sample?", () => {
+                ShowModal("Delete sample", "Are you sure to delete this sample?", () => {
                     SamplesTableBody.removeChild(SamplesTableBodyRow);
                     SamplesData.splice(Index, 1);
                     SamplesTableBody.childNodes.forEach((Element, Index) => {
@@ -270,7 +270,7 @@ SamplesTable.classList.add("table");
 let AddSampleButton = document.createElement("button"); AddProblemData.appendChild(AddSampleButton);
 AddSampleButton.classList.add("btn");
 AddSampleButton.classList.add("btn-secondary");
-AddSampleButton.innerHTML = "Add Sample";
+AddSampleButton.innerHTML = "Add sample";
 AddSampleButton.onclick = () => {
     CreateSampleRow(SamplesTable.children[1], SamplesTable.children[1].children.length);
 };
@@ -278,7 +278,7 @@ AddProblemData.appendChild(CreateHorizontalLine());
 
 let TestCasesLabel = document.createElement("label"); AddProblemData.appendChild(TestCasesLabel);
 TestCasesLabel.classList.add("col-form-label")
-TestCasesLabel.innerHTML = "Test Cases";
+TestCasesLabel.innerHTML = "Test cases";
 let TestCasesTable = document.createElement("table"); AddProblemData.appendChild(TestCasesTable);
 TestCasesTable.classList.add("table");
 {
@@ -287,7 +287,7 @@ TestCasesTable.classList.add("table");
         let TestCasesTableHeadRow = document.createElement("tr"); TestCasesTableHead.appendChild(TestCasesTableHeadRow);
         {
             let TestCasesTableHeadRowTitle = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowTitle);
-            TestCasesTableHeadRowTitle.innerHTML = "Test Case";
+            TestCasesTableHeadRowTitle.innerHTML = "Test case";
             TestCasesTableHeadRowTitle.style.width = "10%";
             let TestCasesTableHeadRowInput = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowInput);
             TestCasesTableHeadRowInput.innerHTML = "Input";

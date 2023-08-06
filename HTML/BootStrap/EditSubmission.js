@@ -1,22 +1,5 @@
 CheckTokenAvailable();
 
-const CreateResultSelect = (Element, Value) => {
-    Element.className = "form-control";
-    for (let i = 0; i < SubmissionResultShortTexts.length; i++) {
-        let Option = document.createElement("option"); Element.appendChild(Option);
-        Option.innerText = SubmissionResultTexts[i];
-        Option.style.color = "white";
-        Option.style.backgroundColor = SubmissionResultColors[i];
-    }
-    Element.selectedIndex = Value;
-    Element.onchange = () => {
-        let Result = Element.selectedIndex;
-        Element.style.color = "white";
-        Element.style.backgroundColor = SubmissionResultColors[Result];
-    }
-    Element.onchange();
-}
-
 if (Data.SID == null) {
     SwitchPage("Home");
 }

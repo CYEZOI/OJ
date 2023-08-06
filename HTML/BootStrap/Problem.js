@@ -47,7 +47,7 @@ ProblemEditButton.onclick = () => {
     });
 };
 ProblemDeleteButton.onclick = () => {
-    ShowModal("Delete Problem", "Are you sure to delete this problem?", () => {
+    ShowModal("Delete problem", "Are you sure to delete this problem?", () => {
         RequestAPI("DeleteProblem",
             {
                 "PID": String(Data.PID)
@@ -148,8 +148,8 @@ RequestAPI("GetProblem",
                     TableBodyValue.innerHTML = Value;
                 }
             };
-            AddRow("Time Limit", TimeToString(MaxTimeLimit));
-            AddRow("Memory Limit", MemoryToString(MaxMemoryLimit));
+            AddRow("Time limit", TimeToString(MaxTimeLimit));
+            AddRow("Memory limit", MemoryToString(MaxMemoryLimit));
             AddRow("Input filename", Response.InputFilename == "" ? Response.InputFilename : "Standard input");
             AddRow("Output filename", Response.OutputFilename == "" ? Response.OutputFilename : "Standard output");
         }

@@ -33,7 +33,9 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     RETURN_JSON_IF_FAILED(REGEXES::CheckUsername(Username))
     RETURN_JSON_IF_FAILED(REGEXES::CheckPassword(Password))
     int UID;
-    RETURN_JSON_IF_FAILED(USERS::CheckPasswordCorrect(Username, Password, UID))
+    std::string HashedPassword;
+    RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
+    RETURN_JSON_IF_FAILED(USERS::CheckPasswordCorrect(Username, HashedPassword, UID))
     std::string Token;
     RETURN_JSON_IF_FAILED(TOKENS::CreateToken(UID, Token))
     configor::json ResponseJSON = BaseJSON;
@@ -58,22 +60,55 @@ configor::json API_PROCEED::SendVerificationCode(std::string EmailAddress)
 {
     RETURN_JSON_IF_FAILED(REGEXES::CheckEmailAddress(EmailAddress))
     std::string VerificationCode;
-    RETURN_JSON_IF_FAILED(EMAIL_Verification_CODES::CreateEmailVerificationCode(EmailAddress, VerificationCode))
+    RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(EmailAddress, VerificationCode))
     RETURN_JSON_IF_FAILED(UTILITIES::SendEmail(EmailAddress, "Email verification Code", "Hello, here is your verification code. Your Verification code is " + VerificationCode + ". Thanks."))
-    CREATE_JSON(true, "Send Verification code success")
+    CREATE_JSON(true, "Send verification code success")
 }
-configor::json API_PROCEED::Register(std::string Username, std::string Password, std::string EmailAddress, std::string VerificationCode)
+configor::json API_PROCEED::Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode)
 {
     RETURN_JSON_IF_FAILED(REGEXES::CheckUsername(Username))
+    RETURN_JSON_IF_FAILED(REGEXES::CheckNickname(Nickname))
     RETURN_JSON_IF_FAILED(REGEXES::CheckPassword(Password))
     RETURN_JSON_IF_FAILED(REGEXES::CheckEmailAddress(EmailAddress))
     RETURN_JSON_IF_FAILED(REGEXES::CheckVerificationCode(VerificationCode))
-    RETURN_JSON_IF_FAILED(EMAIL_Verification_CODES::CheckEmailVerificationCode(EmailAddress, VerificationCode))
-    RETURN_JSON_IF_FAILED(EMAIL_Verification_CODES::DeleteEmailVerificationCode(EmailAddress))
+    RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(EmailAddress, VerificationCode))
+    RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(EmailAddress))
     RETURN_JSON_IF_FAILED(USERS::CheckUsernameAvailable(Username))
     RETURN_JSON_IF_FAILED(USERS::CheckEmailAvailable(EmailAddress))
-    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Password, EmailAddress, ""))
+    std::string HashedPassword;
+    RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
+    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, USER_ROLE::USER_ROLE_USER))
     CREATE_JSON(true, "Register success");
+}
+configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
+{
+    std::string HashedPassword;
+    RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
+    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, USER_ROLE::USER_ROLE_USER))
+    CREATE_JSON(true, "Add user success");
+}
+configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
+{
+    if (!IsAdmin)
+        CREATE_JSON(false, "Not admin");
+    RETURN_JSON_IF_FAILED(REGEXES::CheckUsername(Username))
+    RETURN_JSON_IF_FAILED(REGEXES::CheckNickname(Nickname))
+    RETURN_JSON_IF_FAILED(REGEXES::CheckEmailAddress(EmailAddress))
+    USER OriginalUser;
+    RETURN_JSON_IF_FAILED(USERS::GetUser(UID, OriginalUser))
+    if (OriginalUser.Username != Username)
+        RETURN_JSON_IF_FAILED(USERS::CheckUsernameAvailable(Username))
+    if (OriginalUser.EmailAddress != EmailAddress)
+        RETURN_JSON_IF_FAILED(USERS::CheckEmailAvailable(EmailAddress))
+    RETURN_JSON_IF_FAILED(USERS::UpdateUser(UID, Username, Nickname, HashedPassword, EmailAddress, Role))
+    CREATE_JSON(true, "Update user success");
+}
+configor::json API_PROCEED::DeleteUser(int UID)
+{
+    if (!IsAdmin)
+        CREATE_JSON(false, "Not admin");
+    RETURN_JSON_IF_FAILED(USERS::DeleteUser(UID))
+    CREATE_JSON(true, "Delete user success");
 }
 configor::json API_PROCEED::GetUser(int UID)
 {
@@ -82,8 +117,61 @@ configor::json API_PROCEED::GetUser(int UID)
     RETURN_JSON_IF_FAILED(USERS::GetUser(UID, User))
     ResponseJSON["Success"] = true;
     ResponseJSON["Data"]["Username"] = User.Username;
-    ResponseJSON["Data"]["Email"] = User.Email;
+    ResponseJSON["Data"]["EmailAddress"] = User.EmailAddress;
     ResponseJSON["Data"]["Nickname"] = User.Nickname;
+    ResponseJSON["Data"]["Role"] = User.Role;
+    return ResponseJSON;
+}
+configor::json API_PROCEED::GetUsers(int Page)
+{
+    if (!IsAdmin)
+        CREATE_JSON(false, "Not admin");
+    configor::json ResponseJSON = BaseJSON;
+    RETURN_JSON_IF_FAILED(DATABASE::SELECT("Users")
+                              .Select("UID")
+                              .Select("Username")
+                              .Select("Password")
+                              .Select("Nickname")
+                              .Select("EmailAddress")
+                              .Select("Role")
+                              .Limit(10)
+                              .Offset((Page - 1) * 10)
+                              .Execute(
+                                  [&ResponseJSON](auto Data)
+                                  {
+                                      ResponseJSON["Success"] = true;
+                                      configor::json::array_type Users;
+                                      for (auto i : Data)
+                                      {
+                                          configor::json TempUser;
+                                          TempUser["UID"] = i["UID"];
+                                          TempUser["Username"] = i["Username"];
+                                          TempUser["Nickname"] = i["Nickname"];
+                                          TempUser["EmailAddress"] = i["EmailAddress"];
+                                          TempUser["Password"] = i["Password"];
+                                          TempUser["Role"] = i["Role"];
+                                          Users.push_back(TempUser);
+                                      }
+                                      ResponseJSON["Data"]["Users"] = Users;
+                                      CREATE_RESULT(true, "Get users success");
+                                  }));
+    RETURN_JSON_IF_FAILED(DATABASE::SIZE("Users")
+                              .Execute(
+                                  [&ResponseJSON](int Size)
+                                  {
+                                      ResponseJSON["Data"]["PageCount"] = ceil(Size / 10.0);
+                                  }));
+    return ResponseJSON;
+}
+configor::json API_PROCEED::HashPassword(std::string OriginalPassword)
+{
+    if (!IsAdmin)
+        CREATE_JSON(false, "Not admin");
+    std::string HashedPassword;
+    RETURN_JSON_IF_FAILED(USERS::HashPassword(OriginalPassword, HashedPassword));
+    configor::json ResponseJSON = BaseJSON;
+    ResponseJSON["Success"] = true;
+    ResponseJSON["Data"]["HashedPassword"] = HashedPassword;
     return ResponseJSON;
 }
 
@@ -264,36 +352,6 @@ configor::json API_PROCEED::GetSubmission(int SID)
         TestGroupsLimits.push_back(TempTestGroup);
     }
     ResponseJSON["Data"]["TestGroupsLimits"] = TestGroupsLimits;
-    // configor::json::array_type TestGroups;
-    // for (auto i : Submission.TestGroups)
-    // {
-    //     configor::json TempTestGroup;
-    //     TempTestGroup["TGID"] = i.TGID;
-    //     TempTestGroup["Score"] = i.Score;
-    //     TempTestGroup["Result"] = (int)i.Result;
-    //     TempTestGroup["TestCasesPassed"] = i.TestCasesPassed;
-    //     TempTestGroup["Time"] = i.Time;
-    //     TempTestGroup["TimeSum"] = i.TimeSum;
-    //     TempTestGroup["Memory"] = i.Memory;
-    //     TempTestGroup["TestCases"].array({});
-    //     configor::json::array_type TestCases;
-    //     for (auto j : i.TestCases)
-    //     {
-    //         configor::json TempTestCase;
-    //         TempTestCase["TCID"] = j.TCID;
-    //         TempTestCase["Result"] = (int)j.Result;
-    //         TempTestCase["Description"] = j.Description;
-    //         TempTestCase["Time"] = j.Time;
-    //         TempTestCase["TimeLimit"] = j.UnjudgedTestCase->TimeLimit;
-    //         TempTestCase["Memory"] = j.Memory;
-    //         TempTestCase["MemoryLimit"] = j.UnjudgedTestCase->MemoryLimit;
-    //         TempTestCase["Score"] = j.Score;
-    //         TestCases.push_back(TempTestCase);
-    //     }
-    //     TempTestGroup["TestCases"] = TestCases;
-    //     TestGroups.push_back(TempTestGroup);
-    // }
-    // ResponseJSON["Data"]["TestGroups"] = TestGroups;
     return ResponseJSON;
 }
 configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, std::string Code, int Result, std::string Description, int Time, int TimeSum, int Memory, int Score, bool EnableO2, std::string TestGroups)
@@ -406,302 +464,285 @@ configor::json API_PROCEED::SetSettings(configor::json Settings)
     CREATE_JSON(true, "Set settings success");
 }
 
-void API_PROCEED::TestAddProblem()
-{
-    PROBLEM TestProblem;
-    std::vector<SAMPLE> SampleList;
-    SAMPLE TestSample;
-    TestSample.Input = "1 2";
-    TestSample.Output = "3";
-    SampleList.push_back(TestSample);
-    TestProblem.PID = "1000";
-    TestProblem.Title = "Add";
-    TestProblem.IOFilename = "Add";
-    TestProblem.Description = "**Add** two numbers $a$ and $b$";
-    TestProblem.Input = "two numbers in _one line_";
-    TestProblem.Output = "one number";
-    TestProblem.Samples = SampleList;
-    TestProblem.Range = "$1<=a,b<=1000$";
-    TEST_GROUP_DATA TestGroup1;
-    TestGroup1.TGID = 0;
-    TestGroup1.AddTestCase("1 2", "3", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("2 3", "5", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("23 27", "50", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("20 09", "29", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("01 17", "18", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("45 22", "67", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("99 99", "198", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("465 546", "1011", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("123 456", "579", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup1.AddTestCase("877 479", "1356", 1000, 1024 * 1024 * 1024, 100);
-    TestProblem.TestGroups.push_back(TestGroup1);
-    TEST_GROUP_DATA TestGroup2;
-    TestGroup2.TGID = 1;
-    TestGroup2.AddTestCase("2147483648 2147483648", "4294967296", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup2.AddTestCase("6567867981 5617998756", "12185866737", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup2.AddTestCase("1234567890 9876543210", "11111111100", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup2.AddTestCase("1357924680 2468013579", "3825938259", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup2.AddTestCase("1122334455 6677889900", "7800224355", 1000, 1024 * 1024 * 1024, 100);
-    TestProblem.TestGroups.push_back(TestGroup2);
-    TEST_GROUP_DATA TestGroup3;
-    TestGroup3.TGID = 2;
-    TestGroup3.AddTestCase("1 -1", "0", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("2 -3", "-1", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("23 -27", "-4", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("20 -09", "11", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("01 -17", "-16", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("45 -22", "23", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("99 -99", "0", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("465 -546", "-81", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("123 -456", "-333", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup3.AddTestCase("877 -479", "398", 1000, 1024 * 1024 * 1024, 100);
-    TestProblem.TestGroups.push_back(TestGroup3);
-    TEST_GROUP_DATA TestGroup4;
-    TestGroup4.TGID = 3;
-    TestGroup4.AddTestCase("2147483647 -2147483647", "0", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup4.AddTestCase("6567867981 -5617998756", "949869225", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup4.AddTestCase("1234567890 -9876543210", "-8641975320", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup4.AddTestCase("1357924680 -2468013579", "-1110088899", 1000, 1024 * 1024 * 1024, 100);
-    TestGroup4.AddTestCase("1122334455 -6677889900", "-5555555445", 1000, 1024 * 1024 * 1024, 100);
-    TestProblem.TestGroups.push_back(TestGroup4);
-    PROBLEMS::AddProblem(TestProblem);
-}
 configor::json API_PROCEED::Proceed(configor::json Request)
 {
+    RETURN_JSON_IF_FALSE(CheckTypes(Request, {{"Action", configor::config_value_type::string}}), "Invalid parameters");
     configor::json ResponseJSON = BaseJSON;
-    if (!CheckTypes(Request, {{"Action", configor::config_value_type::string}}))
-        ResponseJSON["Message"] = "Invalid parameters";
+    Action = Request["Action"].as_string();
+    Data = Request["Data"];
+    if (Action == "CheckTokenAvailable")
+    {
+        if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = CheckTokenAvailable(Data["Token"].as_string());
+    }
+    else if (Action == "Register")
+    {
+        if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
+                               {"Nickname", configor::config_value_type::string},
+                               {"Password", configor::config_value_type::string},
+                               {"EmailAddress", configor::config_value_type::string},
+                               {"VerificationCode", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = Register(Data["Username"].as_string(),
+                                    Data["Nickname"].as_string(),
+                                    Data["Password"].as_string(),
+                                    Data["EmailAddress"].as_string(),
+                                    Data["VerificationCode"].as_string());
+    }
+    else if (Action == "AddUser")
+    {
+        if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
+                               {"Nickname", configor::config_value_type::string},
+                               {"Password", configor::config_value_type::string},
+                               {"EmailAddress", configor::config_value_type::string},
+                               {"Role", configor::config_value_type::number_integer}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = AddUser(Data["Username"].as_string(),
+                                   Data["Nickname"].as_string(),
+                                   Data["Password"].as_string(),
+                                   Data["EmailAddress"].as_string(),
+                                   (USER_ROLE)Data["Role"].as_integer());
+    }
+    else if (Action == "CheckUsernameAvailable")
+    {
+        if (!CheckTypes(Data, {{"Username", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = CheckUsernameAvailable(Data["Username"].as_string());
+    }
+    else if (Action == "CheckEmailAvailable")
+    {
+        if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = CheckEmailAvailable(Data["EmailAddress"].as_string());
+    }
+    else if (Action == "SendVerificationCode")
+    {
+        if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = SendVerificationCode(Data["EmailAddress"].as_string());
+    }
+    else if (Action == "Login")
+    {
+        if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
+                               {"Password", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = Login(Data["Username"].as_string(),
+                                 Data["Password"].as_string());
+    }
     else
     {
-        Action = Request["Action"].as_string();
-        Data = Request["Data"];
-        if (Action == "CheckTokenAvailable")
+        RETURN_JSON_IF_FALSE(CheckTypes(Data, {{"Token", configor::config_value_type::string}}), "Invalid parameters");
+        Token = Data["Token"].as_string();
+        RETURN_JSON_IF_FALSE(CheckTokenAvailable(Token)["Success"].as_bool(), "Invalid token");
+        RETURN_JSON_IF_FAILED(TOKENS::GetUID(Token, UID));
+        RETURN_JSON_IF_FAILED(USERS::IsAdmin(UID, IsAdmin));
+
+        if (Action == "GetUser")
         {
-            if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
+            if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
-                ResponseJSON = CheckTokenAvailable(Data["Token"].as_string());
+                ResponseJSON = GetUser(Data["UID"].as_integer());
         }
-        else if (Action == "Register")
+        else if (Action == "UpdateUser")
         {
-            if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
+            if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer},
+                                   {"Username", configor::config_value_type::string},
+                                   {"Nickname", configor::config_value_type::string},
                                    {"Password", configor::config_value_type::string},
                                    {"EmailAddress", configor::config_value_type::string},
-                                   {"VerificationCode", configor::config_value_type::string}}))
+                                   {"Role", configor::config_value_type::number_integer}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
-                ResponseJSON = Register(Data["Username"].as_string(),
-                                        Data["Password"].as_string(),
-                                        Data["EmailAddress"].as_string(),
-                                        Data["VerificationCode"].as_string());
+                ResponseJSON = UpdateUser(Data["UID"].as_integer(),
+                                          Data["Username"].as_string(),
+                                          Data["Nickname"].as_string(),
+                                          Data["Password"].as_string(),
+                                          Data["EmailAddress"].as_string(),
+                                          (USER_ROLE)Data["Role"].as_integer());
         }
-        else if (Action == "CheckUsernameAvailable")
+        else if (Action == "DeleteUser")
         {
-            if (!CheckTypes(Data, {{"Username", configor::config_value_type::string}}))
+            if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
-                ResponseJSON = CheckUsernameAvailable(Data["Username"].as_string());
+                ResponseJSON = DeleteUser(Data["UID"].as_integer());
         }
-        else if (Action == "CheckEmailAvailable")
+        else if (Action == "GetUsers")
         {
-            if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string}}))
+            if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
-                ResponseJSON = CheckEmailAvailable(Data["EmailAddress"].as_string());
+                ResponseJSON = GetUsers(Data["Page"].as_integer());
         }
-        else if (Action == "SendVerificationCode")
+        else if (Action == "HashPassword")
         {
-            if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string}}))
+            if (!CheckTypes(Data, {{"OriginalPassword", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
-                ResponseJSON = SendVerificationCode(Data["EmailAddress"].as_string());
+                ResponseJSON = HashPassword(Data["OriginalPassword"].as_string());
         }
-        else if (Action == "Login")
+        else if (Action == "AddProblem")
         {
-            if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
-                                   {"Password", configor::config_value_type::string}}))
+            if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
+                                   {"Title", configor::config_value_type::string},
+                                   {"IOFilename", configor::config_value_type::string},
+                                   {"Description", configor::config_value_type::string},
+                                   {"Input", configor::config_value_type::string},
+                                   {"Output", configor::config_value_type::string},
+                                   {"Range", configor::config_value_type::string},
+                                   {"Hint", configor::config_value_type::string},
+                                   {"Samples", configor::config_value_type::string},
+                                   {"TestGroups", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
-                ResponseJSON = Login(Data["Username"].as_string(),
-                                     Data["Password"].as_string());
+                ResponseJSON = AddProblem(Data["PID"].as_string(),
+                                          Data["Title"].as_string(),
+                                          Data["IOFilename"].as_string(),
+                                          Data["Description"].as_string(),
+                                          Data["Input"].as_string(),
+                                          Data["Output"].as_string(),
+                                          Data["Range"].as_string(),
+                                          Data["Hint"].as_string(),
+                                          Data["Samples"].as_string(),
+                                          Data["TestGroups"].as_string());
+        }
+        else if (Action == "GetProblem")
+        {
+            if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = GetProblem(Data["PID"].as_string());
+        }
+        else if (Action == "UpdateProblem")
+        {
+            if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
+                                   {"Title", configor::config_value_type::string},
+                                   {"IOFilename", configor::config_value_type::string},
+                                   {"Description", configor::config_value_type::string},
+                                   {"Input", configor::config_value_type::string},
+                                   {"Output", configor::config_value_type::string},
+                                   {"Range", configor::config_value_type::string},
+                                   {"Hint", configor::config_value_type::string},
+                                   {"Samples", configor::config_value_type::string},
+                                   {"TestGroups", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = UpdateProblem(Data["PID"].as_string(),
+                                             Data["Title"].as_string(),
+                                             Data["IOFilename"].as_string(),
+                                             Data["Description"].as_string(),
+                                             Data["Input"].as_string(),
+                                             Data["Output"].as_string(),
+                                             Data["Range"].as_string(),
+                                             Data["Hint"].as_string(),
+                                             Data["Samples"].as_string(),
+                                             Data["TestGroups"].as_string());
+        }
+        else if (Action == "DeleteProblem")
+        {
+            if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = DeleteProblem(Data["PID"].as_string());
+        }
+        else if (Action == "GetProblems")
+        {
+            if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = GetProblems(Data["Page"].as_integer());
+        }
+        else if (Action == "AddSubmission")
+        {
+            if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
+                                   {"EnableO2", configor::config_value_type::boolean},
+                                   {"Code", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = AddSubmission(Data["PID"].as_string(),
+                                             Data["EnableO2"].as_bool(),
+                                             Data["Code"].as_string());
+        }
+        else if (Action == "GetSubmission")
+        {
+            if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = GetSubmission(Data["SID"].as_integer());
+        }
+        else if (Action == "UpdateSubmission")
+        {
+            if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer},
+                                   {"PID", configor::config_value_type::string},
+                                   {"UID", configor::config_value_type::number_integer},
+                                   {"Code", configor::config_value_type::string},
+                                   {"Result", configor::config_value_type::number_integer},
+                                   {"Description", configor::config_value_type::string},
+                                   {"Time", configor::config_value_type::number_integer},
+                                   {"TimeSum", configor::config_value_type::number_integer},
+                                   {"Memory", configor::config_value_type::number_integer},
+                                   {"Score", configor::config_value_type::number_integer},
+                                   {"EnableO2", configor::config_value_type::boolean},
+                                   {"TestGroups", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = UpdateSubmission(Data["SID"].as_integer(),
+                                                Data["PID"].as_string(),
+                                                Data["UID"].as_integer(),
+                                                Data["Code"].as_string(),
+                                                Data["Result"].as_integer(),
+                                                Data["Description"].as_string(),
+                                                Data["Time"].as_integer(),
+                                                Data["TimeSum"].as_integer(),
+                                                Data["Memory"].as_integer(),
+                                                Data["Score"].as_integer(),
+                                                Data["EnableO2"].as_bool(),
+                                                Data["TestGroups"].as_string());
+        }
+        else if (Action == "RejudgeSubmission")
+        {
+            if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = RejudgeSubmission(Data["SID"].as_integer());
+        }
+        else if (Action == "DeleteSubmission")
+        {
+            if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = DeleteSubmission(Data["SID"].as_integer());
+        }
+        else if (Action == "GetSubmissions")
+        {
+            if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = GetSubmissions(Data["Page"].as_integer());
+        }
+        else if (Action == "GetSettings")
+        {
+            ResponseJSON = GetSettings();
+        }
+        else if (Action == "SetSettings")
+        {
+            if (!CheckTypes(Data, {{"Settings", configor::config_value_type::object}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = SetSettings(Data["Settings"]);
         }
         else
-        {
-            if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
-                ResponseJSON["Message"] = "Invalid parameters";
-            else
-            {
-                Token = Data["Token"].as_string();
-                if (CheckTokenAvailable(Token)["Success"].as_bool() == false)
-                    ResponseJSON["Message"] = "Invalid token";
-                else
-                {
-                    RETURN_JSON_IF_FAILED(TOKENS::GetUID(Token, UID));
-                    RETURN_JSON_IF_FAILED(USERS::IsAdmin(UID, IsAdmin));
-
-                    if (Action == "GetUser")
-                    {
-                        if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = GetUser(Data["UID"].as_integer());
-                    }
-                    else if (Action == "AddProblem")
-                    {
-                        if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
-                                               {"Title", configor::config_value_type::string},
-                                               {"IOFilename", configor::config_value_type::string},
-                                               {"Description", configor::config_value_type::string},
-                                               {"Input", configor::config_value_type::string},
-                                               {"Output", configor::config_value_type::string},
-                                               {"Range", configor::config_value_type::string},
-                                               {"Hint", configor::config_value_type::string},
-                                               {"Samples", configor::config_value_type::string},
-                                               {"TestGroups", configor::config_value_type::string}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = AddProblem(Data["PID"].as_string(),
-                                                      Data["Title"].as_string(),
-                                                      Data["IOFilename"].as_string(),
-                                                      Data["Description"].as_string(),
-                                                      Data["Input"].as_string(),
-                                                      Data["Output"].as_string(),
-                                                      Data["Range"].as_string(),
-                                                      Data["Hint"].as_string(),
-                                                      Data["Samples"].as_string(),
-                                                      Data["TestGroups"].as_string());
-                    }
-                    else if (Action == "GetProblem")
-                    {
-                        if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = GetProblem(Data["PID"].as_string());
-                    }
-                    else if (Action == "UpdateProblem")
-                    {
-                        if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
-                                               {"Title", configor::config_value_type::string},
-                                               {"IOFilename", configor::config_value_type::string},
-                                               {"Description", configor::config_value_type::string},
-                                               {"Input", configor::config_value_type::string},
-                                               {"Output", configor::config_value_type::string},
-                                               {"Range", configor::config_value_type::string},
-                                               {"Hint", configor::config_value_type::string},
-                                               {"Samples", configor::config_value_type::string},
-                                               {"TestGroups", configor::config_value_type::string}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = UpdateProblem(Data["PID"].as_string(),
-                                                         Data["Title"].as_string(),
-                                                         Data["IOFilename"].as_string(),
-                                                         Data["Description"].as_string(),
-                                                         Data["Input"].as_string(),
-                                                         Data["Output"].as_string(),
-                                                         Data["Range"].as_string(),
-                                                         Data["Hint"].as_string(),
-                                                         Data["Samples"].as_string(),
-                                                         Data["TestGroups"].as_string());
-                    }
-                    else if (Action == "DeleteProblem")
-                    {
-                        if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = DeleteProblem(Data["PID"].as_string());
-                    }
-                    else if (Action == "GetProblems")
-                    {
-                        if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = GetProblems(Data["Page"].as_integer());
-                    }
-                    else if (Action == "AddSubmission")
-                    {
-                        if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
-                                               {"EnableO2", configor::config_value_type::boolean},
-                                               {"Code", configor::config_value_type::string}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = AddSubmission(Data["PID"].as_string(),
-                                                         Data["EnableO2"].as_bool(),
-                                                         Data["Code"].as_string());
-                    }
-                    else if (Action == "GetSubmission")
-                    {
-                        if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = GetSubmission(Data["SID"].as_integer());
-                    }
-                    else if (Action == "UpdateSubmission")
-                    {
-                        if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer},
-                                               {"PID", configor::config_value_type::string},
-                                               {"UID", configor::config_value_type::number_integer},
-                                               {"Code", configor::config_value_type::string},
-                                               {"Result", configor::config_value_type::number_integer},
-                                               {"Description", configor::config_value_type::string},
-                                               {"Time", configor::config_value_type::number_integer},
-                                               {"TimeSum", configor::config_value_type::number_integer},
-                                               {"Memory", configor::config_value_type::number_integer},
-                                               {"Score", configor::config_value_type::number_integer},
-                                               {"EnableO2", configor::config_value_type::boolean},
-                                               {"TestGroups", configor::config_value_type::string}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = UpdateSubmission(Data["SID"].as_integer(),
-                                                            Data["PID"].as_string(),
-                                                            Data["UID"].as_integer(),
-                                                            Data["Code"].as_string(),
-                                                            Data["Result"].as_integer(),
-                                                            Data["Description"].as_string(),
-                                                            Data["Time"].as_integer(),
-                                                            Data["TimeSum"].as_integer(),
-                                                            Data["Memory"].as_integer(),
-                                                            Data["Score"].as_integer(),
-                                                            Data["EnableO2"].as_bool(),
-                                                            Data["TestGroups"].as_string());
-                    }
-                    else if (Action == "RejudgeSubmission")
-                    {
-                        if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = RejudgeSubmission(Data["SID"].as_integer());
-                    }
-                    else if (Action == "DeleteSubmission")
-                    {
-                        if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = DeleteSubmission(Data["SID"].as_integer());
-                    }
-                    else if (Action == "GetSubmissions")
-                    {
-                        if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = GetSubmissions(Data["Page"].as_integer());
-                    }
-                    else if (Action == "GetSettings")
-                    {
-                        ResponseJSON = GetSettings();
-                    }
-                    else if (Action == "SetSettings")
-                    {
-                        if (!CheckTypes(Data, {{"Settings", configor::config_value_type::object}}))
-                            ResponseJSON["Message"] = "Invalid parameters";
-                        else
-                            ResponseJSON = SetSettings(Data["Settings"]);
-                    }
-                    else
-                        ResponseJSON["Message"] = "No such action";
-                    ResponseJSON["Data"]["IsAdmin"] = IsAdmin;
-                }
-            }
-        }
+            ResponseJSON["Message"] = "No such action";
+        ResponseJSON["Data"]["IsAdmin"] = IsAdmin;
     }
     return ResponseJSON;
 }

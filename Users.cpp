@@ -1,15 +1,31 @@
 #include "Users.hpp"
 #include "Utilities.hpp"
-#include "Privilege.hpp"
+#include "Role.hpp"
+#include "Settings.hpp"
+#include "MurmurHash3/MurmurHash3.h"
 
-RESULT USERS::AddUser(std::string Username, std::string Password, std::string Email, std::string Nickname, int Privilege)
+RESULT USERS::HashPassword(std::string Password, std::string &HashedPassword)
+{
+    std::string Salt1, Salt2;
+    RETURN_IF_FAILED(SETTINGS::GetSettings("PasswordSalt1", Salt1));
+    RETURN_IF_FAILED(SETTINGS::GetSettings("PasswordSalt2", Salt2));
+    std::string SaltedPassword = Salt1 + Password + Salt2;
+    uint32_t Hash[4];
+    MurmurHash3_x86_128(SaltedPassword.c_str(), SaltedPassword.length(), 0, Hash);
+    std::stringstream StringStream;
+    StringStream << std::hex << Hash[0] << Hash[1] << Hash[2] << Hash[3];
+    HashedPassword = StringStream.str();
+    CREATE_RESULT(true, "Hash password succeed");
+}
+
+RESULT USERS::AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role)
 {
     RETURN_IF_FAILED(DATABASE::INSERT("Users")
                          .Insert("Username", Username)
-                         .Insert("Password", Password)
-                         .Insert("Email", Email)
+                         .Insert("Password", HashedPassword)
                          .Insert("Nickname", Nickname)
-                         .Insert("Privilege", Privilege)
+                         .Insert("EmailAddress", EmailAddress)
+                         .Insert("Role", Role)
                          .Execute());
     CREATE_RESULT(true, "Add user succeed");
 }
@@ -27,11 +43,11 @@ RESULT USERS::CheckUsernameAvailable(std::string Username)
                              }));
     CREATE_RESULT(true, "Username available");
 }
-RESULT USERS::CheckEmailAvailable(std::string Email)
+RESULT USERS::CheckEmailAvailable(std::string EmailAddress)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Users")
                          .Select("UID")
-                         .Where("Email", Email)
+                         .Where("EmailAddress", EmailAddress)
                          .Execute(
                              [](auto Data)
                              {
@@ -41,12 +57,12 @@ RESULT USERS::CheckEmailAvailable(std::string Email)
                              }));
     CREATE_RESULT(true, "Email available");
 }
-RESULT USERS::CheckPasswordCorrect(std::string Username, std::string Password, int &UID)
+RESULT USERS::CheckPasswordCorrect(std::string Username, std::string HashedPassword, int &UID)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Users")
                          .Select("UID")
                          .Where("Username", Username)
-                         .Where("Password", Password)
+                         .Where("Password", HashedPassword)
                          .Execute(
                              [&UID](auto Data)
                              {
@@ -60,26 +76,45 @@ RESULT USERS::CheckPasswordCorrect(std::string Username, std::string Password, i
 RESULT USERS::IsAdmin(int UID, bool &Result)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Users")
-                         .Select("Privilege")
+                         .Select("Role")
                          .Where("UID", UID)
                          .Execute(
                              [&Result](auto Data)
                              {
                                  if (Data.size() == 0)
                                      CREATE_RESULT(false, "No such user");
-                                 Result = (atoi(Data[0]["Privilege"].c_str()) == PRIVILEGE_LEVEL::PRIVILEGE_LEVEL_ADMIN);
+                                 Result = (atoi(Data[0]["Role"].c_str()) == USER_ROLE::USER_ROLE_ADMIN);
                                  CREATE_RESULT(true, "Success");
                              }));
     CREATE_RESULT(true, "Success");
+}
+RESULT USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
+{
+    RETURN_IF_FAILED(DATABASE::UPDATE("Users")
+                         .Set("Username", Username)
+                         .Set("Nickname", Nickname)
+                         .Set("Password", HashedPassword)
+                         .Set("EmailAddress", EmailAddress)
+                         .Set("Role", Role)
+                         .Where("UID", UID)
+                         .Execute());
+    CREATE_RESULT(true, "Update user succeed");
+}
+RESULT USERS::DeleteUser(int UID)
+{
+    RETURN_IF_FAILED(DATABASE::DELETE("Users")
+                         .Where("UID", UID)
+                         .Execute());
+    CREATE_RESULT(true, "Delete user succeed");
 }
 RESULT USERS::GetUser(int UID, USER &User)
 {
     RETURN_IF_FAILED(DATABASE::SELECT("Users")
                          .Select("UID")
                          .Select("Username")
-                         .Select("Email")
+                         .Select("EmailAddress")
                          .Select("Nickname")
-                         .Select("Privilege")
+                         .Select("Role")
                          .Where("UID", UID)
                          .Execute(
                              [&User](auto Data)
@@ -88,9 +123,9 @@ RESULT USERS::GetUser(int UID, USER &User)
                                      CREATE_RESULT(false, "No such user");
                                  User.UID = atoi(Data[0]["UID"].c_str());
                                  User.Username = Data[0]["Username"];
-                                 User.Email = Data[0]["Email"];
+                                 User.EmailAddress = Data[0]["EmailAddress"];
                                  User.Nickname = Data[0]["Nickname"];
-                                 User.Privilege = atoi(Data[0]["Privilege"].c_str());
+                                 User.Role = atoi(Data[0]["Role"].c_str());
                                  CREATE_RESULT(true, "Success");
                              }));
     CREATE_RESULT(true, "Success");

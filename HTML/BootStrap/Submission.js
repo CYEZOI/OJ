@@ -30,9 +30,9 @@ const ReloadData = () => {
             });
         };
         SubmissionRejudgeButton.onclick = () => {
-            ShowModal("Rejudge Submission", "Are you sure to rejudge it?", () => {
+            ShowModal("Rejudge submission", "Are you sure to rejudge it?", () => {
                 if (Response.Result > 10) {
-                    ShowModal("Rejudge Submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
+                    ShowModal("Rejudge submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
                         RequestAPI("RejudgeSubmission", {
                             "SID": Number(Data.SID)
                         }, () => { }, () => {
@@ -55,7 +55,7 @@ const ReloadData = () => {
             });
         };
         SubmissionDeleteButton.onclick = () => {
-            ShowModal("Delete Submission", "Are you sure to delete this submission?", () => {
+            ShowModal("Delete submission", "Are you sure to delete this submission?", () => {
                 RequestAPI("DeleteSubmission",
                     {
                         "SID": Number(Data.SID)

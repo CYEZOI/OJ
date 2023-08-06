@@ -153,6 +153,6 @@ SettingsSave.onclick = () => {
     }, () => {
         RemoveLoading(SettingsSave);
     }, () => {
-        ShowSuccess("Settings saved successfully");
+        ShowSuccess("Save Settings Success");
     }, () => { });
 };

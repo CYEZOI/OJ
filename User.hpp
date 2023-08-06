@@ -7,7 +7,7 @@ class USER
 public:
     int UID;
     std::string Username;
-    std::string Email;
+    std::string EmailAddress;
     std::string Nickname;
-    int Privilege;
+    int Role;
 };

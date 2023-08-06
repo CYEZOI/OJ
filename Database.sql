@@ -59,6 +59,6 @@ CREATE TABLE `Users` (
     `Username` VARCHAR(32) NOT NULL UNIQUE,
     `Password` VARCHAR(32) NOT NULL,
     `Nickname` VARCHAR(32) NOT NULL,
-    `Email` TEXT NOT NULL,
-    `Privilege` INT UNSIGNED NOT NULL
+    `EmailAddress` TEXT NOT NULL,
+    `Role` INT UNSIGNED NOT NULL
 );
