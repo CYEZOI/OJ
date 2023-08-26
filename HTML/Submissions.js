@@ -63,6 +63,8 @@ RequestAPI("GetSubmissions", {
             };
             let SubmissionResult = document.createElement("td"); SubmissionRow.appendChild(SubmissionResult);
             SubmissionResult.innerText = SubmissionResultShortTexts[Response.Submissions[i].Result];
+            SubmissionResult.style.color = "white";
+            SubmissionResult.style.backgroundColor = SubmissionResultColors[Response.Submissions[i].Result];
             SubmissionResult.onclick = () => {
                 SwitchPage("Submission", {
                     "SID": Response.Submissions[i].SID

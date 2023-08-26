@@ -5,6 +5,8 @@ for mount_point in (mount | awk '{print $3}')
         umount "$mount_point"
     end
 end
+rm -rf /home/Judger/Run
+mkdir /home/Judger/Run
 rm -f (find "/home/Judger/" -name "*.log") Log.log ./build/main
 service mysql start >/dev/null
 cmake -B build

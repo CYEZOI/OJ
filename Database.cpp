@@ -311,8 +311,3 @@ void DATABASE::CloseConnection(sql::Connection *Connection)
     Connection->close();
     delete Connection;
 }
-
-/*
-CREATE USER 'langningc2009'@'localhost' IDENTIFIED BY '1!2@3#qQwWeE';
-GRANT SELECT, INSERT, UPDATE, DELETE ON OJ.* TO 'langningc2009'@'localhost';
-*/

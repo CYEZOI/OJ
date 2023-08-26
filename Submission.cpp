@@ -3,6 +3,7 @@
 #include "Utilities.hpp"
 #include "Problems.hpp"
 #include "Submissions.hpp"
+#include "TempTestData.hpp"
 #include <fstream>
 #include <algorithm>
 #include <math.h>
@@ -32,7 +33,7 @@ RESULT SUBMISSION::RedirectIO()
     if (freopen((WorkDir + "/main.log").c_str(), "w", stderr) == nullptr)
         CREATE_RESULT(false, "Can not open error data file")
 
-    CREATE_RESULT(true, "Redirected IO success")
+    CREATE_RESULT(true, "Redirected IO succeeds")
 }
 RESULT SUBMISSION::SetupEnvrionment()
 {
@@ -296,7 +297,30 @@ RESULT SUBMISSION::RunTestGroups()
         Problem.IOFilename = std::to_string(SID);
     for (size_t i = 0; i < TestGroups.size(); i++)
     {
-        RETURN_IF_FAILED(TestGroups[i].Judge())
+        TEMP_TEST_DATA::Insert(TestGroups[i]);
+        if (fork() == 0)
+        {
+            OUTPUT_IF_FAILED(TestGroups[i].Judge())
+            exit(0);
+        }
+    }
+    bool Judged = false;
+    while (!Judged)
+    {
+        Judged = true;
+        for (int i = 0; i < TestGroups.size(); i++)
+        {
+            TEMP_TEST_DATA::Select(TestGroups[i]);
+            if (TestGroups[i].Result >= JUDGE_RESULT::WAITING)
+                Judged = false;
+        }
+        SUBMISSIONS::UpdateSubmission(this);
+        usleep(500'000);
+    }
+    for (size_t i = 0; i < TestGroups.size(); i++)
+    {
+        TEMP_TEST_DATA::Select(TestGroups[i]);
+        TEMP_TEST_DATA::Delete(TestGroups[i]);
         Score += TestGroups[i].Score;
         ResultCount[TestGroups[i].Result]++;
         Time = std::max(Time, TestGroups[i].Time);
@@ -348,17 +372,6 @@ RESULT SUBMISSION::Judge()
     RETURN_IF_FAILED(SETTINGS::GetSettings("CompileTimeLimit", TimeLimit));
     RETURN_IF_FAILED(SETTINGS::GetSettings("CompileOutputLimit", OutputLimit));
 
-    bool UpdateDatabaseSignal = true;
-    std::thread UpdateDatabase(
-        [this, &UpdateDatabaseSignal]()
-        {
-            while (UpdateDatabaseSignal)
-            {
-                SUBMISSIONS::UpdateSubmission(this);
-                usleep(500'000);
-            }
-        });
-
     UpdateAllResults(JUDGE_RESULT::FETCHED);
 
     WorkDir = "/home/" + JudgeUsername + "/Run/" + std::to_string(SID);
@@ -382,8 +395,6 @@ RESULT SUBMISSION::Judge()
         RETURN_IF_FAILED(RunTestGroupsResult)
     }
 
-    UpdateDatabaseSignal = false;
-    UpdateDatabase.join();
     RETURN_IF_FAILED(UTILITIES::RemoveDir(WorkDir));
     SUBMISSIONS::UpdateSubmission(this);
 

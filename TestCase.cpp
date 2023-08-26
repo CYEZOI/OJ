@@ -3,8 +3,10 @@
 #include "Settings.hpp"
 #include "TestCase.hpp"
 #include "Submissions.hpp"
+#include "TempTestData.hpp"
 #include <map>
 #include <fstream>
+#include <thread>
 #include <math.h>
 #include <string.h>
 #include <signal.h>
@@ -449,12 +451,26 @@ RESULT TEST_CASE::Judge()
     RETURN_IF_FAILED(UTILITIES::MakeDir(WorkDir))
     RETURN_IF_FAILED(UTILITIES::CopyFile("/home/" + JudgeUsername + "/Run/" + std::to_string(SID) + "/main", WorkDir + "/main"))
 
+    bool UpdateDatabaseSignal = true;
+    std::thread UpdateDatabase(
+        [this, &UpdateDatabaseSignal]()
+        {
+            while (UpdateDatabaseSignal)
+            {
+                TEMP_TEST_DATA::Update(*this);
+                usleep(500'000);
+            }
+        });
+
     Result = JUDGE_RESULT::JUDGING;
 
     RESULT RunResult = Run();
     if (Time > UnjudgedTestCase->TimeLimit)
     {
         Result = JUDGE_RESULT::TIME_LIMIT_EXCEEDED;
+        UpdateDatabaseSignal = false;
+        UpdateDatabase.join();
+        TEMP_TEST_DATA::Update(*this);
         CREATE_RESULT(true, "Time limit exceeded")
     }
     kill(ProcessID, SIGKILL);
@@ -463,6 +479,9 @@ RESULT TEST_CASE::Judge()
     {
         Result = JUDGE_RESULT::SYSTEM_ERROR;
         Description = RunResult.Message;
+        UpdateDatabaseSignal = false;
+        UpdateDatabase.join();
+        TEMP_TEST_DATA::Update(*this);
         CREATE_RESULT(true, "Judged with system error from run")
     }
 
@@ -471,11 +490,18 @@ RESULT TEST_CASE::Judge()
     {
         Result = JUDGE_RESULT::SYSTEM_ERROR;
         Description = CompareResult.Message;
+        UpdateDatabaseSignal = false;
+        UpdateDatabase.join();
+        TEMP_TEST_DATA::Update(*this);
         CREATE_RESULT(true, "Judged with system error from compare")
     }
 
     Score = Result == JUDGE_RESULT::ACCEPTED ? Score : 0;
     RETURN_IF_FAILED(UTILITIES::RemoveDir(WorkDir));
 
+    UpdateDatabaseSignal = false;
+    UpdateDatabase.join();
+
+    TEMP_TEST_DATA::Update(*this);
     CREATE_RESULT(true, "Judged")
 }

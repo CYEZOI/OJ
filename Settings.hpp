@@ -27,19 +27,3 @@ public:
 };
 
 extern SETTINGS Settings;
-
-
-/*
-sudo groupadd judge
-sudo useradd Judger -g judge
-sudo passwd Judger -d
-sudo mkdir /home/Judger
-sudo chown -R Judger /home/Judger
-sudo chgrp -R judge /home/Judger
-echo -e "Judger\tALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers > /dev/null
-sudo chsh Judger -s /usr/bin/fish
-sudo chmod -R a+rw /home/langningc2009/Coding
-
-sudo chmod a+s /bin/chgrp
-sudo chmod a+s /bin/chown
-*/

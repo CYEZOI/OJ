@@ -17,7 +17,13 @@ int main()
         [](std::string RequestHTTPData) -> std::string
         {
             WEB_DATA_PROCEED Data;
-            return Data.Proceed(HTTP_REQUEST(RequestHTTPData)).Stringify();
+            HTTP_REQUEST HTTPRequest;
+            HTTP_RESPONSE HTTPResponse;
+            if (!HTTPRequest.Parse(RequestHTTPData).Success)
+                HTTPResponse.SetCode(400);
+            else
+                HTTPResponse = Data.Proceed(HTTPRequest);
+            return HTTPResponse.Stringify();
         });
     return 0;
 }

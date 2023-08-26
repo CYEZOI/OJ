@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Logger.hpp"
+#include "Result.hpp"
 #include <string>
 #include <map>
 
@@ -18,5 +19,5 @@ private:
     friend class WEB_DATA_PROCEED;
 
 public:
-    HTTP_REQUEST(std::string Data);
+    RESULT Parse(std::string Data);
 };

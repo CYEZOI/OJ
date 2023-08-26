@@ -17,8 +17,6 @@
 HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
 {
     std::string BasicFolder = "/home/langningc2009/OJ/HTML";
-    std::string WebTheme = "";
-    SETTINGS::GetSettings("WebTheme", WebTheme);
     std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
     if (HTTPRequest.Path == "/api")
@@ -161,54 +159,25 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
             HTTPResponse.SetHeader("Content-Type", FileType);
         }
     }
-    else if (HTTPRequest.Path.length() >= 3 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 3, 3) == ".js")
-    {
-        std::string Data;
-        if (!UTILITIES::LoadFile(BasicFolder + "/" + WebTheme + HTTPRequest.Path, Data).Success)
-            HTTPResponse.SetCode(503);
-        HTTPResponse.SetBody(Data);
-        HTTPResponse.SetHeader("Content-Type", "application/javascript");
-    }
-    else if (HTTPRequest.Path.length() >= 4 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 4, 4) == ".css")
-    {
-        std::string Data;
-        if (!UTILITIES::LoadFile(BasicFolder + "/" + WebTheme + HTTPRequest.Path, Data).Success)
-            HTTPResponse.SetCode(503);
-        HTTPResponse.SetBody(Data);
-        HTTPResponse.SetHeader("Content-Type", "text/css");
-    }
     else if (HTTPRequest.Path == "/Shutdown")
         exit(0);
+    else if (HTTPRequest.Path == "/")
+    {
+        HTTPResponse.SetCode(302);
+        HTTPResponse.SetHeader("location", "/index.html");
+    }
     else
     {
-        if (WebTheme == "BootStrap")
-        {
-            if (HTTPRequest.Path.length() >= 5 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 5, 5) == ".html")
-            {
-                std::string Data;
-                if (!UTILITIES::LoadFile(BasicFolder + "/" + WebTheme + HTTPRequest.Path, Data).Success)
-                    HTTPResponse.SetCode(404);
-                HTTPResponse.SetBody(Data);
-            }
-            else if (HTTPRequest.Path == "/")
-            {
-                HTTPResponse.SetCode(302);
-                HTTPResponse.SetHeader("location", "/index.html");
-            }
-            else
-                HTTPResponse.SetCode(404);
-        }
-        else if (WebTheme == "WEUI")
-        {
-            std::string Data;
-            if (!UTILITIES::LoadFile(BasicFolder + "/" + WebTheme + "/index.html", Data).Success)
-                HTTPResponse.SetCode(500);
-            HTTPResponse.SetBody(Data);
-        }
-        else
-        {
-            HTTPResponse.SetCode(503);
-        }
+        std::string Data;
+        if (!UTILITIES::LoadFile(BasicFolder + HTTPRequest.Path, Data).Success)
+            HTTPResponse.SetCode(404);
+        HTTPResponse.SetBody(Data);
+        if (HTTPRequest.Path.length() >= 3 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 3, 3) == ".js")
+            HTTPResponse.SetHeader("Content-Type", "application/javascript");
+        else if (HTTPRequest.Path.length() >= 4 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 4, 4) == ".css")
+            HTTPResponse.SetHeader("Content-Type", "text/css");
+        else if (HTTPRequest.Path.length() >= 5 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 5, 5) == ".html")
+            HTTPResponse.SetHeader("Content-Type", "text/html");
     }
     return HTTPResponse;
 }

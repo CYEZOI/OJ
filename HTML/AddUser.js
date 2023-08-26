@@ -72,7 +72,7 @@ AddUserButton.onclick = () => {
     }, () => {
         RemoveLoading(AddUserButton);
     }, () => {
-        ShowSuccess("AddUser success");
+        ShowSuccess("AddUser succeeds");
         setTimeout(() => {
             SwitchPage("Users");
         }, 1000);

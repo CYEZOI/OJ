@@ -177,7 +177,7 @@ const ShowError = (Text) => {
     ShowAlert(Text, "danger");
 };
 const ShowSuccess = (Text) => {
-    ShowAlert(Text, "success");
+    ShowAlert(Text, "succeeds");
 };
 const ShowToast = (Title, Body, Small = "") => {
     let Toast = document.createElement("div"); ToastList.appendChild(Toast);

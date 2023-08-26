@@ -49,6 +49,7 @@ private:
     friend class PROBLEMS;
     friend class SUBMISSIONS;
     friend class SUBMISSION;
+    friend class TEMP_TEST_DATA;
 
 public:
     RESULT Judge();

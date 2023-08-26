@@ -123,7 +123,7 @@ RegisterButton.onclick = () => {
     }, () => {
         RemoveLoading(RegisterButton);
     }, () => {
-        ShowSuccess("Register success");
+        ShowSuccess("Register succeeds");
         SwitchPage("Login");
     }, () => { }, () => { }, false);
 };

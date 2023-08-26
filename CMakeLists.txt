@@ -6,9 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(main
-    MurmurHash3/MurmurHash3.cpp
-    APIProceed.cpp
     # Captcha.cpp
+    APIProceed.cpp
     Database.cpp
     EmailVerificationCodes.cpp
     Files.cpp
@@ -16,6 +15,7 @@ add_executable(main
     HTTPResponse.cpp
     JudgingList.cpp
     Logger.cpp
+    MurmurHash3/MurmurHash3.cpp
     Problem.cpp
     Problems.cpp
     Regexes.cpp
@@ -24,6 +24,7 @@ add_executable(main
     Socket.cpp
     Submission.cpp
     Submissions.cpp
+    TempTestData.cpp
     TestCase.cpp
     TestGroup.cpp
     TestGroupData.cpp

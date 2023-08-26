@@ -26,7 +26,7 @@ SubmitButton.onclick = () => {
     }, () => {
         RemoveLoading(SubmitButton);
     }, (Response) => {
-        ShowSuccess("Submit succeed");
+        ShowSuccess("Submit succeeds");
         setTimeout(() => {
             SwitchPage("Submission", {
                 "SID": Response.SID

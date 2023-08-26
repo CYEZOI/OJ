@@ -62,3 +62,8 @@ CREATE TABLE `Users` (
     `EmailAddress` TEXT NOT NULL,
     `Role` INT UNSIGNED NOT NULL
 );
+
+CREATE TABLE `TempTestData` (
+    `Index` VARCHAR(32) NOT NULL PRIMARY KEY UNIQUE,
+    `Data` TEXT NOT NULL
+);
