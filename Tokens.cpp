@@ -23,7 +23,7 @@ RESULT TOKENS::CreateToken(int UID, std::string &TokenValue)
                          .Insert("UID", UID)
                          .Insert("TokenValue", TokenValue)
                          .Execute())
-    CREATE_RESULT(true, "Create token succeed");
+    CREATE_RESULT(true, "Create token succeeds");
 }
 RESULT TOKENS::CheckToken(std::string TokenValue)
 {
@@ -44,7 +44,7 @@ RESULT TOKENS::DeleteToken(std::string TokenValue)
     RETURN_IF_FAILED(DATABASE::DELETE("Tokens")
                          .Where("TokenValue", TokenValue)
                          .Execute())
-    CREATE_RESULT(true, "Delete token succeed");
+    CREATE_RESULT(true, "Delete token succeeds");
 }
 RESULT TOKENS::GetUID(std::string TokenValue, int &UID)
 {
@@ -56,7 +56,7 @@ RESULT TOKENS::GetUID(std::string TokenValue, int &UID)
                              {
                                  CREATE_RESULT_IF_FALSE(Data.size() == 1, "Token invalid");
                                  UID = std::stoi(Data[0]["UID"]);
-                                 CREATE_RESULT(true, "Get UID succeed");
+                                 CREATE_RESULT(true, "Get UID succeeds");
                              }))
-    CREATE_RESULT(true, "Get UID succeed");
+    CREATE_RESULT(true, "Get UID succeeds");
 }

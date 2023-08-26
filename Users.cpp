@@ -15,7 +15,7 @@ RESULT USERS::HashPassword(std::string Password, std::string &HashedPassword)
     std::stringstream StringStream;
     StringStream << std::hex << Hash[0] << Hash[1] << Hash[2] << Hash[3];
     HashedPassword = StringStream.str();
-    CREATE_RESULT(true, "Hash password succeed");
+    CREATE_RESULT(true, "Hash password succeeds");
 }
 
 RESULT USERS::AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role)
@@ -27,7 +27,7 @@ RESULT USERS::AddUser(std::string Username, std::string Nickname, std::string Ha
                          .Insert("EmailAddress", EmailAddress)
                          .Insert("Role", Role)
                          .Execute());
-    CREATE_RESULT(true, "Add user succeed");
+    CREATE_RESULT(true, "Add user succeeds");
 }
 RESULT USERS::CheckUsernameAvailable(std::string Username)
 {
@@ -69,9 +69,9 @@ RESULT USERS::CheckPasswordCorrect(std::string Username, std::string HashedPassw
                                  if (Data.size() == 0)
                                      CREATE_RESULT(false, "Username or password incorrect");
                                  UID = atoi(Data[0]["UID"].c_str());
-                                 CREATE_RESULT(true, "Login succeed");
+                                 CREATE_RESULT(true, "Login succeeds");
                              }));
-    CREATE_RESULT(true, "Login succeed")
+    CREATE_RESULT(true, "Login succeeds")
 }
 RESULT USERS::IsAdmin(int UID, bool &Result)
 {
@@ -98,14 +98,14 @@ RESULT USERS::UpdateUser(int UID, std::string Username, std::string Nickname, st
                          .Set("Role", Role)
                          .Where("UID", UID)
                          .Execute());
-    CREATE_RESULT(true, "Update user succeed");
+    CREATE_RESULT(true, "Update user succeeds");
 }
 RESULT USERS::DeleteUser(int UID)
 {
     RETURN_IF_FAILED(DATABASE::DELETE("Users")
                          .Where("UID", UID)
                          .Execute());
-    CREATE_RESULT(true, "Delete user succeed");
+    CREATE_RESULT(true, "Delete user succeeds");
 }
 RESULT USERS::GetUser(int UID, USER &User)
 {

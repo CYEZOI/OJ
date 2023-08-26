@@ -112,9 +112,9 @@ RESULT SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
                              [&Submission](int SID)
                              {
                                  Submission.SID = SID;
-                                 CREATE_RESULT(true, "Adding submission success");
+                                 CREATE_RESULT(true, "Adding submission succeeds");
                              }));
-    CREATE_RESULT(true, "Adding submission success");
+    CREATE_RESULT(true, "Adding submission succeeds");
 }
 RESULT SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
 {
@@ -172,9 +172,9 @@ RESULT SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
                                  }
 
                                  RETURN_IF_FAILED(JSONToTestGroups(Data[0]["TestGroups"], Submission.TestGroups, Submission.PID, Submission.SID));
-                                 CREATE_RESULT(true, "Loading submission success");
+                                 CREATE_RESULT(true, "Loading submission succeeds");
                              }));
-    CREATE_RESULT(true, "Loading submission success");
+    CREATE_RESULT(true, "Loading submission succeeds");
 }
 RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
 {
@@ -194,7 +194,7 @@ RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
                          .Set("TestGroups", TestGroupsData)
                          .Where("SID", Submission.SID)
                          .Execute());
-    CREATE_RESULT(true, "Updating submission success");
+    CREATE_RESULT(true, "Updating submission succeeds");
 }
 RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION *Submission) { return UpdateSubmission(*Submission); }
 RESULT SUBMISSIONS::DeleteSubmission(int SID)

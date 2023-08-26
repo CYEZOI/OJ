@@ -27,7 +27,7 @@ RESULT EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(std::string EmailAd
                          .Insert("EmailAddress", EmailAddress)
                          .Insert("VerificationCode", VerificationCode)
                          .Execute())
-    CREATE_RESULT(true, "Create email Verification code succeed");
+    CREATE_RESULT(true, "Create email Verification code succeeds");
 }
 RESULT EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode)
 {
@@ -49,5 +49,5 @@ RESULT EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(std::string EmailAd
     RETURN_IF_FAILED(DATABASE::DELETE("EmailVerificationCodes")
                          .Where("EmailAddress", EmailAddress)
                          .Execute())
-    CREATE_RESULT(true, "Delete email Verification code succeed");
+    CREATE_RESULT(true, "Delete email Verification code succeeds");
 }

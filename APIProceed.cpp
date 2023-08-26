@@ -40,7 +40,7 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     RETURN_JSON_IF_FAILED(TOKENS::CreateToken(UID, Token))
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
-    ResponseJSON["Message"] = "Login success";
+    ResponseJSON["Message"] = "Login succeeds";
     ResponseJSON["Data"]["Token"] = Token;
     return ResponseJSON;
 }
@@ -62,7 +62,7 @@ configor::json API_PROCEED::SendVerificationCode(std::string EmailAddress)
     std::string VerificationCode;
     RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(EmailAddress, VerificationCode))
     RETURN_JSON_IF_FAILED(UTILITIES::SendEmail(EmailAddress, "Email verification Code", "Hello, here is your verification code. Your Verification code is " + VerificationCode + ". Thanks."))
-    CREATE_JSON(true, "Send verification code success")
+    CREATE_JSON(true, "Send verification code succeeds")
 }
 configor::json API_PROCEED::Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode)
 {
@@ -78,14 +78,14 @@ configor::json API_PROCEED::Register(std::string Username, std::string Nickname,
     std::string HashedPassword;
     RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
     RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, USER_ROLE::USER_ROLE_USER))
-    CREATE_JSON(true, "Register success");
+    CREATE_JSON(true, "Register succeeds");
 }
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
 {
     std::string HashedPassword;
     RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
     RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, USER_ROLE::USER_ROLE_USER))
-    CREATE_JSON(true, "Add user success");
+    CREATE_JSON(true, "Add user succeeds");
 }
 configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
 {
@@ -101,14 +101,14 @@ configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::strin
     if (OriginalUser.EmailAddress != EmailAddress)
         RETURN_JSON_IF_FAILED(USERS::CheckEmailAvailable(EmailAddress))
     RETURN_JSON_IF_FAILED(USERS::UpdateUser(UID, Username, Nickname, HashedPassword, EmailAddress, Role))
-    CREATE_JSON(true, "Update user success");
+    CREATE_JSON(true, "Update user succeeds");
 }
 configor::json API_PROCEED::DeleteUser(int UID)
 {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     RETURN_JSON_IF_FAILED(USERS::DeleteUser(UID))
-    CREATE_JSON(true, "Delete user success");
+    CREATE_JSON(true, "Delete user succeeds");
 }
 configor::json API_PROCEED::GetUser(int UID)
 {
@@ -153,7 +153,7 @@ configor::json API_PROCEED::GetUsers(int Page)
                                           Users.push_back(TempUser);
                                       }
                                       ResponseJSON["Data"]["Users"] = Users;
-                                      CREATE_RESULT(true, "Get users success");
+                                      CREATE_RESULT(true, "Get users succeeds");
                                   }));
     RETURN_JSON_IF_FAILED(DATABASE::SIZE("Users")
                               .Execute(
@@ -191,7 +191,7 @@ configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::
     RETURN_JSON_IF_FAILED(PROBLEMS::JSONToSamples(Samples, Problem.Samples))
     RETURN_JSON_IF_FAILED(PROBLEMS::JSONToUnjudgedTestGroups(TestGroups, Problem.TestGroups))
     RETURN_JSON_IF_FAILED(PROBLEMS::AddProblem(Problem))
-    CREATE_JSON(true, "Add problem success");
+    CREATE_JSON(true, "Add problem succeeds");
 }
 configor::json API_PROCEED::GetProblem(std::string PID)
 {
@@ -259,14 +259,14 @@ configor::json API_PROCEED::UpdateProblem(std::string PID, std::string Title, st
     RETURN_JSON_IF_FAILED(PROBLEMS::JSONToSamples(Samples, Problem.Samples))
     RETURN_JSON_IF_FAILED(PROBLEMS::JSONToUnjudgedTestGroups(TestGroups, Problem.TestGroups))
     RETURN_JSON_IF_FAILED(PROBLEMS::UpdateProblem(Problem))
-    CREATE_JSON(true, "Update problem success");
+    CREATE_JSON(true, "Update problem succeeds");
 }
 configor::json API_PROCEED::DeleteProblem(std::string PID)
 {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     RETURN_JSON_IF_FAILED(PROBLEMS::DeleteProblem(PID))
-    CREATE_JSON(true, "Delete problem success");
+    CREATE_JSON(true, "Delete problem succeeds");
 }
 configor::json API_PROCEED::GetProblems(int Page)
 {
@@ -289,7 +289,7 @@ configor::json API_PROCEED::GetProblems(int Page)
                                           Problems.push_back(TempProblem);
                                       }
                                       ResponseJSON["Data"]["Problems"] = Problems;
-                                      CREATE_RESULT(true, "Get problems success");
+                                      CREATE_RESULT(true, "Get problems succeeds");
                                   }));
     RETURN_JSON_IF_FAILED(DATABASE::SIZE("Problems")
                               .Execute(
@@ -310,7 +310,7 @@ configor::json API_PROCEED::AddSubmission(std::string PID, bool EnableO2, std::s
     RETURN_JSON_IF_FAILED(JudgingList.Add(Submission))
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
-    ResponseJSON["Message"] = "Add submission success";
+    ResponseJSON["Message"] = "Add submission succeeds";
     ResponseJSON["Data"]["SID"] = Submission.SID;
     return ResponseJSON;
 }
@@ -372,7 +372,7 @@ configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, 
     Submission.EnableO2 = EnableO2;
     RETURN_JSON_IF_FAILED(SUBMISSIONS::JSONToTestGroups(TestGroups, Submission.TestGroups, PID, SID));
     RETURN_JSON_IF_FAILED(SUBMISSIONS::UpdateSubmission(Submission))
-    CREATE_JSON(true, "Update problem success");
+    CREATE_JSON(true, "Update problem succeeds");
 }
 configor::json API_PROCEED::RejudgeSubmission(int SID)
 {
@@ -395,14 +395,14 @@ configor::json API_PROCEED::RejudgeSubmission(int SID)
     }
     RETURN_JSON_IF_FAILED(SUBMISSIONS::UpdateSubmission(Submission));
     RETURN_JSON_IF_FAILED(JudgingList.Add(Submission));
-    CREATE_JSON(true, "Rejudge submission success");
+    CREATE_JSON(true, "Rejudge submission succeeds");
 }
 configor::json API_PROCEED::DeleteSubmission(int SID)
 {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     RETURN_JSON_IF_FAILED(SUBMISSIONS::DeleteSubmission(SID))
-    CREATE_JSON(true, "Delete submission success");
+    CREATE_JSON(true, "Delete submission succeeds");
 }
 configor::json API_PROCEED::GetSubmissions(int Page)
 {
@@ -436,7 +436,7 @@ configor::json API_PROCEED::GetSubmissions(int Page)
                                           Submissions.push_back(TempSubmission);
                                       }
                                       ResponseJSON["Data"]["Submissions"] = Submissions;
-                                      CREATE_RESULT(true, "Get submissions success");
+                                      CREATE_RESULT(true, "Get submissions succeeds");
                                   }));
     RETURN_JSON_IF_FAILED(DATABASE::SIZE("Submissions")
                               .Execute(
@@ -461,7 +461,7 @@ configor::json API_PROCEED::SetSettings(configor::json Settings)
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     RETURN_JSON_IF_FAILED(SETTINGS::SetSettings(Settings));
-    CREATE_JSON(true, "Set settings success");
+    CREATE_JSON(true, "Set settings succeeds");
 }
 
 configor::json API_PROCEED::Proceed(configor::json Request)
