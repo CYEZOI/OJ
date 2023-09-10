@@ -288,6 +288,7 @@ RESULT TEST_CASE::CheckSystemCall()
     struct user_regs_struct Regs;
     if (ptrace(PTRACE_GETREGS, ProcessID, nullptr, &Regs) == -1)
         CREATE_RESULT(true, "Can not get registers")
+    Logger.Info(std::to_string(TGID) + "-" + std::to_string(TCID) + "-" + std::to_string(Regs.orig_rax % SystemCallList.size()));
     int CallID = (unsigned int)Regs.orig_rax % SystemCallList.size();
     if (SystemCallList[CallID] == 0)
     {

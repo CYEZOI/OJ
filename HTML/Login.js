@@ -31,7 +31,7 @@ LoginButton.onclick = () => {
         RemoveLoading(LoginButton);
     }, (Response) => {
         localStorage.setItem("Token", Response.Token);
-        ShowSuccess("Login succeeds");
+        ShowSuccess("Login success");
         setTimeout(() => {
             SwitchPage("Home");
         }, 1000);
