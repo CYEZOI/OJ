@@ -214,7 +214,6 @@ RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
                          .Execute());
     CREATE_RESULT(true, "Updating submission succeeds");
 }
-RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION *Submission) { return UpdateSubmission(*Submission); }
 RESULT SUBMISSIONS::DeleteSubmission(int SID)
 {
     RETURN_IF_FAILED(DATABASE::DELETE("Submissions")

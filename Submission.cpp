@@ -332,7 +332,7 @@ RESULT SUBMISSION::RunTestGroups()
             if (TestGroups[i].Result >= JUDGE_RESULT::WAITING)
                 Judged = false;
         }
-        SUBMISSIONS::UpdateSubmission(this);
+        SUBMISSIONS::UpdateSubmission(*this);
         usleep(500'000);
     }
     for (size_t i = 0; i < TestGroups.size(); i++)
@@ -414,7 +414,7 @@ RESULT SUBMISSION::Judge()
     }
 
     RETURN_IF_FAILED(UTILITIES::RemoveDir(WorkDir));
-    SUBMISSIONS::UpdateSubmission(this);
+    SUBMISSIONS::UpdateSubmission(*this);
 
     CREATE_RESULT(true, "Judge submission successfully")
 }

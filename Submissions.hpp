@@ -34,6 +34,5 @@ public:
     AddSubmission(SUBMISSION &Submission);
     static RESULT GetSubmission(int SID, SUBMISSION &Submission);
     static RESULT UpdateSubmission(SUBMISSION Submission);
-    static RESULT UpdateSubmission(SUBMISSION *Submission);
     static RESULT DeleteSubmission(int SID);
 };
