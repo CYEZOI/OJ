@@ -72,3 +72,30 @@ private:
 public:
     RESULT Judge();
 };
+
+#ifdef __arm__
+struct user_regs_struct {
+    long uregs[18];
+};
+#define REG_SYSCALL uregs[7]
+#endif
+
+#ifdef __aarch64__
+#define PTRACE_GETREGS PTRACE_GETREGSET
+#define REG_SYSCALL regs[18]
+#endif
+
+#ifdef __mips__
+struct user_regs_struct {
+    unsigned long long uregs[38];
+};
+#define REG_SYSCALL uregs[2]
+#endif
+
+#ifdef __i386
+#define REG_SYSCALL orig_eax
+#endif
+
+#ifdef __x86_64__
+#define REG_SYSCALL orig_rax
+#endif
