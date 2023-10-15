@@ -1,4 +1,4 @@
-const SubmissionResultShortTexts = ["UKE", "AC", "PE", "WA", "TE", "ME", "OLE", "RE", "RF", "CE", "SE", "WT", "FC", "CP", "CPD", "JG", "JGD", "CMP", "SK", "RJ"];
+const SubmissionResultShortTexts = ["UKE", "AC", "PE", "WA", "TLE", "ME", "OLE", "RE", "RF", "CE", "SE", "WT", "FC", "CP", "CPD", "JG", "JGD", "CMP", "SK", "RJ"];
 const SubmissionResultTexts = ["Unknown error", "Accepted", "Presentation error", "Wrong answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Output Limit Exceeded", "Runtime error", "Restricted function", "Compilation error", "System error", "Waiting", "Fetched", "Compiling", "Compiled", "Judging", "Judged", "Comparing", "Skipped", "Rejected"];
 const SubmissionResultColors = ["#0000FF", "#49CD32", "#FF778E", "#D3140D", "#0C0066", "#5300A7", "#8300A7", "#1A26C8", "#009182", "#8B7400", "#000000", "#4100D9", "#4C00FF", "#5E19FF", "#7340FF", "#844FFF", "#967FFF", "#A87DFF", "#4B4B4B", "#4E0000"];
 const RoleName = ["Admin", "User", "Guest", "Banned"];
