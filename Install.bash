@@ -37,7 +37,7 @@ apt update
 apt upgrade -y
 
 # Install packages
-apt install fish dialog g++ make cmake git libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev -y
+apt install fish dialog g++ make cmake git libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev mount libssl-dev -y
 chsh --shell /usr/bin/fish $1
 
 # Clone repo
