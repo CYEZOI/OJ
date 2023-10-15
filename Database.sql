@@ -1,3 +1,19 @@
+DROP TABLE IF EXISTS `EmailVerificationCodes`;
+
+DROP TABLE IF EXISTS `Files`;
+
+DROP TABLE IF EXISTS `Problems`;
+
+DROP TABLE IF EXISTS `Settings`;
+
+DROP TABLE IF EXISTS `Submissions`;
+
+DROP TABLE IF EXISTS `Tokens`;
+
+DROP TABLE IF EXISTS `Users`;
+
+DROP TABLE IF EXISTS `TempTestData`;
+
 CREATE TABLE `EmailVerificationCodes` (
     `EmailAddress` VARCHAR(64) NOT NULL UNIQUE,
     `VerificationCode` VARCHAR(32) NOT NULL,
