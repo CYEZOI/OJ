@@ -1,9 +1,3 @@
-# Ignore files without extension
-*
-!*.*
-!*/
-!README
-
 # Ingore generated and temp files
 build/
 **/*.log

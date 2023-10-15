@@ -1,4 +1,10 @@
 #!/bin/bash
+echo -e "\033[33m"
+echo "OJ  Copyright (C) 2023  langningchen"
+echo "This program comes with ABSOLUTELY NO WARRANTY."
+echo "This is free software, and you are welcome to redistribute it under certain conditions."
+echo -e "\033[0m"
+
 # Basic checks
 if [ ! -f /etc/os-release ] || [ $(cat /etc/os-release | grep -c "Ubuntu") -eq 0 ]; then
     echo "This script only supports Ubuntu."
