@@ -10,6 +10,9 @@ if [ ! -f /etc/os-release ] || [ $(cat /etc/os-release | grep -c "Ubuntu") -eq 0
     echo "This script only supports Ubuntu."
     exit
 elif [ $(id -u) -ne 0 ]; then
+    echo -e "\033[31m"
+    echo "Rerunning this script as root or with sudo..."
+    echo -e "\033[0m"
     sudo $0 $(whoami) $HOME
     exit
 elif [ $# -ne 2 ]; then
