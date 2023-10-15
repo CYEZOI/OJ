@@ -53,7 +53,7 @@ RESULT TEST_GROUP::Judge()
         TEMP_TEST_DATA::Insert(TestCases[i]);
         if (fork() == 0)
         {
-            OUTPUT_IF_FAILED(TestCases[i].Judge());
+            TestCases[i].Judge();
             exit(0);
         }
     }

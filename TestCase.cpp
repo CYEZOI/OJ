@@ -378,9 +378,9 @@ RESULT TEST_CASE::Run()
     else
     {
         this->ProcessID = ProcessID;
-        OUTPUT_IF_FAILED(ParentProcess());
+        ParentProcess();
         kill(ProcessID, SIGKILL);
-        OUTPUT_IF_FAILED(RemoveEnvrionment());
+        RemoveEnvrionment();
     }
 
     CREATE_RESULT(true, "Run ended");

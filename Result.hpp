@@ -38,13 +38,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         }                                                                         \
     }
 
-#define OUTPUT_IF_FAILED(NewResult)                         \
-    {                                                       \
-        RESULT _Result = (NewResult);                       \
-        if (!_Result.Success)                               \
-            std::cout << _Result.DebugMessage << std::endl; \
-    }
-
 #define RETURN_IF_FAILED(NewResult)                                                                                                                               \
     {                                                                                                                                                             \
         RESULT _Result = (NewResult);                                                                                                                             \

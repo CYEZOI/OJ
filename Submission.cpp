@@ -318,7 +318,7 @@ RESULT SUBMISSION::RunTestGroups()
         TEMP_TEST_DATA::Insert(TestGroups[i]);
         if (fork() == 0)
         {
-            OUTPUT_IF_FAILED(TestGroups[i].Judge())
+            TestGroups[i].Judge();
             exit(0);
         }
     }

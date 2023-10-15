@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 int main()
 {
     srand(time(NULL));
-    OUTPUT_IF_FAILED(Settings.Init());
+    Settings.Init();
     JudgingList.Init();
     new SOCKET(
         [](std::string RequestHTTPData) -> std::string

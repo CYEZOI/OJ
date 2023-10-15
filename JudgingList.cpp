@@ -34,9 +34,9 @@ void JUDGING_LIST::Init()
                 while (JudgingList.empty())
                     usleep(500'000);
                 SUBMISSION Submission;
-                OUTPUT_IF_FAILED(SUBMISSIONS::GetSubmission(JudgingList.front(), Submission))
+                SUBMISSIONS::GetSubmission(JudgingList.front(), Submission);
                 JudgingList.pop();
-                OUTPUT_IF_FAILED(Submission.Judge())
+                Submission.Judge();
             }
         });
 }
