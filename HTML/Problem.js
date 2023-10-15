@@ -150,8 +150,8 @@ RequestAPI("GetProblem",
             };
             AddRow("Time limit", TimeToString(MaxTimeLimit));
             AddRow("Memory limit", MemoryToString(MaxMemoryLimit));
-            AddRow("Input filename", Response.IOFilename == "" ? Response.IOFilename : "Standard input");
-            AddRow("Output filename", Response.IOFilename == "" ? Response.IOFilename : "Standard output");
+            AddRow("Input filename", Response.IOFilename !== "" ? Response.IOFilename + ".in" : "Standard input");
+            AddRow("Output filename", Response.IOFilename !== "" ? Response.IOFilename + ".out" : "Standard output");
         }
         CreateAccordion("Other data", DataTable.outerHTML, "OtherData");
     }, () => { }, () => { });

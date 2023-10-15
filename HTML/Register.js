@@ -78,6 +78,7 @@ RegisterEmailInput.onblur = () => {
 }
 RegisterEmailVerificationCodeButton.onclick = () => {
     AddLoading(RegisterEmailVerificationCodeButton);
+    RegisterEmailVerificationCodeButton.disabled = true;
     RequestAPI("SendVerificationCode", {
         "EmailAddress": String(RegisterEmailInput.value)
     }, () => {
@@ -124,6 +125,8 @@ RegisterButton.onclick = () => {
         RemoveLoading(RegisterButton);
     }, () => {
         ShowSuccess("Register success");
-        SwitchPage("Login");
+        setTimeout(() => {
+            SwitchPage("Login");
+        }, 1000);
     }, () => { }, () => { }, false);
 };
