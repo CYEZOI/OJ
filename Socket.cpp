@@ -101,6 +101,7 @@ SOCKET::SOCKET(CALL_BACK CallBack)
 
     if (listen(ListenSocket, 1024) == -1)
         Logger.Fetal("Can not listen");
+    Logger.Warning("Listening on port " + std::to_string(Port));
 
     while (true)
     {
@@ -109,7 +110,6 @@ SOCKET::SOCKET(CALL_BACK CallBack)
         int ClientSocket = accept(ListenSocket, (struct sockaddr *)&ClientAddress, &ClientAddressLength);
         if (ClientSocket == -1)
             Logger.Error("Can not accept");
-        // new std::thread(SubThread, ClientSocket, ClientAddress, CallBack);
         new std::thread(
             [this, ClientSocket, ClientAddress, CallBack]
             {

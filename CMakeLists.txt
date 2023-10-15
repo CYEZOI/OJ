@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(main
-    # Captcha.cpp
     APIProceed.cpp
     Database.cpp
     EmailVerificationCodes.cpp
@@ -15,7 +14,6 @@ add_executable(main
     HTTPResponse.cpp
     JudgingList.cpp
     Logger.cpp
-    MurmurHash3/MurmurHash3.cpp
     Problem.cpp
     Problems.cpp
     Regexes.cpp
@@ -38,6 +36,8 @@ set(LIBS
     pthread
     curl
     mysqlcppconn
+    ssl
+    crypto
 )
 target_link_libraries(main PRIVATE ${LIBS})
 target_include_directories(main PRIVATE "/usr/include/mysql")

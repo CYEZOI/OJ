@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "Role.hpp"
 #include "Settings.hpp"
-#include "MurmurHash3/MurmurHash3.h"
+#include <openssl/sha.h>
 
 RESULT USERS::HashPassword(std::string Password, std::string &HashedPassword)
 {
@@ -28,10 +28,11 @@ RESULT USERS::HashPassword(std::string Password, std::string &HashedPassword)
     RETURN_IF_FAILED(SETTINGS::GetSettings("PasswordSalt1", Salt1));
     RETURN_IF_FAILED(SETTINGS::GetSettings("PasswordSalt2", Salt2));
     std::string SaltedPassword = Salt1 + Password + Salt2;
-    uint32_t Hash[4];
-    MurmurHash3_x86_128(SaltedPassword.c_str(), SaltedPassword.length(), 0, Hash);
+    unsigned char Hash[SHA256_DIGEST_LENGTH];
+    SHA256((unsigned char *)SaltedPassword.c_str(), SaltedPassword.length(), Hash);
     std::stringstream StringStream;
-    StringStream << std::hex << Hash[0] << Hash[1] << Hash[2] << Hash[3];
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+        StringStream << std::hex << (int)Hash[i];
     HashedPassword = StringStream.str();
     CREATE_RESULT(true, "Hash password succeeds");
 }

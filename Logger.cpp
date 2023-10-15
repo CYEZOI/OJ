@@ -51,16 +51,21 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
     localtime_r(&CurrentSecond.tv_sec, &TempTime);
     strftime(CurrentTime, sizeof(CurrentTime), "%Y-%m-%d %H:%M:%S", &TempTime);
 
-    OutputMutex.lock();
-    fprintf(LogFile, "\033[%sm%s[%s.%03d][%d-%d] %s\033[0m\n",
+    char Buffer[1024];
+    sprintf(Buffer, "\033[%sm%s[%s.%03d][%d-%d] %s\033[0m\n",
             Style.c_str(), Type.c_str(),
             CurrentTime, MilliSecond,
             getpid(), gettid(),
             Data.c_str());
+
+    OutputMutex.lock();
+    fprintf(LogFile, "%s", Buffer);
     fflush(LogFile);
+    OutputMutex.unlock();
 
     errno = 0;
-    OutputMutex.unlock();
+    if (Type == "W" || Type == "E")
+        printf("%s", Buffer);
 }
 
 void LOGGER::Debug(std::string Data)

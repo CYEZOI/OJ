@@ -23,7 +23,6 @@ cd ../
 
 # Run
 if test -f "./build/main"
-    clear
     service mysql start >/dev/null
     ./build/main
     cat Log.log
