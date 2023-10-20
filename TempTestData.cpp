@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 RESULT TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup)
 {
     configor::json::array_type TestCasesJSON;
-    for (int i = 0; i < TestGroup.TestCases.size(); i++)
+    for (size_t i = 0; i < TestGroup.TestCases.size(); i++)
     {
         TestCasesJSON.push_back(configor::json({{"Output", TestGroup.TestCases[i].Output},
                                                 {"StandardOutput", TestGroup.TestCases[i].StandardOutput},
@@ -47,7 +47,7 @@ RESULT TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup)
 RESULT TEMP_TEST_DATA::Update(TEST_GROUP TestGroup)
 {
     configor::json::array_type TestCasesJSON;
-    for (int i = 0; i < TestGroup.TestCases.size(); i++)
+    for (size_t i = 0; i < TestGroup.TestCases.size(); i++)
     {
         TestCasesJSON.push_back(configor::json({{"Output", TestGroup.TestCases[i].Output},
                                                 {"StandardOutput", TestGroup.TestCases[i].StandardOutput},
@@ -84,7 +84,7 @@ RESULT TEMP_TEST_DATA::Select(TEST_GROUP &TestGroup)
                 TestGroup.Time = JSONData["Time"].as_integer();
                 TestGroup.TimeSum = JSONData["TimeSum"].as_integer();
                 TestGroup.Memory = JSONData["Memory"].as_integer();
-                for (int i = 0; i < JSONData["TestCases"].size(); i++)
+                for (size_t i = 0; i < JSONData["TestCases"].size(); i++)
                 {
                     TestGroup.TestCases[i].Output = JSONData["TestCases"][i]["Output"].as_string();
                     TestGroup.TestCases[i].StandardOutput = JSONData["TestCases"][i]["StandardOutput"].as_string();

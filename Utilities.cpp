@@ -50,7 +50,7 @@ std::vector<std::string> UTILITIES::StringSplit(std::string Data, std::string De
 std::string UTILITIES::StringJoin(std::vector<std::string> Data, std::string Delimiter)
 {
     std::string Result = "";
-    for (int i = 0; i < Data.size(); i++)
+    for (size_t i = 0; i < Data.size(); i++)
     {
         Result += Data[i];
         if (i != Data.size() - 1)

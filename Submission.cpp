@@ -326,7 +326,7 @@ RESULT SUBMISSION::RunTestGroups()
     while (!Judged)
     {
         Judged = true;
-        for (int i = 0; i < TestGroups.size(); i++)
+        for (size_t i = 0; i < TestGroups.size(); i++)
         {
             TEMP_TEST_DATA::Select(TestGroups[i]);
             if (TestGroups[i].Result >= JUDGE_RESULT::WAITING)

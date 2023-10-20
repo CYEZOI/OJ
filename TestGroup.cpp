@@ -61,7 +61,7 @@ RESULT TEST_GROUP::Judge()
     while (!Judged)
     {
         Judged = true;
-        for (int i = 0; i < TestCases.size(); i++)
+        for (size_t i = 0; i < TestCases.size(); i++)
         {
             TEMP_TEST_DATA::Select(TestCases[i]);
             if (TestCases[i].Result >= JUDGE_RESULT::WAITING)

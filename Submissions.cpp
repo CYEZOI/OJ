@@ -28,7 +28,7 @@ RESULT SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROU
         configor::json JSON = configor::json::parse(JSONData);
         for (auto TestGroup : JSON)
         {
-            int TGID = TestGroup["TGID"].as_integer();
+            size_t TGID = TestGroup["TGID"].as_integer();
             while (TestGroups.size() <= TGID)
                 TestGroups.push_back({});
             TestGroups[TGID].TGID = TGID;
@@ -41,7 +41,7 @@ RESULT SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROU
             TestGroups[TGID].Score = TestGroup["Score"].as_integer();
             for (auto TestCase : TestGroup["TestCases"])
             {
-                int TCID = TestCase["TCID"].as_integer();
+                size_t TCID = TestCase["TCID"].as_integer();
                 while (TestGroups[TGID].TestCases.size() <= TCID)
                     TestGroups[TGID].TestCases.push_back({});
                 TestGroups[TGID].TestCases[TCID].TCID = TCID;
