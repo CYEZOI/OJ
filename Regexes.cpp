@@ -20,26 +20,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 void REGEXES::CheckUsername(std::string Username)
 {
-    if (std::regex_match(Username, std::regex("^[0-9a-zA-Z]{4,16}$")))
-            throw EXCEPTION("Username invalid");
+    if (!std::regex_match(Username, std::regex("^[0-9a-zA-Z]{4,16}$")))
+        throw EXCEPTION("Username invalid");
 }
 void REGEXES::CheckPassword(std::string Password)
 {
-    if (!std::regex_match(Password, std::regex("^([^a-z]+|[^A-Z]+|[^0-9]+|[a-zA-Z0-9]+|)$")))
-            throw EXCEPTION("Password invalid");
+    if (std::regex_match(Password, std::regex("^([^a-z]+|[^A-Z]+|[^0-9]+|[a-zA-Z0-9]+|)$")))
+        throw EXCEPTION("Password invalid");
 }
 void REGEXES::CheckNickname(std::string Nickname)
 {
-    if (std::regex_match(Nickname, std::regex("^.{4,16}$")))
-            throw EXCEPTION("Nickname invalid");
+    if (!std::regex_match(Nickname, std::regex("^.{4,16}$")))
+        throw EXCEPTION("Nickname invalid");
 }
 void REGEXES::CheckEmailAddress(std::string EmailAddress)
 {
-    if (std::regex_match(EmailAddress, std::regex("^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+$")))
-            throw EXCEPTION("Email address invalid");
+    if (!std::regex_match(EmailAddress, std::regex("^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+$")))
+        throw EXCEPTION("Email address invalid");
 }
 void REGEXES::CheckVerificationCode(std::string VerificationCode)
 {
-    if (std::regex_match(VerificationCode, std::regex("^[0-9]{6}$")))
-            throw EXCEPTION("Verification code invalid");
+    if (!std::regex_match(VerificationCode, std::regex("^[0-9]{6}$")))
+        throw EXCEPTION("Verification code invalid");
 }
