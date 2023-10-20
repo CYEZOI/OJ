@@ -49,5 +49,5 @@ private:
     friend class TEMP_TEST_DATA;
 
 public:
-    RESULT Judge();
+    void Judge();
 };

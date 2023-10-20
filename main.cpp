@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Problems.hpp"
 #include "Submission.hpp"
 #include "JudgingList.hpp"
-#include "unistd.h"
+#include <unistd.h>
 #include "HTTPRequest.hpp"
 #include "Utilities.hpp"
 #include "Database.hpp"
@@ -37,10 +37,15 @@ int main()
             WEB_DATA_PROCEED Data;
             HTTP_REQUEST HTTPRequest;
             HTTP_RESPONSE HTTPResponse;
-            if (!HTTPRequest.Parse(RequestHTTPData).Success)
-                HTTPResponse.SetCode(400);
-            else
+            try
+            {
+                HTTPRequest.Parse(RequestHTTPData);
                 HTTPResponse = Data.Proceed(HTTPRequest);
+            }
+            catch (EXCEPTION ErrorData)
+            {
+                HTTPResponse.SetCode(400);
+            }
             return HTTPResponse.Stringify();
         });
     return 0;

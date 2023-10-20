@@ -19,12 +19,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <string>
-#include "configor/json.hpp"
+#include <configor/json.hpp>
 #include "Role.hpp"
 
 class API_PROCEED
 {
-public:
+private:
     std::string Token;
     int UID;
     bool IsAdmin;

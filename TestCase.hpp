@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Result.hpp"
+#include "Exception.hpp"
 #include "Settings.hpp"
 #include "JudgeResult.hpp"
 #include "Logger.hpp"
@@ -49,18 +49,18 @@ private:
     std::string JudgeUsername = "";
     std::vector<int> SystemCallList;
 
-    RESULT RedirectIO();
-    RESULT SetupEnvrionment();
-    RESULT RemoveEnvrionment();
-    RESULT ChangeUser();
-    RESULT SetLimits();
-    RESULT ChildProcess();
-    RESULT CheckSignal();
-    RESULT CheckMemory();
-    RESULT CheckSystemCall();
-    RESULT ParentProcess();
-    RESULT Run();
-    RESULT Compare();
+    void RedirectIO();
+    void SetupEnvrionment();
+    void RemoveEnvrionment();
+    void ChangeUser();
+    void SetLimits();
+    void ChildProcess();
+    bool CheckSignal();
+    bool CheckMemory();
+    bool CheckSystemCall();
+    void ParentProcess();
+    void Run();
+    void Compare();
 
     friend class TEST_GROUP;
     friend class API_PROCEED;
@@ -70,7 +70,7 @@ private:
     friend class TEMP_TEST_DATA;
 
 public:
-    RESULT Judge();
+    void Judge();
 };
 
 #ifdef __arm__

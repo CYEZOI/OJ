@@ -18,13 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Result.hpp"
+#include "Exception.hpp"
 
 class TOKENS
 {
 public:
-    static RESULT CreateToken(int UID, std::string &TokenValue);
-    static RESULT CheckToken(std::string TokenValue);
-    static RESULT DeleteToken(std::string TokenValue);
-    static RESULT GetUID(std::string TokenValue, int &UID);
+    static void CreateToken(int UID, std::string &TokenValue);
+    static void CheckToken(std::string TokenValue);
+    static void DeleteToken(std::string TokenValue);
+    static void GetUID(std::string TokenValue, int &UID);
 };

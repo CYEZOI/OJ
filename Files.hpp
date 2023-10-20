@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Result.hpp"
+#include "Exception.hpp"
 
 class FILES
 {
@@ -26,8 +26,8 @@ private:
     static std::string RandomToken();
 
 public:
-    static RESULT CreateFileDownloadLink(int FID, std::string &FileDownloadLink);
-    static RESULT GetFileContent(std::string FileToken, std::string &FileContent, std::string &Filename, std::string &FileType);
-    static RESULT UploadFile(std::string Filename, std::string FileContent, std::string FileType, int UID, int &FID);
-    static RESULT DeleteFile(int FID);
+    static void CreateFileDownloadLink(int FID, std::string &FileDownloadLink);
+    static void GetFileContent(std::string FileToken, std::string &FileContent, std::string &Filename, std::string &FileType);
+    static void UploadFile(std::string Filename, std::string FileContent, std::string FileType, int UID, int &FID);
+    static void DeleteFile(int FID);
 };

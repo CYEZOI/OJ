@@ -20,52 +20,53 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Database.hpp"
 #include "Utilities.hpp"
 
-RESULT EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode)
+void EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode)
 {
-    RETURN_IF_FAILED(DATABASE::SELECT("EmailVerificationCodes")
-                         .Select("CreateTime")
-                         .Where("EmailAddress", EmailAddress)
-                         .Execute(
-                             [EmailAddress](auto Data)
-                             {
-                                 if (Data.size() != 0)
-                                 {
-                                     RETURN_IF_FALSE(UTILITIES::StringToTime(Data[0]["CreateTime"]) + 60 <= time(NULL), "Email verification code already exists")
-                                     RETURN_IF_FAILED(DATABASE::DELETE("EmailVerificationCodes")
-                                                          .Where("EmailAddress", EmailAddress)
-                                                          .Execute())
-                                 }
-                                 CREATE_RESULT(true, "No email Verification code");
-                             }))
+    DATABASE::SELECT("EmailVerificationCodes")
+        .Select("CreateTime")
+        .Where("EmailAddress", EmailAddress)
+        .Execute(
+            [EmailAddress](auto Data)
+            {
+                if (Data.size() != 0)
+                {
+                    if (UTILITIES::StringToTime(Data[0]["CreateTime"]) + 60 > time(NULL))
+                        throw EXCEPTION("Email verification code already exists");
+                    DATABASE::DELETE("EmailVerificationCodes")
+                        .Where("EmailAddress", EmailAddress)
+                        .Execute();
+                }
+                            });
     VerificationCode = "";
     const std::string VerificationCodeCharList = "0123456789";
     for (int i = 0; i < 6; i++)
         VerificationCode.push_back(VerificationCodeCharList[rand() % VerificationCodeCharList.size()]);
-    RETURN_IF_FAILED(DATABASE::INSERT("EmailVerificationCodes")
-                         .Insert("EmailAddress", EmailAddress)
-                         .Insert("VerificationCode", VerificationCode)
-                         .Execute())
-    CREATE_RESULT(true, "Create email Verification code succeeds");
-}
-RESULT EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode)
+    DATABASE::INSERT("EmailVerificationCodes")
+        .Insert("EmailAddress", EmailAddress)
+        .Insert("VerificationCode", VerificationCode)
+        .Execute();
+    }
+void EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode)
 {
-    RETURN_IF_FAILED(DATABASE::SELECT("EmailVerificationCodes")
-                         .Select("CreateTime")
-                         .Where("EmailAddress", EmailAddress)
-                         .Where("VerificationCode", VerificationCode)
-                         .Execute(
-                             [EmailAddress, VerificationCode](auto Data)
-                             {
-                                 CREATE_RESULT_IF_FALSE(Data.size() == 1, "Verification code invalid");
-                                 CREATE_RESULT_IF_FALSE_WITH_OPERATION(UTILITIES::StringToTime(Data[0]["CreateTime"]) + 600 >= time(NULL), "Verification code expired", DeleteEmailVerificationCode(EmailAddress))
-                                 CREATE_RESULT(true, "Verification code valid");
-                             }))
-    CREATE_RESULT(true, "Verification code valid");
-}
-RESULT EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(std::string EmailAddress)
+    DATABASE::SELECT("EmailVerificationCodes")
+        .Select("CreateTime")
+        .Where("EmailAddress", EmailAddress)
+        .Where("VerificationCode", VerificationCode)
+        .Execute(
+            [EmailAddress, VerificationCode](auto Data)
+            {
+                if (Data.size() != 1)
+                    throw EXCEPTION("Verification code invalid");
+                if (UTILITIES::StringToTime(Data[0]["CreateTime"]) + 600 < time(NULL))
+                {
+                    DeleteEmailVerificationCode(EmailAddress);
+                    throw EXCEPTION("Verification code expired");
+                }
+                            });
+    }
+void EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(std::string EmailAddress)
 {
-    RETURN_IF_FAILED(DATABASE::DELETE("EmailVerificationCodes")
-                         .Where("EmailAddress", EmailAddress)
-                         .Execute())
-    CREATE_RESULT(true, "Delete email Verification code succeeds");
-}
+    DATABASE::DELETE("EmailVerificationCodes")
+        .Where("EmailAddress", EmailAddress)
+        .Execute();
+    }

@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "Result.hpp"
+#include "Exception.hpp"
 #include "Settings.hpp"
 #include "TestCase.hpp"
 #include "TestGroup.hpp"
@@ -171,7 +171,6 @@ configor::json API_PROCEED::GetUsers(int Page)
                                           Users.push_back(TempUser);
                                       }
                                       ResponseJSON["Data"]["Users"] = Users;
-                                      CREATE_RESULT(true, "Get users succeeds");
                                   }));
     RETURN_JSON_IF_FAILED(DATABASE::SIZE("Users")
                               .Execute(
@@ -307,7 +306,6 @@ configor::json API_PROCEED::GetProblems(int Page)
                                           Problems.push_back(TempProblem);
                                       }
                                       ResponseJSON["Data"]["Problems"] = Problems;
-                                      CREATE_RESULT(true, "Get problems succeeds");
                                   }));
     RETURN_JSON_IF_FAILED(DATABASE::SIZE("Problems")
                               .Execute(
@@ -454,7 +452,6 @@ configor::json API_PROCEED::GetSubmissions(int Page)
                                           Submissions.push_back(TempSubmission);
                                       }
                                       ResponseJSON["Data"]["Submissions"] = Submissions;
-                                      CREATE_RESULT(true, "Get submissions succeeds");
                                   }));
     RETURN_JSON_IF_FAILED(DATABASE::SIZE("Submissions")
                               .Execute(
@@ -484,7 +481,8 @@ configor::json API_PROCEED::SetSettings(configor::json Settings)
 
 configor::json API_PROCEED::Proceed(configor::json Request)
 {
-    RETURN_JSON_IF_FALSE(CheckTypes(Request, {{"Action", configor::config_value_type::string}}), "Invalid parameters");
+    if (!CheckTypes(Request, {{"Action", configor::config_value_type::string}}))
+        CREATE_JSON(false, "Invalid parameters");
     configor::json ResponseJSON = BaseJSON;
     Action = Request["Action"].as_string();
     Data = Request["Data"];
@@ -557,9 +555,11 @@ configor::json API_PROCEED::Proceed(configor::json Request)
     }
     else
     {
-        RETURN_JSON_IF_FALSE(CheckTypes(Data, {{"Token", configor::config_value_type::string}}), "Invalid parameters");
+        if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
+            CREATE_JSON(false, "Invalid parameters");
         Token = Data["Token"].as_string();
-        RETURN_JSON_IF_FALSE(CheckTokenAvailable(Token)["Success"].as_bool(), "Invalid token");
+        if (!CheckTokenAvailable(Token)["Success"].as_bool())
+            CREATE_JSON(false, "Invalid token");
         RETURN_JSON_IF_FAILED(TOKENS::GetUID(Token, UID));
         RETURN_JSON_IF_FAILED(USERS::IsAdmin(UID, IsAdmin));
 

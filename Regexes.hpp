@@ -19,14 +19,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <regex>
-#include "Result.hpp"
+#include "Exception.hpp"
 
 class REGEXES
 {
 public:
-    static RESULT CheckUsername(std::string Username);
-    static RESULT CheckPassword(std::string Password);
-    static RESULT CheckNickname(std::string Nickname);
-    static RESULT CheckEmailAddress(std::string EmailAddress);
-    static RESULT CheckVerificationCode(std::string VerificationCode);
+    static void CheckUsername(std::string Username);
+    static void CheckPassword(std::string Password);
+    static void CheckNickname(std::string Nickname);
+    static void CheckEmailAddress(std::string EmailAddress);
+    static void CheckVerificationCode(std::string VerificationCode);
 };

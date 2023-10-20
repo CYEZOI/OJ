@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <cppconn/prepared_statement.h>
 #include <string>
 #include <vector>
-#include "Result.hpp"
+#include "Exception.hpp"
 
 class DATABASE
 {
@@ -51,7 +51,7 @@ public:
         SELECT &Order(std::string Column, bool Ascending);
         SELECT &Limit(int Limits);
         SELECT &Offset(int Offsets);
-        RESULT Execute(std::function<RESULT(std::vector<std::map<std::string, std::string>>)> Callback = nullptr);
+        void Execute(std::function<void(std::vector<std::map<std::string, std::string>>)> Callback = nullptr);
     };
     class INSERT
     {
@@ -66,7 +66,7 @@ public:
         ~INSERT();
         INSERT &Insert(std::string Column, std::string Value);
         INSERT &Insert(std::string Column, int Value);
-        RESULT Execute(std::function<void(int)> Callback = nullptr);
+        void Execute(std::function<void(int)> Callback = nullptr);
     };
     class DELETE
     {
@@ -80,7 +80,7 @@ public:
         ~DELETE();
         DELETE &Where(std::string Column, std::string Value);
         DELETE &Where(std::string Column, int Value);
-        RESULT Execute();
+        void Execute();
     };
     class UPDATE
     {
@@ -97,7 +97,7 @@ public:
         UPDATE &Set(std::string Column, int Value);
         UPDATE &Where(std::string Column, std::string Value);
         UPDATE &Where(std::string Column, int Value);
-        RESULT Execute();
+        void Execute();
     };
     class SIZE
     {
@@ -107,7 +107,7 @@ public:
 
     public:
         SIZE(std::string TableName);
-        RESULT Execute(std::function<void(int)> Callback = nullptr);
+        void Execute(std::function<void(int)> Callback = nullptr);
     };
     class TRUNCATE
     {
@@ -117,7 +117,7 @@ public:
 
     public:
         TRUNCATE(std::string TableName);
-        RESULT Execute();
+        void Execute();
     };
 
     static sql::Connection *CreateConnection();

@@ -18,22 +18,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Result.hpp"
+#include "Exception.hpp"
 #include "Problem.hpp"
 
 class PROBLEMS
 {
 private:
-    static RESULT JSONToSamples(std::string JSONData, std::vector<SAMPLE> &Samples);
-    static RESULT JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_GROUP_DATA> &UnjudgedTestGroups);
-    static RESULT SamplesToJSON(std::vector<SAMPLE> Samples, std::string &JSONData);
-    static RESULT UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTestGroups, std::string &JSONData);
+    static void JSONToSamples(std::string JSONData, std::vector<SAMPLE> &Samples);
+    static void JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_GROUP_DATA> &UnjudgedTestGroups);
+    static void SamplesToJSON(std::vector<SAMPLE> Samples, std::string &JSONData);
+    static void UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTestGroups, std::string &JSONData);
 
     friend class API_PROCEED;
 
 public:
-    static RESULT AddProblem(PROBLEM Problem);
-    static RESULT GetProblem(std::string PID, PROBLEM &Problem);
-    static RESULT UpdateProblem(PROBLEM Problem);
-    static RESULT DeleteProblem(std::string PID);
+    static void AddProblem(PROBLEM Problem);
+    static void GetProblem(std::string PID, PROBLEM &Problem);
+    static void UpdateProblem(PROBLEM Problem);
+    static void DeleteProblem(std::string PID);
 };

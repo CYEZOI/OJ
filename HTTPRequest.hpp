@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Logger.hpp"
-#include "Result.hpp"
+#include "Exception.hpp"
 #include <string>
 #include <map>
 
@@ -37,5 +37,5 @@ private:
     friend class WEB_DATA_PROCEED;
 
 public:
-    RESULT Parse(std::string Data);
+    void Parse(std::string Data);
 };

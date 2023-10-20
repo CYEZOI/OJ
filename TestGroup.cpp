@@ -33,7 +33,7 @@ void TEST_GROUP::UpdateAllResults(JUDGE_RESULT Result)
         TestCases[i].Result = Result;
 }
 
-RESULT TEST_GROUP::Judge()
+void TEST_GROUP::Judge()
 {
     Result = JUDGE_RESULT::JUDGING;
 
@@ -107,6 +107,4 @@ RESULT TEST_GROUP::Judge()
     UpdateDatabase.join();
 
     TEMP_TEST_DATA::Update(*this);
-
-    CREATE_RESULT(true, "Test group " + std::to_string(TGID) + " of submission " + std::to_string(SID) + " judged")
 }

@@ -41,10 +41,9 @@ void JUDGING_LIST::Init()
         });
 }
 
-RESULT JUDGING_LIST::Add(SUBMISSION &Submission)
+void JUDGING_LIST::Add(SUBMISSION &Submission)
 {
     JudgingList.push(Submission.SID);
-    CREATE_RESULT(true, "Submission added to judging list")
-}
+    }
 
 JUDGING_LIST JudgingList;

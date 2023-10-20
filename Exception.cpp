@@ -16,20 +16,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "Result.hpp"
+#include "Exception.hpp"
+#include "Logger.hpp"
 
-RESULT::RESULT()
+EXCEPTION::EXCEPTION()
 {
-    Success = true;
     Message = "No message";
 }
-RESULT::RESULT(bool Success, std::string Message, std::string DebugMessage)
+EXCEPTION::EXCEPTION(std::string Message)
 {
-    this->Success = Success;
     this->Message = Message;
-    this->DebugMessage = DebugMessage;
-    if (Success)
-        Logger.Debug(DebugMessage);
-    else
-        Logger.Warning(DebugMessage);
+    Logger.Warning(Message + " " + std::to_string(errno) + ":" + strerror(errno));
 }

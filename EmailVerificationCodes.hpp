@@ -18,12 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Result.hpp"
+#include "Exception.hpp"
 
 class EMAIL_VERIFICATION_CODES
 {
 public:
-    static RESULT CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode);
-    static RESULT CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode);
-    static RESULT DeleteEmailVerificationCode(std::string EmailAddress);
+    static void CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode);
+    static void CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode);
+    static void DeleteEmailVerificationCode(std::string EmailAddress);
 };

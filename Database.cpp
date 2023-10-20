@@ -53,10 +53,10 @@ DATABASE::SELECT &DATABASE::SELECT::Offset(int Offsets)
     this->Offsets = Offsets;
     return *this;
 }
-RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::string, std::string>>)> Callback)
+void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::string, std::string>>)> Callback)
 {
     if (Connection == nullptr)
-        CREATE_RESULT(false, "Not connected")
+        throw EXCEPTION("Not connected");
     if (Columns.empty())
     {
         sql::ResultSet *ResultSet(Connection->createStatement()->executeQuery("DESCRIBE " + TableName));
@@ -106,15 +106,14 @@ RESULT DATABASE::SELECT::Execute(std::function<RESULT(std::vector<std::map<std::
             Data.push_back(Row);
         }
         if (Callback != nullptr)
-            RETURN_IF_FAILED_WITH_OPERATION(Callback(Data), (ResultSet->close(), delete ResultSet));
+            Callback(Data);
         ResultSet->close();
         delete ResultSet;
     }
     catch (sql::SQLException &e)
     {
-        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
-    CREATE_RESULT(true, "Executed")
 }
 
 DATABASE::INSERT::INSERT(std::string TableName)
@@ -130,10 +129,10 @@ DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, std::string Value
     return *this;
 }
 DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, int Value) { return Insert(Column, std::to_string(Value)); }
-RESULT DATABASE::INSERT::Execute(std::function<void(int)> Callback)
+void DATABASE::INSERT::Execute(std::function<void(int)> Callback)
 {
     if (Connection == nullptr)
-        CREATE_RESULT(false, "Not connected")
+        throw EXCEPTION("Not connected");
     std::string Query = "INSERT INTO " + TableName + " (";
     for (auto &Column : Columns)
         Query += "`" + Column + "`, ";
@@ -161,9 +160,8 @@ RESULT DATABASE::INSERT::Execute(std::function<void(int)> Callback)
     }
     catch (sql::SQLException &e)
     {
-        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
-    CREATE_RESULT(true, "Executed")
 }
 
 DATABASE::DELETE::DELETE(std::string TableName)
@@ -181,10 +179,10 @@ DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, int Value)
 {
     return Where(Column, std::to_string(Value));
 }
-RESULT DATABASE::DELETE::Execute()
+void DATABASE::DELETE::Execute()
 {
     if (Connection == nullptr)
-        CREATE_RESULT(false, "Not connected")
+        throw EXCEPTION("Not connected");
     std::string Query = "DELETE FROM " + TableName;
     if (!Conditions.empty())
     {
@@ -205,9 +203,8 @@ RESULT DATABASE::DELETE::Execute()
     }
     catch (sql::SQLException &e)
     {
-        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
-    CREATE_RESULT(true, "Executed")
 }
 
 DATABASE::UPDATE::UPDATE(std::string TableName)
@@ -228,10 +225,10 @@ DATABASE::UPDATE &DATABASE::UPDATE::Where(std::string Column, std::string Value)
     return *this;
 }
 DATABASE::UPDATE &DATABASE::UPDATE::Where(std::string Column, int Value) { return Where(Column, std::to_string(Value)); }
-RESULT DATABASE::UPDATE::Execute()
+void DATABASE::UPDATE::Execute()
 {
     if (Connection == nullptr)
-        CREATE_RESULT(false, "Not connected")
+        throw EXCEPTION("Not connected");
     std::string Query = "UPDATE " + TableName + " SET ";
     for (auto &Column : Columns)
         Query += "`" + Column.first + "`=?, ";
@@ -257,9 +254,8 @@ RESULT DATABASE::UPDATE::Execute()
     }
     catch (sql::SQLException &e)
     {
-        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
-    CREATE_RESULT(true, "Executed")
 }
 
 DATABASE::SIZE::SIZE(std::string TableName)
@@ -267,10 +263,10 @@ DATABASE::SIZE::SIZE(std::string TableName)
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
-RESULT DATABASE::SIZE::Execute(std::function<void(int)> Callback)
+void DATABASE::SIZE::Execute(std::function<void(int)> Callback)
 {
     if (Connection == nullptr)
-        CREATE_RESULT(false, "Not connected")
+        throw EXCEPTION("Not connected");
     try
     {
         sql::ResultSet *ResultSet(Connection->createStatement()->executeQuery("SELECT COUNT(*) FROM " + TableName));
@@ -282,28 +278,26 @@ RESULT DATABASE::SIZE::Execute(std::function<void(int)> Callback)
     }
     catch (sql::SQLException &e)
     {
-        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
-    CREATE_RESULT(true, "Executed")
 }
 DATABASE::TRUNCATE::TRUNCATE(std::string TableName)
 {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
-RESULT DATABASE::TRUNCATE::Execute()
+void DATABASE::TRUNCATE::Execute()
 {
     if (Connection == nullptr)
-        CREATE_RESULT(false, "Not connected")
+        throw EXCEPTION("Not connected");
     try
     {
         Connection->createStatement()->execute("TRUNCATE TABLE " + TableName);
     }
     catch (sql::SQLException &e)
     {
-        CREATE_RESULT(false, "SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState())
+        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
-    CREATE_RESULT(true, "Executed")
 }
 
 sql::Connection *DATABASE::CreateConnection()

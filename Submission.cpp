@@ -43,17 +43,15 @@ void SUBMISSION::UpdateAllResults(JUDGE_RESULT Result)
     for (size_t i = 0; i < TestGroups.size(); i++)
         TestGroups[i].UpdateAllResults(Result);
 }
-RESULT SUBMISSION::RedirectIO()
+void SUBMISSION::RedirectIO()
 {
     if (freopen((WorkDir + "/main.log").c_str(), "w", stdout) == nullptr)
-        CREATE_RESULT(false, "Can not open output data file")
+        throw EXCEPTION("Can not open output data file");
 
     if (freopen((WorkDir + "/main.log").c_str(), "w", stderr) == nullptr)
-        CREATE_RESULT(false, "Can not open error data file")
-
-    CREATE_RESULT(true, "Redirected IO succeeds")
+        throw EXCEPTION("Can not open error data file");
 }
-RESULT SUBMISSION::SetupEnvrionment()
+void SUBMISSION::SetupEnvrionment()
 {
     const std::string DirsToMake[7] = {
         "./root",
@@ -66,29 +64,29 @@ RESULT SUBMISSION::SetupEnvrionment()
     for (int i = 0; i < 7; i++)
     {
         if (mkdir(DirsToMake[i].c_str(), 0755) == -1)
-            CREATE_RESULT(false, "Can not create dir for the new root")
+            throw EXCEPTION("Can not create dir for the new root");
     }
 
     if (chown("./root", JudgeUserID, JudgeUserGroupID) == -1)
-        CREATE_RESULT(false, "Can not change the owner of the new root")
+        throw EXCEPTION("Can not change the owner of the new root");
 
     if (chown("./tmp", JudgeUserID, JudgeUserGroupID) == -1)
-        CREATE_RESULT(false, "Can not change the owner of the new root")
+        throw EXCEPTION("Can not change the owner of the new root");
 
     if (mount("/usr", "./usr", "ext4", MS_BIND, nullptr) == -1)
-        CREATE_RESULT(false, "Can not mount the new root")
+        throw EXCEPTION("Can not mount the new root");
 
     if (mount("/usr", "./usr", "ext4", MS_BIND | MS_REMOUNT | MS_RDONLY, nullptr) == -1)
-        CREATE_RESULT(false, "Can not remount the new root")
+        throw EXCEPTION("Can not remount the new root");
 
     if (mount("/proc", "./proc", "proc", MS_BIND, nullptr) == -1)
-        CREATE_RESULT(false, "Can not mount the new root")
+        throw EXCEPTION("Can not mount the new root");
 
     if (mount("/dev", "./dev", "devtmpfs", MS_BIND, nullptr) == -1)
-        CREATE_RESULT(false, "Can not mount the new root")
+        throw EXCEPTION("Can not mount the new root");
 
     if (mount("/dev", "./dev", "devtmpfs", MS_BIND | MS_REMOUNT | MS_RDONLY, nullptr) == -1)
-        CREATE_RESULT(false, "Can not remount the new root")
+        throw EXCEPTION("Can not remount the new root");
 
     const std::string DirsToLink[5] = {
         "bin",
@@ -99,20 +97,18 @@ RESULT SUBMISSION::SetupEnvrionment()
     for (int i = 0; i < 5; i++)
     {
         if (symlink(("/usr/" + DirsToLink[i]).c_str(), DirsToLink[i].c_str()) == -1)
-            CREATE_RESULT(false, "Can not create symlink for the new root")
+            throw EXCEPTION("Can not create symlink for the new root");
     }
 
-    RETURN_IF_FAILED(UTILITIES::CopyDir("/etc/alternatives", "./etc/alternatives"))
+    UTILITIES::CopyDir("/etc/alternatives", "./etc/alternatives");
 
     if (chroot(WorkDir.c_str()) != 0)
-        CREATE_RESULT(false, "Can not change root dir")
-
-    CREATE_RESULT(true, "Environment setted")
+        throw EXCEPTION("Can not change root dir");
 }
-RESULT SUBMISSION::RemoveEnvrionment()
+void SUBMISSION::RemoveEnvrionment()
 {
     if (chdir(WorkDir.c_str()) == -1)
-        CREATE_RESULT(false, "Can not change directory")
+        throw EXCEPTION("Can not change directory");
 
     const std::string DirsToUmount[4] = {
         "usr",
@@ -138,49 +134,43 @@ RESULT SUBMISSION::RemoveEnvrionment()
         "tmp",
         "usr"};
     for (int i = 0; i < 6; i++)
-        RETURN_IF_FAILED(UTILITIES::RemoveDir(DirsToRemove[i].c_str()))
-
-    CREATE_RESULT(true, "Environment removed")
+        UTILITIES::RemoveDir(DirsToRemove[i].c_str());
 }
-RESULT SUBMISSION::ChangeUser()
+void SUBMISSION::ChangeUser()
 {
     if (setgid(JudgeUserGroupID) != 0)
-        CREATE_RESULT(false, "Can not change gid")
+        throw EXCEPTION("Can not change gid");
     if (setuid(JudgeUserID) != 0)
-        CREATE_RESULT(false, "Can not change uid")
+        throw EXCEPTION("Can not change uid");
     if (setresgid(JudgeUserGroupID,
                   JudgeUserGroupID,
                   JudgeUserGroupID) != 0)
-        CREATE_RESULT(false, "Can not change real gid")
+        throw EXCEPTION("Can not change real gid");
     if (setresuid(JudgeUserID,
                   JudgeUserID,
                   JudgeUserID) != 0)
-        CREATE_RESULT(false, "Can not change real uid")
-
-    CREATE_RESULT(true, "Changed uid and gid")
+        throw EXCEPTION("Can not change real uid");
 }
-RESULT SUBMISSION::SetLimits()
+void SUBMISSION::SetLimits()
 {
     struct rlimit Limit;
     Limit.rlim_cur = Limit.rlim_max = TimeLimit + 1;
     if (setrlimit(RLIMIT_CPU, &Limit))
-        CREATE_RESULT(false, "Can not set cpu limit")
+        throw EXCEPTION("Can not set cpu limit");
 
     if (alarm(ceil(TimeLimit / 1000.0) + 1) != 0)
-        CREATE_RESULT(false, "Can not set alarm")
+        throw EXCEPTION("Can not set alarm");
 
     Limit.rlim_max = OutputLimit + 1024 * 1024;
     Limit.rlim_cur = OutputLimit;
     if (setrlimit(RLIMIT_FSIZE, &Limit))
-        CREATE_RESULT(false, "Can not set file size limit")
+        throw EXCEPTION("Can not set file size limit");
 
     Limit.rlim_max = Limit.rlim_cur = 0;
     if (setrlimit(RLIMIT_CORE, &Limit))
-        CREATE_RESULT(false, "Can not set core limit")
-
-    CREATE_RESULT(true, "Set limits")
+        throw EXCEPTION("Can not set core limit");
 }
-RESULT SUBMISSION::ChildProcess()
+void SUBMISSION::ChildProcess()
 {
     std::vector<std::string>
         CompileCommands = {Compiler,
@@ -198,14 +188,14 @@ RESULT SUBMISSION::ChildProcess()
                            "/main.cpp"};
 
     if (nice(19) != 19)
-        CREATE_RESULT(false, "Can not change nice value")
+        throw EXCEPTION("Can not change nice value");
     if (chdir(WorkDir.c_str()) == -1)
-        CREATE_RESULT(false, "Can not change to work dir")
+        throw EXCEPTION("Can not change to work dir");
 
-    RETURN_IF_FAILED(RedirectIO())
-    RETURN_IF_FAILED(SetupEnvrionment())
-    RETURN_IF_FAILED(ChangeUser())
-    RETURN_IF_FAILED(SetLimits())
+    RedirectIO();
+    SetupEnvrionment();
+    ChangeUser();
+    SetLimits();
 
     char **CompileArguments = new char *[CompileCommands.size() + 1];
     for (size_t i = 0; i < CompileCommands.size(); i++)
@@ -216,9 +206,9 @@ RESULT SUBMISSION::ChildProcess()
 
     execvp(Compiler.c_str(), CompileArguments);
 
-    CREATE_RESULT(false, "Can not execute program")
+    throw EXCEPTION("Can not execute program");
 }
-RESULT SUBMISSION::ParentProcess()
+void SUBMISSION::ParentProcess()
 {
     while (true)
     {
@@ -227,70 +217,68 @@ RESULT SUBMISSION::ParentProcess()
         if (wait4(ProcessID, &Status, 0, &Usage) == -1)
         {
             ptrace(PTRACE_KILL, ProcessID, nullptr, nullptr);
-            CREATE_RESULT(false, "Can not wait for child process")
+            throw EXCEPTION("Can not wait for child process");
         }
         if (WIFEXITED(Status) || WIFSIGNALED(Status) || WIFSTOPPED(Status))
-            CREATE_RESULT(true, "Child process exited")
+            break;
     }
 }
-RESULT SUBMISSION::CreateFiles()
+void SUBMISSION::CreateFiles()
 {
     std::ofstream LogFile(WorkDir + "/main.log");
     if (!LogFile.is_open())
-        CREATE_RESULT(false, "Can not open data file")
+        throw EXCEPTION("Can not open data file");
     LogFile.close();
 
     if (chown((WorkDir + "/main.log").c_str(), JudgeUserID, JudgeUserGroupID) == -1)
-        CREATE_RESULT(false, "Can not change group of compile log file")
+        throw EXCEPTION("Can not change group of compile log file");
 
     if (chmod((WorkDir + "/main.log").c_str(), 0760) == -1)
-        CREATE_RESULT(false, "Can not change permission of compile log file")
+        throw EXCEPTION("Can not change permission of compile log file");
 
     std::ofstream OutputFile(WorkDir + "/main");
     if (!OutputFile.is_open())
-        CREATE_RESULT(false, "Can not open data file")
+        throw EXCEPTION("Can not open data file");
     OutputFile.close();
 
     if (chown((WorkDir + "/main").c_str(), JudgeUserID, JudgeUserGroupID) == -1)
-        CREATE_RESULT(false, "Can not change group of compile output file")
+        throw EXCEPTION("Can not change group of compile output file");
 
     if (chmod((WorkDir + "/main").c_str(), 0760) == -1)
-        CREATE_RESULT(false, "Can not change permission of compile output file")
-
-    CREATE_RESULT(true, "Create files")
+        throw EXCEPTION("Can not change permission of compile output file");
 }
-RESULT SUBMISSION::Compile()
+void SUBMISSION::Compile()
 {
     UpdateAllResults(JUDGE_RESULT::COMPILING);
 
-    RETURN_IF_FAILED(CreateFiles())
+    CreateFiles();
 
     pid_t PID = fork();
     if (PID == 0)
     {
-        RETURN_IF_FAILED(ChildProcess())
+        ChildProcess();
         exit(0);
     }
     else
     {
         this->ProcessID = PID;
-        RETURN_IF_FAILED(ParentProcess())
-        RETURN_IF_FAILED(RemoveEnvrionment())
+        ParentProcess();
+        RemoveEnvrionment();
 
         struct stat OutputFileStatus;
 
         if (stat((WorkDir + "/main").c_str(), &OutputFileStatus) < 0)
-            CREATE_RESULT(false, "Can not open check compile output file status")
+            throw EXCEPTION("Can not open check compile output file status");
 
         if (OutputFileStatus.st_size != 0)
         {
             UpdateAllResults(JUDGE_RESULT::COMPILED);
-            CREATE_RESULT(true, "Submission compiled successfully")
+            return;
         }
 
         std::ifstream CompileLog(WorkDir + "/main.log");
         if (!CompileLog.is_open())
-            CREATE_RESULT(false, "Can not open compile output log file")
+            throw EXCEPTION("Can not open compile output log file");
 
         std::string CompileResult;
         std::string Line;
@@ -299,20 +287,16 @@ RESULT SUBMISSION::Compile()
         CompileLog.close();
 
         if (CompileResult == "")
-            CREATE_RESULT(false, "Compiler output log file is empty but compile failed")
+            throw EXCEPTION("Compiler output log file is empty but compile failed");
         UpdateAllResults(JUDGE_RESULT::COMPILATION_ERROR);
         Description = CompileResult;
-        CREATE_RESULT(true, "Submission compile failed")
     }
-
-    CREATE_RESULT(false, "Should't go here");
 }
-RESULT SUBMISSION::RunTestGroups()
+void SUBMISSION::RunTestGroups()
 {
     if (Result != JUDGE_RESULT::COMPILED)
-        CREATE_RESULT(true, "Submission is not compiled")
-    if (Problem.IOFilename == "")
-        Problem.IOFilename = std::to_string(SID);
+        if (Problem.IOFilename == "")
+            Problem.IOFilename = std::to_string(SID);
     for (size_t i = 0; i < TestGroups.size(); i++)
     {
         TEMP_TEST_DATA::Insert(TestGroups[i]);
@@ -364,57 +348,52 @@ RESULT SUBMISSION::RunTestGroups()
             SecondMaxResult = (JUDGE_RESULT)i;
         }
     Result = (SecondMaxCount == 0 || MaxResult != JUDGE_RESULT::ACCEPTED) ? MaxResult : SecondMaxResult;
-
-    CREATE_RESULT(true, "Submission run test groups")
 }
 
-RESULT SUBMISSION::Set(std::string Code, std::string PID)
+void SUBMISSION::Set(std::string Code, std::string PID)
 {
     UpdateAllResults(JUDGE_RESULT::WAITING);
     this->Code = Code;
     this->PID = PID;
     if (Code.length() > 1024 * 1024)
-        CREATE_RESULT(false, "Source code is too long")
-    CREATE_RESULT(true, "Set submission successfully")
+        throw EXCEPTION("Source code is too long");
 }
 
-RESULT SUBMISSION::Judge()
+void SUBMISSION::Judge()
 {
     if (Result != JUDGE_RESULT::WAITING)
-        CREATE_RESULT(false, "Submission has been judged")
+        throw EXCEPTION("Submission has been judged");
 
-    RETURN_IF_FAILED(SETTINGS::GetSettings("JudgeUserID", JudgeUserID));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("JudgeUserGroupID", JudgeUserGroupID));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("Compiler", Compiler));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("JudgeUsername", JudgeUsername));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("CompileTimeLimit", TimeLimit));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("CompileOutputLimit", OutputLimit));
+    SETTINGS::GetSettings("JudgeUserID", JudgeUserID);
+    SETTINGS::GetSettings("JudgeUserGroupID", JudgeUserGroupID);
+    SETTINGS::GetSettings("Compiler", Compiler);
+    SETTINGS::GetSettings("JudgeUsername", JudgeUsername);
+    SETTINGS::GetSettings("CompileTimeLimit", TimeLimit);
+    SETTINGS::GetSettings("CompileOutputLimit", OutputLimit);
 
     UpdateAllResults(JUDGE_RESULT::FETCHED);
 
     WorkDir = "/home/" + JudgeUsername + "/Run/" + std::to_string(SID);
-    RETURN_IF_FAILED(UTILITIES::MakeDir(WorkDir))
+    UTILITIES::MakeDir(WorkDir);
 
     std::ofstream SourceFile = std::ofstream(WorkDir + "/main.cpp");
     if (!SourceFile.is_open())
-        CREATE_RESULT(false, "Can not open source file to write")
+        throw EXCEPTION("Can not open source file to write");
     SourceFile << Code;
     SourceFile.close();
 
-    RESULT CompileResult = Compile();
-    if (!CompileResult.Success)
-        UpdateAllResults(JUDGE_RESULT::SYSTEM_ERROR);
-
-    RESULT RunTestGroupsResult = RunTestGroups();
-    if (!RunTestGroupsResult.Success)
+    try
+    {
+        Compile();
+        if (Result == JUDGE_RESULT::COMPILED)
+            RunTestGroups();
+    }
+    catch (EXCEPTION ErrorData)
     {
         UpdateAllResults(JUDGE_RESULT::SYSTEM_ERROR);
-        Description = RunTestGroupsResult.Message;
-        RETURN_IF_FAILED(RunTestGroupsResult)
+        Description = ErrorData.Message;
     }
 
-    RETURN_IF_FAILED(UTILITIES::RemoveDir(WorkDir));
+    UTILITIES::RemoveDir(WorkDir);
     SUBMISSIONS::UpdateSubmission(*this);
-
-    CREATE_RESULT(true, "Judge submission successfully")
 }

@@ -24,15 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class SUBMISSIONS
 {
 private:
-    static RESULT JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID);
-    static RESULT TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData);
+    static void JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID);
+    static void TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData);
 
     friend class API_PROCEED;
 
 public:
-    static RESULT
-    AddSubmission(SUBMISSION &Submission);
-    static RESULT GetSubmission(int SID, SUBMISSION &Submission);
-    static RESULT UpdateSubmission(SUBMISSION Submission);
-    static RESULT DeleteSubmission(int SID);
+    static void AddSubmission(SUBMISSION &Submission);
+    static void GetSubmission(int SID, SUBMISSION &Submission);
+    static void UpdateSubmission(SUBMISSION Submission);
+    static void DeleteSubmission(int SID);
 };

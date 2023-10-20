@@ -19,8 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Logger.hpp"
-#include "Result.hpp"
-#include "configor/json.hpp"
+#include "Exception.hpp"
+#include <configor/json.hpp>
 
 class SETTINGS
 {
@@ -35,13 +35,13 @@ private:
     friend class DATABASE;
 
 public:
-    RESULT Init();
-    static RESULT GetSettings(std::string Key, std::string &Value);
-    static RESULT GetSettings(std::string Key, int &Value);
-    static RESULT GetSettings(configor::json &Value);
-    static RESULT SetSettings(std::string Key, std::string Value);
-    static RESULT SetSettings(std::string Key, int Value);
-    static RESULT SetSettings(configor::json Value);
+    void Init();
+    static void GetSettings(std::string Key, std::string &Value);
+    static void GetSettings(std::string Key, int &Value);
+    static void GetSettings(configor::json &Value);
+    static void SetSettings(std::string Key, std::string Value);
+    static void SetSettings(std::string Key, int Value);
+    static void SetSettings(configor::json Value);
 };
 
 extern SETTINGS Settings;

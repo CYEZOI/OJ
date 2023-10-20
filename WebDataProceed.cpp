@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "WebDataProceed.hpp"
 #include "APIProceed.hpp"
-#include "Result.hpp"
+#include "Exception.hpp"
 #include "Utilities.hpp"
 #include "Settings.hpp"
 #include "Files.hpp"
@@ -59,16 +59,16 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
             {
                 std::string UserToken = HTTPRequest.Headers["X-Upload-Token"];
                 if (UserToken == "")
-                    throw std::string("No token");
+                    throw EXCEPTION("No token");
                 int UID;
-                THROW_STRING_ERROR_IF_FAILED(TOKENS::GetUID(UserToken, UID));
+                TOKENS::GetUID(UserToken, UID);
                 bool IsAdmin;
-                THROW_STRING_ERROR_IF_FAILED(USERS::IsAdmin(UID, IsAdmin));
+                USERS::IsAdmin(UID, IsAdmin);
                 if (!IsAdmin)
-                    throw std::string("Not admin");
+                    throw EXCEPTION("Not admin");
                 size_t BoundaryStartPosition = HTTPRequest.Headers["Content-Type"].find("boundary=");
                 if (BoundaryStartPosition == std::string::npos)
-                    throw std::string("No boundary");
+                    throw EXCEPTION("No boundary");
                 std::string Boundary = HTTPRequest.Headers["Content-Type"].substr(BoundaryStartPosition + 9);
                 std::vector<std::string> Data = UTILITIES::StringSplit(HTTPRequest.Body, "--" + Boundary);
                 for (auto &i : Data)
@@ -108,31 +108,31 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                                 Line.push_back(i[j]);
                         }
                         if (Headers["Content-Disposition"] == "")
-                            throw std::string("No Content-Disposition");
+                            throw EXCEPTION("No Content-Disposition");
                         if (Headers["Content-Type"] == "")
-                            throw std::string("No Content-Type");
+                            throw EXCEPTION("No Content-Type");
                         if (Body == "")
-                            throw std::string("No Body");
+                            throw EXCEPTION("No Body");
                         size_t NameStartPosition = Headers["Content-Disposition"].find("filename=\"");
                         if (NameStartPosition == std::string::npos)
-                            throw std::string("No filename start position");
+                            throw EXCEPTION("No filename start position");
                         NameStartPosition += 10;
                         size_t NameEndPosition = Headers["Content-Disposition"].find("\"", NameStartPosition);
                         if (NameEndPosition == std::string::npos)
-                            throw std::string("No filename end position");
+                            throw EXCEPTION("No filename end position");
                         OriginalFilename = Headers["Content-Disposition"].substr(NameStartPosition, NameEndPosition - NameStartPosition);
                         std::string Filename = OriginalFilename;
                         std::string BadCharacters = "\\/:*?\"<>|";
                         for (size_t i = 0; i < BadCharacters.size(); i++)
                             Filename = UTILITIES::StringReplaceAll(Filename, BadCharacters.substr(i, 1), "");
                         if (Filename == "")
-                            throw std::string("No filename");
+                            throw EXCEPTION("No filename");
                         else
                         {
                             int FID;
-                            THROW_STRING_ERROR_IF_FAILED(FILES::UploadFile(Filename, Body, Headers["Content-Type"], UID, FID));
+                            FILES::UploadFile(Filename, Body, Headers["Content-Type"], UID, FID);
                             std::string FileDownloadLink;
-                            THROW_STRING_ERROR_IF_FAILED(FILES::CreateFileDownloadLink(FID, FileDownloadLink));
+                            FILES::CreateFileDownloadLink(FID, FileDownloadLink);
                             ResponseJSON["data"]["succMap"][OriginalFilename] = FileDownloadLink;
                         }
                     }
@@ -143,10 +143,10 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                     }
                 }
             }
-            catch (std::string Exception)
+            catch (EXCEPTION ErrorData)
             {
                 ResponseJSON["code"] = 400;
-                ResponseJSON["msg"] = Exception;
+                ResponseJSON["msg"] = ErrorData.Message;
             }
             HTTPResponse.SetBody(ResponseJSON.dump());
         }
@@ -172,13 +172,16 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
         std::string FileContent;
         std::string Filename;
         std::string FileType;
-        if (!FILES::GetFileContent(FileToken, FileContent, Filename, FileType).Success)
-            HTTPResponse.SetCode(404);
-        else
+        try
         {
+            FILES::GetFileContent(FileToken, FileContent, Filename, FileType);
             HTTPResponse.SetBody(FileContent);
             HTTPResponse.SetHeader("Content-Disposition", "attachment; filename=\"" + Filename + "\"");
             HTTPResponse.SetHeader("Content-Type", FileType);
+        }
+        catch (EXCEPTION ErrorData)
+        {
+            HTTPResponse.SetCode(404);
         }
     }
     else if (RequestPath == "/Shutdown")
@@ -191,8 +194,14 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
     else
     {
         std::string Data;
-        if (!UTILITIES::LoadFile(BasicFolder + RequestPath, Data).Success)
+        try
+        {
+            UTILITIES::LoadFile(BasicFolder + RequestPath, Data);
+        }
+        catch (EXCEPTION ErrorData)
+        {
             HTTPResponse.SetCode(404);
+        }
         HTTPResponse.SetBody(Data);
         if (RequestPath.length() >= 3 && RequestPath.substr(RequestPath.length() - 3, 3) == ".js")
             HTTPResponse.SetHeader("Content-Type", "application/javascript");

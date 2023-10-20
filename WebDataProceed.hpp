@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <string>
 #include "HTTPRequest.hpp"
-#include "configor/json.hpp"
+#include <configor/json.hpp>
 #include "HTTPResponse.hpp"
 
 class WEB_DATA_PROCEED

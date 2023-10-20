@@ -53,22 +53,22 @@ private:
     int OutputLimit = 1024 * 1024 * 1024;
 
     void UpdateAllResults(JUDGE_RESULT Result);
-    RESULT RedirectIO();
-    RESULT SetupEnvrionment();
-    RESULT RemoveEnvrionment();
-    RESULT ChangeUser();
-    RESULT SetLimits();
-    RESULT ChildProcess();
-    RESULT ParentProcess();
-    RESULT CreateFiles();
-    RESULT Compile();
-    RESULT RunTestGroups();
+    void RedirectIO();
+    void SetupEnvrionment();
+    void RemoveEnvrionment();
+    void ChangeUser();
+    void SetLimits();
+    void ChildProcess();
+    void ParentProcess();
+    void CreateFiles();
+    void Compile();
+    void RunTestGroups();
 
     friend class API_PROCEED;
     friend class JUDGING_LIST;
     friend class SUBMISSIONS;
 
 public:
-    RESULT Set(std::string Code, std::string PID);
-    RESULT Judge();
+    void Set(std::string Code, std::string PID);
+    void Judge();
 };

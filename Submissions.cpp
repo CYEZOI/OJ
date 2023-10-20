@@ -19,9 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Submissions.hpp"
 #include "Utilities.hpp"
 #include "Problems.hpp"
-#include "configor/json.hpp"
+#include <configor/json.hpp>
 
-RESULT SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID)
+void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID)
 {
     try
     {
@@ -60,11 +60,10 @@ RESULT SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROU
     }
     catch (std::exception &e)
     {
-        CREATE_RESULT(false, e.what());
+        throw EXCEPTION(e.what());
     }
-    CREATE_RESULT(true, "Success");
-}
-RESULT SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData)
+    }
+void SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData)
 {
     try
     {
@@ -95,129 +94,121 @@ RESULT SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::st
     }
     catch (std::exception &e)
     {
-        CREATE_RESULT(false, e.what());
+        throw EXCEPTION(e.what());
     }
-    CREATE_RESULT(true, "Success");
-}
+    }
 
-RESULT SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
+void SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
 {
-    RETURN_IF_FAILED(DATABASE::SELECT("Submissions")
-                         .Select("PID")
-                         .Where("SID", Submission.SID)
-                         .Execute(
-                             [](auto Data)
-                             {
-                                 if (Data.size() != 0)
-                                     CREATE_RESULT(false, "Submission already exists");
-                                 CREATE_RESULT(true, "Submission not found");
-                             }));
+    DATABASE::SELECT("Submissions")
+        .Select("PID")
+        .Where("SID", Submission.SID)
+        .Execute(
+            [](auto Data)
+            {
+                if (Data.size() != 0)
+                    throw EXCEPTION("Submission already exists");
+                            });
     std::string TestGroupsData;
-    RETURN_IF_FAILED(TestGroupsToJSON(Submission.TestGroups, TestGroupsData));
-    RETURN_IF_FAILED(DATABASE::INSERT("Submissions")
-                         .Insert("PID", Submission.PID)
-                         .Insert("UID", std::to_string(Submission.UID))
-                         .Insert("Code", Submission.Code)
-                         .Insert("Result", std::to_string(Submission.Result))
-                         .Insert("Description", Submission.Description)
-                         .Insert("Time", std::to_string(Submission.Time))
-                         .Insert("TimeSum", std::to_string(Submission.TimeSum))
-                         .Insert("Memory", std::to_string(Submission.Memory))
-                         .Insert("Score", std::to_string(Submission.Score))
-                         .Insert("EnableO2", std::to_string(Submission.EnableO2))
-                         .Insert("TestGroups", TestGroupsData)
-                         .Execute(
-                             [&Submission](int SID)
-                             {
-                                 Submission.SID = SID;
-                                 CREATE_RESULT(true, "Adding submission succeeds");
-                             }));
-    CREATE_RESULT(true, "Adding submission succeeds");
-}
-RESULT SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
+    TestGroupsToJSON(Submission.TestGroups, TestGroupsData);
+    DATABASE::INSERT("Submissions")
+        .Insert("PID", Submission.PID)
+        .Insert("UID", std::to_string(Submission.UID))
+        .Insert("Code", Submission.Code)
+        .Insert("Result", std::to_string(Submission.Result))
+        .Insert("Description", Submission.Description)
+        .Insert("Time", std::to_string(Submission.Time))
+        .Insert("TimeSum", std::to_string(Submission.TimeSum))
+        .Insert("Memory", std::to_string(Submission.Memory))
+        .Insert("Score", std::to_string(Submission.Score))
+        .Insert("EnableO2", std::to_string(Submission.EnableO2))
+        .Insert("TestGroups", TestGroupsData)
+        .Execute(
+            [&Submission](int SID)
+            {
+                Submission.SID = SID;
+                            });
+    }
+void SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
 {
-    RETURN_IF_FAILED(DATABASE::SELECT("Submissions")
-                         .Select("PID")
-                         .Select("UID")
-                         .Select("Code")
-                         .Select("Result")
-                         .Select("Description")
-                         .Select("Time")
-                         .Select("TimeSum")
-                         .Select("Memory")
-                         .Select("Score")
-                         .Select("EnableO2")
-                         .Select("CreateTime")
-                         .Select("TestGroups")
-                         .Where("SID", SID)
-                         .Execute(
-                             [SID, &Submission](auto Data)
-                             {
-                                 if (Data.size() == 0)
-                                     CREATE_RESULT(false, "Submission not found");
-                                 Submission.SID = SID;
-                                 Submission.PID = Data[0]["PID"];
-                                 Submission.UID = atoi(Data[0]["UID"].c_str());
-                                 Submission.Code = Data[0]["Code"];
-                                 Submission.Result = (JUDGE_RESULT)atoi(Data[0]["Result"].c_str());
-                                 Submission.Description = Data[0]["Description"];
-                                 Submission.Time = atoi(Data[0]["Time"].c_str());
-                                 Submission.TimeSum = atoi(Data[0]["TimeSum"].c_str());
-                                 Submission.Memory = atoi(Data[0]["Memory"].c_str());
-                                 Submission.Score = atoi(Data[0]["Score"].c_str());
-                                 Submission.EnableO2 = atoi(Data[0]["EnableO2"].c_str());
-                                 Submission.CreateTime = UTILITIES::StringToTime(Data[0]["CreateTime"]);
+    DATABASE::SELECT("Submissions")
+        .Select("PID")
+        .Select("UID")
+        .Select("Code")
+        .Select("Result")
+        .Select("Description")
+        .Select("Time")
+        .Select("TimeSum")
+        .Select("Memory")
+        .Select("Score")
+        .Select("EnableO2")
+        .Select("CreateTime")
+        .Select("TestGroups")
+        .Where("SID", SID)
+        .Execute(
+            [SID, &Submission](auto Data)
+            {
+                if (Data.size() == 0)
+                    throw EXCEPTION("Submission not found");
+                Submission.SID = SID;
+                Submission.PID = Data[0]["PID"];
+                Submission.UID = atoi(Data[0]["UID"].c_str());
+                Submission.Code = Data[0]["Code"];
+                Submission.Result = (JUDGE_RESULT)atoi(Data[0]["Result"].c_str());
+                Submission.Description = Data[0]["Description"];
+                Submission.Time = atoi(Data[0]["Time"].c_str());
+                Submission.TimeSum = atoi(Data[0]["TimeSum"].c_str());
+                Submission.Memory = atoi(Data[0]["Memory"].c_str());
+                Submission.Score = atoi(Data[0]["Score"].c_str());
+                Submission.EnableO2 = atoi(Data[0]["EnableO2"].c_str());
+                Submission.CreateTime = UTILITIES::StringToTime(Data[0]["CreateTime"]);
 
-                                 RETURN_IF_FAILED(PROBLEMS::GetProblem(Submission.PID, Submission.Problem))
-                                 for (size_t TGID = 0; TGID < Submission.Problem.TestGroups.size(); TGID++)
-                                 {
-                                     TEST_GROUP TempTestGroup;
-                                     TempTestGroup.PID = Submission.PID;
-                                     TempTestGroup.SID = Submission.SID;
-                                     TempTestGroup.TGID = TGID;
-                                     for (size_t TCID = 0; TCID < Submission.Problem.TestGroups[TGID].TestCases.size(); TCID++)
-                                     {
-                                         TEST_CASE TempTestCase;
-                                         TempTestCase.PID = Submission.PID;
-                                         TempTestCase.SID = Submission.SID;
-                                         TempTestCase.TGID = TGID;
-                                         TempTestCase.TCID = TCID;
-                                         TempTestCase.Problem = &Submission.Problem;
-                                         TempTestCase.UnjudgedTestCase = &TempTestCase.Problem->TestGroups[TempTestCase.TGID].TestCases[TempTestCase.TCID];
-                                         TempTestGroup.TestCases.push_back(TempTestCase);
-                                     }
-                                     Submission.TestGroups.push_back(TempTestGroup);
-                                 }
+                PROBLEMS::GetProblem(Submission.PID, Submission.Problem);
+                for (size_t TGID = 0; TGID < Submission.Problem.TestGroups.size(); TGID++)
+                {
+                    TEST_GROUP TempTestGroup;
+                    TempTestGroup.PID = Submission.PID;
+                    TempTestGroup.SID = Submission.SID;
+                    TempTestGroup.TGID = TGID;
+                    for (size_t TCID = 0; TCID < Submission.Problem.TestGroups[TGID].TestCases.size(); TCID++)
+                    {
+                        TEST_CASE TempTestCase;
+                        TempTestCase.PID = Submission.PID;
+                        TempTestCase.SID = Submission.SID;
+                        TempTestCase.TGID = TGID;
+                        TempTestCase.TCID = TCID;
+                        TempTestCase.Problem = &Submission.Problem;
+                        TempTestCase.UnjudgedTestCase = &TempTestCase.Problem->TestGroups[TempTestCase.TGID].TestCases[TempTestCase.TCID];
+                        TempTestGroup.TestCases.push_back(TempTestCase);
+                    }
+                    Submission.TestGroups.push_back(TempTestGroup);
+                }
 
-                                 RETURN_IF_FAILED(JSONToTestGroups(Data[0]["TestGroups"], Submission.TestGroups, Submission.PID, Submission.SID));
-                                 CREATE_RESULT(true, "Loading submission succeeds");
-                             }));
-    CREATE_RESULT(true, "Loading submission succeeds");
-}
-RESULT SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
+                JSONToTestGroups(Data[0]["TestGroups"], Submission.TestGroups, Submission.PID, Submission.SID);
+                            });
+    }
+void SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
 {
     std::string TestGroupsData;
-    RETURN_IF_FAILED(TestGroupsToJSON(Submission.TestGroups, TestGroupsData));
-    RETURN_IF_FAILED(DATABASE::UPDATE("Submissions")
-                         .Set("PID", Submission.PID)
-                         .Set("UID", Submission.UID)
-                         .Set("Code", Submission.Code)
-                         .Set("Result", Submission.Result)
-                         .Set("Description", Submission.Description)
-                         .Set("Time", Submission.Time)
-                         .Set("TimeSum", Submission.TimeSum)
-                         .Set("Memory", Submission.Memory)
-                         .Set("Score", Submission.Score)
-                         .Set("EnableO2", Submission.EnableO2)
-                         .Set("TestGroups", TestGroupsData)
-                         .Where("SID", Submission.SID)
-                         .Execute());
-    CREATE_RESULT(true, "Updating submission succeeds");
-}
-RESULT SUBMISSIONS::DeleteSubmission(int SID)
+    TestGroupsToJSON(Submission.TestGroups, TestGroupsData);
+    DATABASE::UPDATE("Submissions")
+        .Set("PID", Submission.PID)
+        .Set("UID", Submission.UID)
+        .Set("Code", Submission.Code)
+        .Set("Result", Submission.Result)
+        .Set("Description", Submission.Description)
+        .Set("Time", Submission.Time)
+        .Set("TimeSum", Submission.TimeSum)
+        .Set("Memory", Submission.Memory)
+        .Set("Score", Submission.Score)
+        .Set("EnableO2", Submission.EnableO2)
+        .Set("TestGroups", TestGroupsData)
+        .Where("SID", Submission.SID)
+        .Execute();
+    }
+void SUBMISSIONS::DeleteSubmission(int SID)
 {
-    RETURN_IF_FAILED(DATABASE::DELETE("Submissions")
-                         .Where("SID", SID)
-                         .Execute());
-    CREATE_RESULT(true, "Success");
-}
+    DATABASE::DELETE("Submissions")
+        .Where("SID", SID)
+        .Execute();
+    }

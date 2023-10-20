@@ -58,17 +58,17 @@ std::string UTILITIES::StringJoin(std::vector<std::string> Data, std::string Del
     }
     return Result;
 }
-RESULT UTILITIES::MakeDir(std::string Dir)
+void UTILITIES::MakeDir(std::string Dir)
 {
     if (access(Dir.c_str(), F_OK) == -1)
-        CREATE_RESULT_IF_FALSE(mkdir(Dir.c_str(), 0755) == 0, "Can not create working directory " + Dir)
-    CREATE_RESULT(true, "Created working directory " + Dir)
+        if (mkdir(Dir.c_str(), 0755) != 0)
+            throw EXCEPTION("Can not create working directory " + Dir);
 }
-RESULT UTILITIES::RemoveDir(std::string Dir)
+void UTILITIES::RemoveDir(std::string Dir)
 {
     DIR *DirPtr = opendir(Dir.c_str());
     if (DirPtr == nullptr)
-        CREATE_RESULT(false, "Can not open directory " + Dir)
+        throw EXCEPTION("Can not open directory " + Dir);
     struct dirent *Entry = readdir(DirPtr);
     while (Entry != nullptr)
     {
@@ -86,10 +86,9 @@ RESULT UTILITIES::RemoveDir(std::string Dir)
     }
     closedir(DirPtr);
     if (rmdir(Dir.c_str()) != 0)
-        CREATE_RESULT(false, "Can not remove directory " + Dir)
-    CREATE_RESULT(true, "Removed directory " + Dir)
+        throw EXCEPTION("Can not remove directory " + Dir);
 }
-RESULT UTILITIES::CopyFile(std::string Source, std::string Destination)
+void UTILITIES::CopyFile(std::string Source, std::string Destination)
 {
     FILE *SourceFile = fopen(Source.c_str(), "rb");
     if (SourceFile == nullptr)
@@ -104,7 +103,7 @@ RESULT UTILITIES::CopyFile(std::string Source, std::string Destination)
             ErrorCount++;
         }
         if (SourceFile == nullptr)
-            CREATE_RESULT(false, "Can not open source file " + Source)
+            throw EXCEPTION("Can not open source file " + Source);
     }
     FILE *DestinationFile = fopen(Destination.c_str(), "wb");
     if (DestinationFile == nullptr)
@@ -120,7 +119,7 @@ RESULT UTILITIES::CopyFile(std::string Source, std::string Destination)
             ErrorCount++;
         }
         if (DestinationFile == nullptr)
-            CREATE_RESULT(false, "Can not open destination file " + Destination)
+            throw EXCEPTION("Can not open destination file " + Destination);
     }
     char Buffer[1024];
     size_t ReadSize = fread(Buffer, 1, 1024, SourceFile);
@@ -130,7 +129,7 @@ RESULT UTILITIES::CopyFile(std::string Source, std::string Destination)
         {
             fclose(SourceFile);
             fclose(DestinationFile);
-            CREATE_RESULT(false, "Can not write to destination file " + Destination)
+            throw EXCEPTION("Can not write to destination file " + Destination);
         }
         ReadSize = fread(Buffer, 1, 1024, SourceFile);
     }
@@ -139,17 +138,15 @@ RESULT UTILITIES::CopyFile(std::string Source, std::string Destination)
 
     struct stat FileStatus;
     if (lstat(Source.c_str(), &FileStatus) == -1)
-        CREATE_RESULT(false, "Can not get source file \"" + Source + "\" attributions")
+        throw EXCEPTION("Can not get source file \"" + Source + "\" attributions");
     if (chmod(Destination.c_str(), FileStatus.st_mode) == -1)
-        CREATE_RESULT(false, "Can not set destination file \"" + Destination + "\" attributions")
-
-    CREATE_RESULT(true, "Copied file \"" + Source + "\" to \"" + Destination + "\"")
+        throw EXCEPTION("Can not set destination file \"" + Destination + "\" attributions");
 }
-RESULT UTILITIES::CopyDir(std::string Source, std::string Destination)
+void UTILITIES::CopyDir(std::string Source, std::string Destination)
 {
     DIR *DirPtr = opendir(Source.c_str());
     if (DirPtr == nullptr)
-        CREATE_RESULT(false, "Can not open directory " + Source)
+        throw EXCEPTION("Can not open directory " + Source);
     struct dirent *Entry = readdir(DirPtr);
     while (Entry != nullptr)
     {
@@ -161,28 +158,27 @@ RESULT UTILITIES::CopyDir(std::string Source, std::string Destination)
                 if (lstat((Source + "/" + Entry->d_name).c_str(), &FileStatus) == -1)
                 {
                     closedir(DirPtr);
-                    CREATE_RESULT(false, "Can not get directory " + Source + "/" + Entry->d_name + " attributions")
+                    throw EXCEPTION("Can not get directory " + Source + "/" + Entry->d_name + " attributions");
                 }
                 if (mkdir((Destination + "/" + Entry->d_name).c_str(), FileStatus.st_mode) == -1)
                 {
                     closedir(DirPtr);
-                    CREATE_RESULT(false, "Can not create directory " + Destination + "/" + Entry->d_name)
+                    throw EXCEPTION("Can not create directory " + Destination + "/" + Entry->d_name);
                 }
-                RETURN_IF_FAILED(CopyDir(Source + "/" + Entry->d_name, Destination + "/" + Entry->d_name))
+                CopyDir(Source + "/" + Entry->d_name, Destination + "/" + Entry->d_name);
             }
         }
         else
-            RETURN_IF_FAILED_WITH_OPERATION(CopyFile(Source + "/" + Entry->d_name, Destination + "/" + Entry->d_name), closedir(DirPtr))
+            CopyFile(Source + "/" + Entry->d_name, Destination + "/" + Entry->d_name);
         Entry = readdir(DirPtr);
     }
     closedir(DirPtr);
-    CREATE_RESULT(true, "Copied directory \"" + Source + "\" to \"" + Destination + "\"")
 }
-RESULT UTILITIES::LoadFile(std::string Filename, std::string &Output)
+void UTILITIES::LoadFile(std::string Filename, std::string &Output)
 {
     FILE *File = fopen(Filename.c_str(), "rb");
     if (File == nullptr)
-        CREATE_RESULT(false, "Can not open file " + Filename)
+        throw EXCEPTION("Can not open file " + Filename);
     fseek(File, 0, SEEK_END);
     size_t Size = ftell(File);
     rewind(File);
@@ -191,35 +187,32 @@ RESULT UTILITIES::LoadFile(std::string Filename, std::string &Output)
     {
         fclose(File);
         delete[] Buffer;
-        CREATE_RESULT(false, "Can not read file " + Filename)
+        throw EXCEPTION("Can not read file " + Filename);
     }
     Buffer[Size] = '\0';
     Output.assign(Buffer, Size);
     delete[] Buffer;
     fclose(File);
-    CREATE_RESULT(true, "Loaded file " + Filename)
 }
-RESULT UTILITIES::LoadFile(std::string Filename, int &Output)
+void UTILITIES::LoadFile(std::string Filename, int &Output)
 {
     std::string Temp;
-    RETURN_IF_FAILED(LoadFile(Filename, Temp))
+    LoadFile(Filename, Temp);
     Output = atoi(Temp.c_str());
-    CREATE_RESULT(true, "Loaded file " + Filename)
 }
-RESULT UTILITIES::SaveFile(std::string Filename, std::string Data)
+void UTILITIES::SaveFile(std::string Filename, std::string Data)
 {
     FILE *File = fopen(Filename.c_str(), "wb");
     if (File == nullptr)
-        CREATE_RESULT(false, "Can not open file " + Filename)
+        throw EXCEPTION("Can not open file " + Filename);
     if (fwrite(Data.c_str(), 1, Data.size(), File) != Data.size())
     {
         fclose(File);
-        CREATE_RESULT(false, "Can not write to file " + Filename)
+        throw EXCEPTION("Can not write to file " + Filename);
     }
     fclose(File);
-    CREATE_RESULT(true, "Saved file " + Filename)
 }
-RESULT UTILITIES::SaveFile(std::string Filename, int Data)
+void UTILITIES::SaveFile(std::string Filename, int Data)
 {
     return SaveFile(Filename, std::to_string(Data));
 }
@@ -251,20 +244,20 @@ size_t UTILITIES::UploadFunction(char *ptr, size_t size, size_t nmemb, void *use
     Upload->erase(0, len);
     return len;
 }
-RESULT UTILITIES::SendEmail(std::string To, std::string Subject, std::string Body)
+void UTILITIES::SendEmail(std::string To, std::string Subject, std::string Body)
 {
     std::string From = "";
     std::string Password = "";
     std::string Server = "";
-    RETURN_IF_FAILED(SETTINGS::GetSettings("EmailUsername", From));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("EmailPassword", Password));
-    RETURN_IF_FAILED(SETTINGS::GetSettings("EmailServer", Server));
+    SETTINGS::GetSettings("EmailUsername", From);
+    SETTINGS::GetSettings("EmailPassword", Password);
+    SETTINGS::GetSettings("EmailServer", Server);
     From = UTILITIES::RemoveSpaces(From);
     Password = UTILITIES::RemoveSpaces(Password);
     Server = UTILITIES::RemoveSpaces(Server);
     CURL *Curl = curl_easy_init();
     if (Curl == nullptr)
-        CREATE_RESULT(false, "Can not initialize CURL")
+        throw EXCEPTION("Can not initialize CURL");
     struct curl_slist *Recipients = nullptr;
     Recipients = curl_slist_append(Recipients, To.c_str());
     curl_easy_setopt(Curl, CURLOPT_URL, Server.c_str());
@@ -282,11 +275,10 @@ RESULT UTILITIES::SendEmail(std::string To, std::string Subject, std::string Bod
     {
         curl_slist_free_all(Recipients);
         curl_easy_cleanup(Curl);
-        CREATE_RESULT(false, "Can not send email: " + std::string(curl_easy_strerror(Result)))
+        throw EXCEPTION("Can not send email: " + std::string(curl_easy_strerror(Result)));
     }
     curl_slist_free_all(Recipients);
     curl_easy_cleanup(Curl);
-    CREATE_RESULT(true, "Sent email to " + To)
 }
 time_t UTILITIES::StringToTime(std::string String)
 {

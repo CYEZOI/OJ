@@ -29,7 +29,7 @@ private:
 
 public:
     void Init();
-    RESULT Add(SUBMISSION &Submission);
+    void Add(SUBMISSION &Submission);
 };
 
 extern JUDGING_LIST JudgingList;
