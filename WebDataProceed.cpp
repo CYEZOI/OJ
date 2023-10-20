@@ -119,7 +119,7 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                         OriginalFilename = Headers["Content-Disposition"].substr(NameStartPosition, NameEndPosition - NameStartPosition);
                         std::string Filename = OriginalFilename;
                         std::string BadCharacters = "\\/:*?\"<>|";
-                        for (int i = 0; i < BadCharacters.size(); i++)
+                        for (size_t i = 0; i < BadCharacters.size(); i++)
                             Filename = UTILITIES::StringReplaceAll(Filename, BadCharacters.substr(i, 1), "");
                         if (Filename == "")
                             throw std::string("No filename");
