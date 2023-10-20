@@ -58,7 +58,7 @@ RequestAPI("GetSettings", {}, () => { },
                 let ValueElement = document.createElement("td"); Row.appendChild(ValueElement);
                 {
                     let ValueInput = document.createElement("input"); ValueElement.appendChild(ValueInput);
-                    ValueInput.classList.add("form-control");
+                    ValueInput.classList.add("form-control", "BlurDefault");
                     ValueInput.value = Value;
                 }
             }
@@ -73,7 +73,6 @@ const SetData = (SystemCallID) => {
         SettingsSystemCallBanned.disabled = true;
         SettingsSystemCallAllowedForTimes.disabled = true;
         SettingsSystemCallAllowedForTimesInput.disabled = true;
-        SettingsSystemCallReference.disabled = true;
         return;
     }
     SettingsSystemCallID.value = SystemCallID;
@@ -81,7 +80,6 @@ const SetData = (SystemCallID) => {
     SettingsSystemCallAllowed.disabled = false;
     SettingsSystemCallBanned.disabled = false;
     SettingsSystemCallAllowedForTimes.disabled = false;
-    SettingsSystemCallReference.disabled = false;
     if (SystemCallList[SystemCallID] == -1) {
         SettingsSystemCallAllowed.checked = true;
         SettingsSystemCallBanned.checked = false;
@@ -101,9 +99,6 @@ const SetData = (SystemCallID) => {
         SettingsSystemCallAllowedForTimesInput.disabled = false;
         SettingsSystemCallAllowedForTimesInput.value = SystemCallList[SystemCallID];
     }
-    SettingsSystemCallReference.onclick = () => {
-        open("https://linux.die.net/man/2/" + SystemCallsNames[SystemCallID], "_blank");
-    };
     SettingsSystemCallAllowed.onchange = () => {
         if (SettingsSystemCallAllowed.checked) {
             SystemCallList[SystemCallID] = -1;
