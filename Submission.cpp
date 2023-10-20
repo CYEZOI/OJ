@@ -180,7 +180,7 @@ void SUBMISSION::ChildProcess()
                            "-lm",
                            "-fmax-errors=1",
                            "-std=c++14",
-                           EnableO2 ? "-O2" : "-O1",
+                           EnableO2 ? "-O2" : "-O0",
                            "--static",
                            "-DONLINE_JUDGE",
                            "-o",
