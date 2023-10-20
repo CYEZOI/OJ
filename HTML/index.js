@@ -296,10 +296,14 @@ const RequestAPI = async (Action, Data, CallBack, SuccessCallback, FailCallback,
 };
 const SwitchPage = async (Path, Data = {}, PushState = true) => {
     if (PushState) {
+        let URLPath = "index.html?Page=" + Path;
+        for (let i in Data) {
+            URLPath += "&" + encodeURIComponent(i) + "=" + encodeURIComponent(Data[i]);
+        }
         history.pushState({
             "Path": Path,
             "Data": Data
-        }, Path, Path + ".html");
+        }, Path, URLPath);
     }
 
     let LoweredPath = "";
@@ -339,8 +343,8 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
                 }).then((JSResponse) => {
                     MainContainer.innerHTML = "<h4>" + LoweredPath + "</h4>"
                         + HTMLResponse;
-                    eval("var Data = " + JSON.stringify(Data) + ";\n" +
-                        JSResponse);
+                    window.Data = Data;
+                    eval(JSResponse);
                 });
         });
 }
@@ -368,7 +372,18 @@ const CheckTokenAvailable = () => {
         };
     }
     CheckTokenAvailable();
-    SwitchPage("Home");
+    if (new URLSearchParams(window.location.search).get("Page") !== null) {
+        let Data = {};
+        for (let i of new URLSearchParams(window.location.search).entries()) {
+            if (i[0] != "Page") {
+                Data[i[0]] = i[1];
+            }
+        }
+        SwitchPage(new URLSearchParams(window.location.search).get("Page"), Data, false);
+    }
+    else {
+        SwitchPage("Home");
+    }
 })();
 onpopstate = (Event) => {
     if (Event.isTrusted && Event.state != null) {

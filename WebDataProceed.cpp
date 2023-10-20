@@ -37,7 +37,11 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
     std::string BasicFolder = "/home/langningc2009/OJ/HTML";
     std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
-    if (HTTPRequest.Path == "/api")
+    std::string RequestPath = HTTPRequest.Path;
+    size_t SearchParamsStartPosition = RequestPath.find("?");
+    if (SearchParamsStartPosition != std::string::npos)
+        RequestPath = RequestPath.substr(0, SearchParamsStartPosition);
+    if (RequestPath == "/api")
     {
         HTTPResponse.SetHeader("Content-Type", "application/json");
         if (HTTPRequest.Verb != "POST")
@@ -162,9 +166,9 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
             }
         }
     }
-    else if (HTTPRequest.Path.length() == 39 && HTTPRequest.Path.substr(0, 7) == "/Files/")
+    else if (RequestPath.length() == 39 && RequestPath.substr(0, 7) == "/Files/")
     {
-        std::string FileToken = HTTPRequest.Path.substr(7);
+        std::string FileToken = RequestPath.substr(7);
         std::string FileContent;
         std::string Filename;
         std::string FileType;
@@ -177,9 +181,9 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
             HTTPResponse.SetHeader("Content-Type", FileType);
         }
     }
-    else if (HTTPRequest.Path == "/Shutdown")
+    else if (RequestPath == "/Shutdown")
         exit(0);
-    else if (HTTPRequest.Path == "/")
+    else if (RequestPath == "/")
     {
         HTTPResponse.SetCode(302);
         HTTPResponse.SetHeader("location", "/index.html");
@@ -187,14 +191,14 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
     else
     {
         std::string Data;
-        if (!UTILITIES::LoadFile(BasicFolder + HTTPRequest.Path, Data).Success)
+        if (!UTILITIES::LoadFile(BasicFolder + RequestPath, Data).Success)
             HTTPResponse.SetCode(404);
         HTTPResponse.SetBody(Data);
-        if (HTTPRequest.Path.length() >= 3 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 3, 3) == ".js")
+        if (RequestPath.length() >= 3 && RequestPath.substr(RequestPath.length() - 3, 3) == ".js")
             HTTPResponse.SetHeader("Content-Type", "application/javascript");
-        else if (HTTPRequest.Path.length() >= 4 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 4, 4) == ".css")
+        else if (RequestPath.length() >= 4 && RequestPath.substr(RequestPath.length() - 4, 4) == ".css")
             HTTPResponse.SetHeader("Content-Type", "text/css");
-        else if (HTTPRequest.Path.length() >= 5 && HTTPRequest.Path.substr(HTTPRequest.Path.length() - 5, 5) == ".html")
+        else if (RequestPath.length() >= 5 && RequestPath.substr(RequestPath.length() - 5, 5) == ".html")
             HTTPResponse.SetHeader("Content-Type", "text/html");
     }
     return HTTPResponse;
