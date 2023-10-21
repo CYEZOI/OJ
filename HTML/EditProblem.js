@@ -1,28 +1,9 @@
+const EditProblemData = document.getElementById("EditProblemData");
+const EditProblemSaveButton = document.getElementById("EditProblemSaveButton");
 CheckTokenAvailable();
 let SamplesData = [];
 let TestCasesData = [];
-const CreateHorizontalLine = () => {
-    let HorizontalLine = document.createElement("hr");
-    HorizontalLine.classList.add("border");
-    HorizontalLine.classList.add("border-2");
-    HorizontalLine.classList.add("border-primary");
-    HorizontalLine.classList.add("rounded");
-    return HorizontalLine;
-};
-const CreateMarkdownEditor = (Title, Content) => {
-    let VditorEditor;
-    let Container = document.createElement("div"); EditProblemData.appendChild(Container);
-    Container.classList.add("form-group");
-    {
-        let Label = document.createElement("label"); Container.appendChild(Label);
-        Label.classList.add("col-form-label");
-        Label.innerHTML = Title;
-        let Editor = document.createElement("div"); Container.appendChild(Editor);
-        VditorEditor = CreateVditorEditor(Editor, Content);
-        Container.appendChild(CreateHorizontalLine());
-    }
-    return VditorEditor;
-};
+
 const CreateSampleRow = (SamplesTableBody, Index) => {
     if (Index >= SamplesData.length) {
         SamplesData.push({
@@ -62,6 +43,7 @@ const CreateSampleRow = (SamplesTableBody, Index) => {
         let SamplesTableBodyRowDescription = document.createElement("td"); SamplesTableBodyRow.appendChild(SamplesTableBodyRowDescription);
         {
             let DescriptionTextArea = document.createElement("textarea"); SamplesTableBodyRowDescription.appendChild(DescriptionTextArea);
+            DescriptionTextArea.classList.add("form-control");
             DescriptionTextArea.innerText = Sample.Description;
             Sample.DescriptionEditor = CreateVditorEditor(SamplesTableBodyRowDescription, Sample.Description);
         }
@@ -191,23 +173,27 @@ const CreateTestCaseRow = (TestCasesTableBody, Index) => {
     }
 };
 
-if (Data.PID == null) {
-    SwitchPage("Home");
-}
-
-for (let i = 0; i < 10; i++) {
-    EditProblemData.appendChild(CreatePlaceHolder());
-}
-
 let TitleElement = document.getElementsByTagName("h4")[0];
-let OldTitle = TitleElement.innerHTML;
+let OldTitle = Data.PID == null ? "Add problem" : "Edit problem";
 TitleElement.innerHTML = "";
 TitleElement.classList.add("row");
 TitleElement.classList.add("align-items-center");
 {
     let TitleTextElement = document.createElement("div"); TitleElement.appendChild(TitleTextElement);
     TitleTextElement.classList.add("col-auto");
-    TitleTextElement.innerHTML = OldTitle + " " + Data.PID;
+    TitleTextElement.innerHTML = OldTitle + " ";
+    let PIDInputElement = document.createElement("div"); TitleElement.appendChild(PIDInputElement);
+    PIDInputElement.classList.add("col-auto");
+    {
+        let PIDInput = document.createElement("input"); PIDInputElement.appendChild(PIDInput);
+        PIDInput.classList.add("form-control");
+        PIDInput.id = "PID";
+        PIDInput.placeholder = "PID";
+        if (Data.PID != null) {
+            PIDInput.value = Data.PID;
+            PIDInput.readOnly = PIDInput.disabled = true;
+        }
+    }
     let TitleInputElement = document.createElement("div"); TitleElement.appendChild(TitleInputElement);
     TitleInputElement.classList.add("col-auto");
     {
@@ -218,192 +204,198 @@ TitleElement.classList.add("align-items-center");
     }
 }
 
-RequestAPI("GetProblem", {
-    "PID": String(Data.PID)
-}, () => { }, (Response) => {
-    if (!Response.IsAdmin) {
-        SwitchPage("Home");
-    }
-    EditProblemData.innerHTML = "";
-    Title.value = Response.Title;
+let IOFilenameInputGroup = document.createElement("div"); EditProblemData.appendChild(IOFilenameInputGroup);
+IOFilenameInputGroup.classList.add("input-group");
+IOFilenameInputGroup.classList.add("mb-3");
+{
+    var IOFilenameInput = document.createElement("input"); IOFilenameInputGroup.appendChild(IOFilenameInput);
+    IOFilenameInput.classList.add("form-control");
+    IOFilenameInput.id = "IOFilename";
+    IOFilenameInput.placeholder = "IO Filename";
+    let IOFilenameExtension = document.createElement("span"); IOFilenameInputGroup.appendChild(IOFilenameExtension);
+    IOFilenameExtension.classList.add("input-group-text");
+    IOFilenameExtension.innerHTML = ".in/out";
+}
+EditProblemData.appendChild(CreateHorizontalLine());
 
-    let IOFilenameInputGroup = document.createElement("div"); EditProblemData.appendChild(IOFilenameInputGroup);
-    IOFilenameInputGroup.classList.add("input-group");
-    IOFilenameInputGroup.classList.add("mb-3");
+let DescriptionEditor = CreateMarkdownEditor("Description", "", EditProblemData);
+let InputEditor = CreateMarkdownEditor("Input", "", EditProblemData);
+let OutputEditor = CreateMarkdownEditor("Output", "", EditProblemData);
+let RangeEditor = CreateMarkdownEditor("Range", "", EditProblemData);
+let HintEditor = CreateMarkdownEditor("Hint", "", EditProblemData);
+
+let SamplesLabel = document.createElement("label"); EditProblemData.appendChild(SamplesLabel);
+SamplesLabel.classList.add("col-form-label")
+SamplesLabel.innerHTML = "Samples";
+let SamplesTable = document.createElement("table"); EditProblemData.appendChild(SamplesTable);
+SamplesTable.classList.add("table");
+{
+    let SamplesTableHead = document.createElement("thead"); SamplesTable.appendChild(SamplesTableHead);
     {
-        let IOFilenameInput = document.createElement("input"); IOFilenameInputGroup.appendChild(IOFilenameInput);
-        IOFilenameInput.classList.add("form-control");
-        IOFilenameInput.id = "IOFilename";
-        IOFilenameInput.placeholder = "IO Filename";
+        let SamplesTableHeadRow = document.createElement("tr"); SamplesTableHead.appendChild(SamplesTableHeadRow);
+        {
+            let SamplesTableHeadRowTitle = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowTitle);
+            SamplesTableHeadRowTitle.innerHTML = "Sample";
+            SamplesTableHeadRowTitle.classList.add("col-2");
+            let SamplesTableHeadRowInput = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowInput);
+            SamplesTableHeadRowInput.innerHTML = "Input";
+            SamplesTableHeadRowInput.classList.add("col-2");
+            let SamplesTableHeadRowOutput = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowOutput);
+            SamplesTableHeadRowOutput.innerHTML = "Output";
+            SamplesTableHeadRowOutput.classList.add("col-2");
+            let SamplesTableHeadRowDescription = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowDescription);
+            SamplesTableHeadRowDescription.innerHTML = "Description";
+            SamplesTableHeadRow.classList.add("col-4");
+            let SamplesTableHeadRowOperation = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowOperation);
+            SamplesTableHeadRowOperation.innerHTML = "Operation";
+            SamplesTableHeadRowOperation.classList.add("col-2");
+        }
+    }
+    var SamplesTableBody = document.createElement("tbody"); SamplesTable.appendChild(SamplesTableBody);
+}
+let AddSampleButton = document.createElement("button"); EditProblemData.appendChild(AddSampleButton);
+AddSampleButton.classList.add("btn");
+AddSampleButton.classList.add("btn-secondary");
+AddSampleButton.innerHTML = "Add sample";
+AddSampleButton.onclick = () => {
+    CreateSampleRow(SamplesTable.children[1], SamplesTable.children[1].children.length);
+};
+EditProblemData.appendChild(CreateHorizontalLine());
+
+let TestCasesLabel = document.createElement("label"); EditProblemData.appendChild(TestCasesLabel);
+TestCasesLabel.classList.add("col-form-label")
+TestCasesLabel.innerHTML = "Test cases";
+let TestCasesTable = document.createElement("table"); EditProblemData.appendChild(TestCasesTable);
+TestCasesTable.classList.add("table");
+{
+    let TestCasesTableHead = document.createElement("thead"); TestCasesTable.appendChild(TestCasesTableHead);
+    {
+        let TestCasesTableHeadRow = document.createElement("tr"); TestCasesTableHead.appendChild(TestCasesTableHeadRow);
+        {
+            let TestCasesTableHeadRowTitle = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowTitle);
+            TestCasesTableHeadRowTitle.innerHTML = "Test case";
+            TestCasesTableHeadRowTitle.classList.add("col-2");
+            let TestCasesTableHeadRowInput = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowInput);
+            TestCasesTableHeadRowInput.innerHTML = "Input";
+            TestCasesTableHeadRowInput.classList.add("col-3");
+            let TestCasesTableHeadRowAnswer = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowAnswer);
+            TestCasesTableHeadRowAnswer.innerHTML = "Answer";
+            TestCasesTableHeadRowAnswer.classList.add("col-3");
+            let TestCasesTableHeadRowLimitsAndScore = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowLimitsAndScore);
+            TestCasesTableHeadRowLimitsAndScore.innerHTML = "Limits and Score";
+            TestCasesTableHeadRowLimitsAndScore.classList.add("col-2");
+            let TestCasesTableHeadRowOperation = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowOperation);
+            TestCasesTableHeadRowOperation.innerHTML = "Operation";
+            TestCasesTableHeadRowOperation.classList.add("col-2");
+        }
+    }
+    var TestCasesTableBody = document.createElement("tbody"); TestCasesTable.appendChild(TestCasesTableBody);
+}
+let AddTestCaseButton = document.createElement("button"); EditProblemData.appendChild(AddTestCaseButton);
+AddTestCaseButton.classList.add("btn");
+AddTestCaseButton.classList.add("btn-secondary");
+AddTestCaseButton.innerHTML = "Add Test Case";
+AddTestCaseButton.onclick = () => {
+    CreateTestCaseRow(TestCasesTable.children[1], TestCasesTable.children[1].children.length);
+};
+EditProblemData.appendChild(CreateHorizontalLine());
+
+EditProblemSaveButton.onclick = () => {
+    let SubmitSamplesData = [];
+    for (let SampleCount = 0; SampleCount < SamplesData.length; SampleCount++) {
+        SubmitSamplesData.push({
+            "Input": String(SamplesData[SampleCount].InputEditor.getValue()),
+            "Output": String(SamplesData[SampleCount].OutputEditor.getValue()),
+            "Description": String(SamplesData[SampleCount].DescriptionEditor.getValue())
+        });
+    }
+
+    let SubmitTestGroupsData = [];
+    for (let TestCaseCount = 0; TestCaseCount < TestCasesData.length; TestCaseCount++) {
+        while (SubmitTestGroupsData.length <= TestCasesData[TestCaseCount].TGID) {
+            SubmitTestGroupsData.push({
+                "TGID": Number(SubmitTestGroupsData.length),
+                "TestCases": []
+            });
+        }
+        SubmitTestGroupsData[TestCasesData[TestCaseCount].TGID].TestCases.push({
+            "TCID": Number(SubmitTestGroupsData[TestCasesData[TestCaseCount].TGID].TestCases.length),
+            "Input": String(TestCasesData[TestCaseCount].InputEditor.getValue()),
+            "Answer": String(TestCasesData[TestCaseCount].AnswerEditor.getValue()),
+            "TimeLimit": Number(TestCasesData[TestCaseCount].TimeLimit),
+            "MemoryLimit": Number(TestCasesData[TestCaseCount].MemoryLimit),
+            "Score": Number(TestCasesData[TestCaseCount].Score)
+        });
+    }
+
+    RequestAPI(Data.PID != null ? "UpdateProblem" : "AddProblem", {
+        "PID": String(PID.value),
+        "Title": String(Title.value),
+        "IOFilename": String(IOFilename.value.trim()),
+        "Description": String(DescriptionEditor.getValue().trim()),
+        "Input": String(InputEditor.getValue().trim()),
+        "Output": String(OutputEditor.getValue().trim()),
+        "Range": String(RangeEditor.getValue().trim()),
+        "Hint": String(HintEditor.getValue().trim()),
+        "Samples": JSON.stringify(SubmitSamplesData),
+        "TestGroups": JSON.stringify(SubmitTestGroupsData)
+    }, () => { }, () => {
+        ShowSuccess(Data.PID != null ? "Update" : "Add" + " Problem Success");
+        setTimeout(() => {
+            SwitchPage("Problem", {
+                "PID": PID.value
+            });
+        }, 1000);
+    }, () => { }, () => { });
+};
+
+if (Data.PID != null) {
+    RequestAPI("GetProblem", {
+        "PID": String(Data.PID)
+    }, () => { }, (Response) => {
+        if (!Response.IsAdmin) {
+            SwitchPage("Home");
+        }
+
         IOFilenameInput.value = Response.IOFilename;
-        let IOFilenameExtension = document.createElement("span"); IOFilenameInputGroup.appendChild(IOFilenameExtension);
-        IOFilenameExtension.classList.add("input-group-text");
-        IOFilenameExtension.innerHTML = ".in/out";
-    }
-    EditProblemData.appendChild(CreateHorizontalLine());
+        Title.value = Response.Title;
 
-    let DescriptionEditor = CreateMarkdownEditor("Description", Response.Description);
-    let InputEditor = CreateMarkdownEditor("Input", Response.Input);
-    let OutputEditor = CreateMarkdownEditor("Output", Response.Output);
-    let RangeEditor = CreateMarkdownEditor("Range", Response.Range);
-    let HintEditor = CreateMarkdownEditor("Hint", Response.Hint);
+        let SampleCount = 0;
+        Response.Samples.map((Sample) => {
+            SamplesData.push({
+                "Input": Sample.Input,
+                "Output": Sample.Output,
+                "Description": Sample.Description,
+                "InputEditor": null,
+                "OutputEditor": null,
+                "DescriptionEditor": null
+            });
+            CreateSampleRow(SamplesTableBody, SampleCount);
+            SampleCount++;
+        });
 
-    let SamplesLabel = document.createElement("label"); EditProblemData.appendChild(SamplesLabel);
-    SamplesLabel.classList.add("col-form-label")
-    SamplesLabel.innerHTML = "Samples";
-    let SamplesTable = document.createElement("table"); EditProblemData.appendChild(SamplesTable);
-    SamplesTable.classList.add("table");
-    {
-        let SamplesTableHead = document.createElement("thead"); SamplesTable.appendChild(SamplesTableHead);
-        {
-            let SamplesTableHeadRow = document.createElement("tr"); SamplesTableHead.appendChild(SamplesTableHeadRow);
-            {
-                let SamplesTableHeadRowTitle = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowTitle);
-                SamplesTableHeadRowTitle.innerHTML = "Sample";
-                SamplesTableHeadRowTitle.style.width = "10%";
-                let SamplesTableHeadRowInput = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowInput);
-                SamplesTableHeadRowInput.innerHTML = "Input";
-                SamplesTableHeadRowInput.style.width = "20%";
-                let SamplesTableHeadRowOutput = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowOutput);
-                SamplesTableHeadRowOutput.innerHTML = "Output";
-                SamplesTableHeadRowOutput.style.width = "20%";
-                let SamplesTableHeadRowDescription = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowDescription);
-                SamplesTableHeadRowDescription.innerHTML = "Description";
-                SamplesTableHeadRow.style.width = "40%";
-                let SamplesTableHeadRowOperation = document.createElement("th"); SamplesTableHeadRow.appendChild(SamplesTableHeadRowOperation);
-                SamplesTableHeadRowOperation.innerHTML = "Operation";
-                SamplesTableHeadRowOperation.style.width = "10%";
-            }
-        }
-        let SamplesTableBody = document.createElement("tbody"); SamplesTable.appendChild(SamplesTableBody);
-        {
-            let SampleCount = 0;
-            Response.Samples.map((Sample) => {
-                SamplesData.push({
-                    "Input": Sample.Input,
-                    "Output": Sample.Output,
-                    "Description": Sample.Description,
+        let TestCaseCount = 0;
+        Response.TestGroups.map((TestGroup) => {
+            TestGroup.TestCases.map((TestCase) => {
+                TestCasesData.push({
+                    "TGID": TestGroup.TGID,
+                    "Input": TestCase.Input,
+                    "Answer": TestCase.Answer,
+                    "TimeLimit": TestCase.TimeLimit,
+                    "MemoryLimit": TestCase.MemoryLimit,
+                    "Score": TestCase.Score,
                     "InputEditor": null,
-                    "OutputEditor": null,
-                    "DescriptionEditor": null
+                    "AnswerEditor": null
                 });
-                CreateSampleRow(SamplesTableBody, SampleCount);
-                SampleCount++;
+                CreateTestCaseRow(TestCasesTableBody, TestCaseCount);
+                TestCaseCount++;
             });
-        }
-    }
-    let AddSampleButton = document.createElement("button"); EditProblemData.appendChild(AddSampleButton);
-    AddSampleButton.classList.add("btn");
-    AddSampleButton.classList.add("btn-secondary");
-    AddSampleButton.innerHTML = "Add sample";
-    AddSampleButton.onclick = () => {
-        CreateSampleRow(SamplesTable.children[1], SamplesTable.children[1].children.length);
-    };
-    EditProblemData.appendChild(CreateHorizontalLine());
+        });
 
-    let TestCasesLabel = document.createElement("label"); EditProblemData.appendChild(TestCasesLabel);
-    TestCasesLabel.classList.add("col-form-label")
-    TestCasesLabel.innerHTML = "Test cases";
-    let TestCasesTable = document.createElement("table"); EditProblemData.appendChild(TestCasesTable);
-    TestCasesTable.classList.add("table");
-    {
-        let TestCasesTableHead = document.createElement("thead"); TestCasesTable.appendChild(TestCasesTableHead);
-        {
-            let TestCasesTableHeadRow = document.createElement("tr"); TestCasesTableHead.appendChild(TestCasesTableHeadRow);
-            {
-                let TestCasesTableHeadRowTitle = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowTitle);
-                TestCasesTableHeadRowTitle.innerHTML = "Test case";
-                TestCasesTableHeadRowTitle.style.width = "10%";
-                let TestCasesTableHeadRowInput = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowInput);
-                TestCasesTableHeadRowInput.innerHTML = "Input";
-                TestCasesTableHeadRowInput.style.width = "20%";
-                let TestCasesTableHeadRowAnswer = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowAnswer);
-                TestCasesTableHeadRowAnswer.innerHTML = "Answer";
-                TestCasesTableHeadRowAnswer.style.width = "20%";
-                let TestCasesTableHeadRowLimitsAndScore = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowLimitsAndScore);
-                TestCasesTableHeadRowLimitsAndScore.innerHTML = "Limits and Score";
-                TestCasesTableHeadRowLimitsAndScore.style.width = "40%";
-                let TestCasesTableHeadRowOperation = document.createElement("th"); TestCasesTableHeadRow.appendChild(TestCasesTableHeadRowOperation);
-                TestCasesTableHeadRowOperation.innerHTML = "Operation";
-                TestCasesTableHeadRowOperation.style.width = "10%";
-            }
-        }
-        let TestCasesTableBody = document.createElement("tbody"); TestCasesTable.appendChild(TestCasesTableBody);
-        {
-            let TestCaseCount = 0;
-            Response.TestGroups.map((TestGroup) => {
-                TestGroup.TestCases.map((TestCase) => {
-                    TestCasesData.push({
-                        "TGID": TestGroup.TGID,
-                        "Input": TestCase.Input,
-                        "Answer": TestCase.Answer,
-                        "TimeLimit": TestCase.TimeLimit,
-                        "MemoryLimit": TestCase.MemoryLimit,
-                        "Score": TestCase.Score,
-                        "InputEditor": null,
-                        "AnswerEditor": null
-                    });
-                    CreateTestCaseRow(TestCasesTableBody, TestCaseCount);
-                    TestCaseCount++;
-                });
-            });
-        }
-    }
-    let AddTestCaseButton = document.createElement("button"); EditProblemData.appendChild(AddTestCaseButton);
-    AddTestCaseButton.classList.add("btn");
-    AddTestCaseButton.classList.add("btn-secondary");
-    AddTestCaseButton.innerHTML = "Add Test Case";
-    AddTestCaseButton.onclick = () => {
-        CreateTestCaseRow(TestCasesTable.children[1], TestCasesTable.children[1].children.length);
-    };
-    EditProblemData.appendChild(CreateHorizontalLine());
-
-    EditProblemSaveButton.onclick = () => {
-        let SubmitSamplesData = [];
-        for (let SampleCount = 0; SampleCount < SamplesData.length; SampleCount++) {
-            SubmitSamplesData.push({
-                "Input": String(SamplesData[SampleCount].InputEditor.getValue()),
-                "Output": String(SamplesData[SampleCount].OutputEditor.getValue()),
-                "Description": String(SamplesData[SampleCount].DescriptionEditor.getValue())
-            });
-        }
-
-        let SubmitTestGroupsData = [];
-        for (let TestCaseCount = 0; TestCaseCount < TestCasesData.length; TestCaseCount++) {
-            while (SubmitTestGroupsData.length <= TestCasesData[TestCaseCount].TGID) {
-                SubmitTestGroupsData.push({
-                    "TGID": Number(SubmitTestGroupsData.length),
-                    "TestCases": []
-                });
-            }
-            SubmitTestGroupsData[TestCasesData[TestCaseCount].TGID].TestCases.push({
-                "TCID": Number(SubmitTestGroupsData[TestCasesData[TestCaseCount].TGID].TestCases.length),
-                "Input": String(TestCasesData[TestCaseCount].InputEditor.getValue()),
-                "Answer": String(TestCasesData[TestCaseCount].AnswerEditor.getValue()),
-                "TimeLimit": Number(TestCasesData[TestCaseCount].TimeLimit),
-                "MemoryLimit": Number(TestCasesData[TestCaseCount].MemoryLimit),
-                "Score": Number(TestCasesData[TestCaseCount].Score)
-            });
-        }
-
-        RequestAPI("UpdateProblem", {
-            "PID": String(Response.PID),
-            "Title": String(Title.value),
-            "IOFilename": String(IOFilename.value.trim()),
-            "Description": String(DescriptionEditor.getValue().trim()),
-            "Input": String(InputEditor.getValue().trim()),
-            "Output": String(OutputEditor.getValue().trim()),
-            "Range": String(RangeEditor.getValue().trim()),
-            "Hint": String(HintEditor.getValue().trim()),
-            "Samples": JSON.stringify(SubmitSamplesData),
-            "TestGroups": JSON.stringify(SubmitTestGroupsData)
-        }, () => { }, () => {
-            ShowSuccess("Update Problem Success");
-            setTimeout(() => {
-                SwitchPage("Problem", {
-                    "PID": Response.PID
-                });
-            }, 1000);
-        }, () => { }, () => { });
-    };
-}, () => { }, () => { });
+        DescriptionEditor.setValue(Response.Description);
+        InputEditor.setValue(Response.Input);
+        OutputEditor.setValue(Response.Output);
+        RangeEditor.setValue(Response.Range);
+        HintEditor.setValue(Response.Hint);
+    }, () => { }, () => { });
+}

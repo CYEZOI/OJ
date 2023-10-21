@@ -1,8 +1,23 @@
-CheckTokenAvailable();
+const EditSubmissionData = document.getElementById("EditSubmissionData");
+const EditSubmissionEnableO2 = document.getElementById("EditSubmissionEnableO2");
+const EditSubmissionPID = document.getElementById("EditSubmissionPID");
+const EditSubmissionUID = document.getElementById("EditSubmissionUID");
+const EditSubmissionResult = document.getElementById("EditSubmissionResult");
+const EditSubmissionDescription = document.getElementById("EditSubmissionDescription");
+const EditSubmissionTime = document.getElementById("EditSubmissionTime");
+const EditSubmissionTimeSum = document.getElementById("EditSubmissionTimeSum");
+const EditSubmissionMemory = document.getElementById("EditSubmissionMemory");
+const EditSubmissionScore = document.getElementById("EditSubmissionScore");
+const EditSubmissionCode = document.getElementById("EditSubmissionCode");
+const SubmissionTestGroupsTable = document.getElementById("SubmissionTestGroupsTable");
+const SubmissionTestCasesTable = document.getElementById("SubmissionTestCasesTable");
+const EditSubmissionSaveButton = document.getElementById("EditSubmissionSaveButton");
 
+CheckTokenAvailable();
 if (Data.SID == null) {
     SwitchPage("Home");
 }
+
 for (let i = 0; i < 10; i++) {
     let Row = document.createElement("tr"); SubmissionTestCasesTable.children[1].appendChild(Row);
     {

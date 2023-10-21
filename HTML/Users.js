@@ -1,3 +1,9 @@
+const OriginalPassword = document.getElementById("OriginalPassword");
+const HashPassword = document.getElementById("HashPassword");
+const HashedPassword = document.getElementById("HashedPassword");
+const UsersAddUserButton = document.getElementById("UsersAddUserButton");
+const UsersData = document.getElementById("UsersData");
+
 CheckTokenAvailable();
 if (Data.Page == null) {
     Data.Page = 1;

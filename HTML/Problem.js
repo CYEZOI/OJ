@@ -1,3 +1,8 @@
+const ProblemSubmitButton = document.getElementById("ProblemSubmitButton");
+const ProblemEditButton = document.getElementById("ProblemEditButton");
+const ProblemDeleteButton = document.getElementById("ProblemDeleteButton");
+const ProblemData = document.getElementById("ProblemData");
+
 CheckTokenAvailable();
 const CreateAccordion = (Title, Body, ID, AutoShow = true) => {
     let Accordion = document.createElement("div"); ProblemData.appendChild(Accordion);
@@ -61,97 +66,96 @@ for (let i = 0; i < 10; i++) {
     CreateAccordion(CreatePlaceHolder().outerHTML, CreatePlaceHolder().outerHTML, "");
 }
 document.getElementsByTagName("h4")[0].innerHTML += " " + Data.PID;
-RequestAPI("GetProblem",
-    {
-        "PID": String(Data.PID)
-    }, () => { }, (Response) => {
-        ProblemData.innerHTML = "";
-        document.getElementsByTagName("h4")[0].innerHTML += ": " + Response.Title;
-        if (!Response.IsAdmin) {
-            ProblemEditButton.remove();
-            ProblemDeleteButton.remove();
-        }
+RequestAPI("GetProblem", {
+    "PID": String(Data.PID)
+}, () => { }, (Response) => {
+    ProblemData.innerHTML = "";
+    document.getElementsByTagName("h4")[0].innerHTML += ": " + Response.Title;
+    if (!Response.IsAdmin) {
+        ProblemEditButton.remove();
+        ProblemDeleteButton.remove();
+    }
 
-        CreateAccordion("Description", Response.Description, "Description");
-        CreateAccordion("Input", Response.Input, "Input");
-        CreateAccordion("Output", Response.Output, "Output");
+    CreateAccordion("Description", Response.Description, "Description");
+    CreateAccordion("Input", Response.Input, "Input");
+    CreateAccordion("Output", Response.Output, "Output");
 
-        let Samples = document.createElement("div");
-        Response.Samples.map((Sample) => {
-            let SampleData = document.createElement("div"); Samples.appendChild(SampleData);
-            SampleData.classList.add("row");
-            {
-                let SampleTitle = document.createElement("div"); SampleData.appendChild(SampleTitle);
-                SampleTitle.classList.add("col-12");
-                SampleTitle.innerHTML = "Sample " + (Response.Samples.indexOf(Sample) + 1);
-                let SampleInput = document.createElement("div"); SampleData.appendChild(SampleInput);
-                SampleInput.classList.add("col-6");
-                {
-                    let InputTextArea = document.createElement("textarea"); SampleInput.appendChild(InputTextArea);
-                    InputTextArea.classList.add("form-control");
-                    InputTextArea.innerText = Sample.Input;
-                }
-                let SampleOutput = document.createElement("div"); SampleData.appendChild(SampleOutput);
-                SampleOutput.classList.add("col-6");
-                {
-                    let OutputTextArea = document.createElement("textarea"); SampleOutput.appendChild(OutputTextArea);
-                    OutputTextArea.classList.add("form-control");
-                    OutputTextArea.innerText = Sample.Output;
-                }
-                if (Sample.Description != "") {
-                    let SampleDescription = document.createElement("div"); SampleData.appendChild(SampleDescription);
-                    SampleDescription.innerHTML = Sample.Description;
-                }
-            }
-            let HorizontalLine = document.createElement("hr"); Samples.appendChild(HorizontalLine);
-        });
-        if (Samples.children.length != 0) {
-            Samples.removeChild(Samples.lastChild);
-        }
-        CreateAccordion("Samples", Samples.outerHTML, "Samples");
-        let Textarea = document.querySelectorAll("textarea.form-control");
-        for (let i = 0; i < Textarea.length; i++) {
-            CodeMirror.fromTextArea(Textarea[i], {
-                cursorBlinkRate: 0,
-                gutters: ["CodeMirror-linenumbers"],
-                lineNumbers: true,
-                readOnly: true
-            }).setSize("100%", "auto");
-        }
-
-        if (Response.Range != "") {
-            CreateAccordion("Range", Response.Range, "Range");
-        }
-        if (Response.Hint != "") {
-            CreateAccordion("Hint", Response.Hint, "Hint", false);
-        }
-        let MaxTimeLimit = 0;
-        let MaxMemoryLimit = 0;
-        Response.TestGroups.map((TestGroup) => {
-            TestGroup.TestCases.map((TestCase) => {
-                MaxTimeLimit = Math.max(MaxTimeLimit, TestCase.TimeLimit);
-                MaxMemoryLimit = Math.max(MaxMemoryLimit, TestCase.MemoryLimit);
-            });
-        });
-        let DataTable = document.createElement("table");
-        DataTable.classList.add("table");
-        DataTable.classList.add("table-bordered");
-        DataTable.classList.add("table-striped");
-        let TableBody = document.createElement("tbody"); DataTable.appendChild(TableBody);
+    let Samples = document.createElement("div");
+    Response.Samples.map((Sample) => {
+        let SampleData = document.createElement("div"); Samples.appendChild(SampleData);
+        SampleData.classList.add("row");
         {
-            const AddRow = (Name, Value) => {
-                let TableBodyRow = document.createElement("tr"); TableBody.appendChild(TableBodyRow);
-                {
-                    let TableBodyName = document.createElement("td"); TableBodyRow.appendChild(TableBodyName);
-                    TableBodyName.innerHTML = Name;
-                    let TableBodyValue = document.createElement("td"); TableBodyRow.appendChild(TableBodyValue);
-                    TableBodyValue.innerHTML = Value;
-                }
-            };
-            AddRow("Time limit", TimeToString(MaxTimeLimit));
-            AddRow("Memory limit", MemoryToString(MaxMemoryLimit));
-            AddRow("Input filename", Response.IOFilename !== "" ? Response.IOFilename + ".in" : "Standard input");
-            AddRow("Output filename", Response.IOFilename !== "" ? Response.IOFilename + ".out" : "Standard output");
+            let SampleTitle = document.createElement("div"); SampleData.appendChild(SampleTitle);
+            SampleTitle.classList.add("col-12");
+            SampleTitle.innerHTML = "Sample " + (Response.Samples.indexOf(Sample) + 1);
+            let SampleInput = document.createElement("div"); SampleData.appendChild(SampleInput);
+            SampleInput.classList.add("col-6");
+            {
+                let InputTextArea = document.createElement("textarea"); SampleInput.appendChild(InputTextArea);
+                InputTextArea.classList.add("form-control");
+                InputTextArea.innerText = Sample.Input;
+            }
+            let SampleOutput = document.createElement("div"); SampleData.appendChild(SampleOutput);
+            SampleOutput.classList.add("col-6");
+            {
+                let OutputTextArea = document.createElement("textarea"); SampleOutput.appendChild(OutputTextArea);
+                OutputTextArea.classList.add("form-control");
+                OutputTextArea.innerText = Sample.Output;
+            }
+            if (Sample.Description != "") {
+                let SampleDescription = document.createElement("div"); SampleData.appendChild(SampleDescription);
+                SampleDescription.innerHTML = Sample.Description;
+            }
         }
-        CreateAccordion("Other data", DataTable.outerHTML, "OtherData");
-    }, () => { }, () => { });
+        let HorizontalLine = document.createElement("hr"); Samples.appendChild(HorizontalLine);
+    });
+    if (Samples.children.length != 0) {
+        Samples.removeChild(Samples.lastChild);
+    }
+    CreateAccordion("Samples", Samples.outerHTML, "Samples");
+    let Textarea = document.querySelectorAll("textarea.form-control");
+    for (let i = 0; i < Textarea.length; i++) {
+        CodeMirror.fromTextArea(Textarea[i], {
+            cursorBlinkRate: 0,
+            gutters: ["CodeMirror-linenumbers"],
+            lineNumbers: true,
+            readOnly: true
+        }).setSize("100%", "auto");
+    }
+
+    if (Response.Range != "") {
+        CreateAccordion("Range", Response.Range, "Range");
+    }
+    if (Response.Hint != "") {
+        CreateAccordion("Hint", Response.Hint, "Hint", false);
+    }
+    let MaxTimeLimit = 0;
+    let MaxMemoryLimit = 0;
+    Response.TestGroups.map((TestGroup) => {
+        TestGroup.TestCases.map((TestCase) => {
+            MaxTimeLimit = Math.max(MaxTimeLimit, TestCase.TimeLimit);
+            MaxMemoryLimit = Math.max(MaxMemoryLimit, TestCase.MemoryLimit);
+        });
+    });
+    let DataTable = document.createElement("table");
+    DataTable.classList.add("table");
+    DataTable.classList.add("table-bordered");
+    DataTable.classList.add("table-striped");
+    let TableBody = document.createElement("tbody"); DataTable.appendChild(TableBody);
+    {
+        const AddRow = (Name, Value) => {
+            let TableBodyRow = document.createElement("tr"); TableBody.appendChild(TableBodyRow);
+            {
+                let TableBodyName = document.createElement("td"); TableBodyRow.appendChild(TableBodyName);
+                TableBodyName.innerHTML = Name;
+                let TableBodyValue = document.createElement("td"); TableBodyRow.appendChild(TableBodyValue);
+                TableBodyValue.innerHTML = Value;
+            }
+        };
+        AddRow("Time limit", TimeToString(MaxTimeLimit));
+        AddRow("Memory limit", MemoryToString(MaxMemoryLimit));
+        AddRow("Input filename", Response.IOFilename !== "" ? Response.IOFilename + ".in" : "Standard input");
+        AddRow("Output filename", Response.IOFilename !== "" ? Response.IOFilename + ".out" : "Standard output");
+    }
+    CreateAccordion("Other data", DataTable.outerHTML, "OtherData");
+}, () => { }, () => { });

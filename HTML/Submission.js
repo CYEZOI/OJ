@@ -1,3 +1,8 @@
+const SubmissionButtonGroup = document.getElementById("SubmissionButtonGroup");
+const SubmissionSpinner = document.getElementById("SubmissionSpinner");
+const SubmissionData = document.getElementById("SubmissionData");
+const SubmissionCode = document.getElementById("SubmissionCode");
+
 CheckTokenAvailable();
 if (Data.SID == null) {
     SwitchPage("Home");
@@ -12,59 +17,77 @@ const ReloadData = () => {
     RequestAPI("GetSubmission", {
         "SID": Number(Data.SID)
     }, () => { }, (Response) => {
-        if (!Response.IsAdmin) {
-            SubmissionRejudgeButton.remove();
-            SubmissionEditButton.remove();
-            SubmissionDeleteButton.remove();
-        }
-        SubmissionData.innerHTML = "";
-        SubmissionData.className = "";
+        SubmissionButtonGroup.innerHTML = ``;
+        let SubmissionGoToProblemButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionGoToProblemButton);
+        SubmissionGoToProblemButton.classList.add("btn", "btn-primary");
+        SubmissionGoToProblemButton.innerText = "Go to problem";
         SubmissionGoToProblemButton.onclick = () => {
             SwitchPage("Problem", {
                 "PID": Response.PID
             });
         };
+
+        let SubmissionResubmitButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionResubmitButton);
+        SubmissionResubmitButton.classList.add("btn", "btn-secondary");
+        SubmissionResubmitButton.innerText = "Resubmit";
         SubmissionResubmitButton.onclick = () => {
             SwitchPage("Submit", {
                 "PID": Response.PID
             });
         };
-        SubmissionRejudgeButton.onclick = () => {
-            ShowModal("Rejudge submission", "Are you sure to rejudge it?", () => {
-                if (Response.Result > 10) {
-                    ShowModal("Rejudge submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
+
+        if (Response.IsAdmin) {
+            let SubmissionRejudgeButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionRejudgeButton);
+            SubmissionRejudgeButton.classList.add("btn", "btn-warning");
+            SubmissionRejudgeButton.innerText = "Rejudge";
+            SubmissionRejudgeButton.onclick = () => {
+                ShowModal("Rejudge submission", "Are you sure to rejudge it?", () => {
+                    if (Response.Result > 10) {
+                        ShowModal("Rejudge submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
+                            RequestAPI("RejudgeSubmission", {
+                                "SID": Number(Data.SID)
+                            }, () => { }, () => {
+                                ReloadData();
+                            }, () => { });
+                        }, () => { });
+                    }
+                    else {
                         RequestAPI("RejudgeSubmission", {
                             "SID": Number(Data.SID)
                         }, () => { }, () => {
                             ReloadData();
                         }, () => { });
-                    }, () => { });
-                }
-                else {
-                    RequestAPI("RejudgeSubmission", {
-                        "SID": Number(Data.SID)
-                    }, () => { }, () => {
-                        ReloadData();
-                    }, () => { });
-                }
-            }, () => { });
-        };
-        SubmissionEditButton.onclick = () => {
-            SwitchPage("EditSubmission", {
-                "SID": Data.SID
-            });
-        };
-        SubmissionDeleteButton.onclick = () => {
-            ShowModal("Delete submission", "Are you sure to delete this submission?", () => {
-                RequestAPI("DeleteSubmission",
-                    {
-                        "SID": Number(Data.SID)
-                    }, () => { }, (Response) => {
-                        ShowSuccess("Delete Submission Success");
-                        SwitchPage("Submissions");
-                    }, () => { }, () => { });
-            }, () => { });
-        };
+                    }
+                }, () => { });
+            };
+
+            let SubmissionEditButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionEditButton);
+            SubmissionEditButton.classList.add("btn", "btn-warning");
+            SubmissionEditButton.innerText = "Edit";
+            SubmissionEditButton.onclick = () => {
+                SwitchPage("EditSubmission", {
+                    "SID": Data.SID
+                });
+            };
+
+            let SubmissionDeleteButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionDeleteButton);
+            SubmissionDeleteButton.classList.add("btn", "btn-danger");
+            SubmissionDeleteButton.innerText = "Delete";
+            SubmissionDeleteButton.onclick = () => {
+                ShowModal("Delete submission", "Are you sure to delete this submission?", () => {
+                    RequestAPI("DeleteSubmission",
+                        {
+                            "SID": Number(Data.SID)
+                        }, () => { }, (Response) => {
+                            ShowSuccess("Delete Submission Success");
+                            SwitchPage("Submissions");
+                        }, () => { }, () => { });
+                }, () => { });
+            };
+        }
+
+        SubmissionData.innerHTML = "";
+        SubmissionData.className = "";
 
         SubmissionData.classList.add("Submission");
         // SubmissionData.classList.add("JudgeResult" + SubmissionResultShortTexts[Response.Result]);

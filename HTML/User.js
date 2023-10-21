@@ -1,3 +1,5 @@
+const UserData = document.getElementById("UserData");
+
 CheckTokenAvailable();
 if (Data.UID == null) {
     SwitchPage("Home");

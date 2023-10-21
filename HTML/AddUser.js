@@ -1,4 +1,11 @@
+const AddUserUsernameInput = document.getElementById("AddUserUsernameInput");
+const AddUserNicknameInput = document.getElementById("AddUserNicknameInput");
+const AddUserPasswordInput = document.getElementById("AddUserPasswordInput");
+const AddUserEmailInput = document.getElementById("AddUserEmailInput");
+const AddUserRoleSelect = document.getElementById("AddUserRoleSelect");
+const AddUserButton = document.getElementById("AddUserButton");
 CheckTokenAvailable();
+
 AddUserUsernameInput.oninput = () => {
     AddUserNicknameInput.value = AddUserUsernameInput.value;
     SetValid(AddUserUsernameInput);
@@ -72,7 +79,7 @@ AddUserButton.onclick = () => {
     }, () => {
         RemoveLoading(AddUserButton);
     }, () => {
-        ShowSuccess("AddUser success");
+        ShowSuccess("Add user success");
         setTimeout(() => {
             SwitchPage("Users");
         }, 1000);

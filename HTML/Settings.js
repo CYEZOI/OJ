@@ -1,3 +1,13 @@
+const SettingsData = document.getElementById("SettingsData");
+const SettingsSystemCallID = document.getElementById("SettingsSystemCallID");
+const SettingsSystemCallName = document.getElementById("SettingsSystemCallName");
+const SettingsSystemCallStatus = document.getElementById("SettingsSystemCallStatus");
+const SettingsSystemCallAllowed = document.getElementById("SettingsSystemCallAllowed");
+const SettingsSystemCallBanned = document.getElementById("SettingsSystemCallBanned");
+const SettingsSystemCallAllowedForTimes = document.getElementById("SettingsSystemCallAllowedForTimes");
+const SettingsSystemCallAllowedForTimesInput = document.getElementById("SettingsSystemCallAllowedForTimesInput");
+const SettingsSave = document.getElementById("SettingsSave");
+
 CheckTokenAvailable();
 let SystemCallList = [];
 const SystemCallsNames = ["read", "write", "open", "close", "stat", "fstat", "lstat", "poll", "lseek", "mmap",

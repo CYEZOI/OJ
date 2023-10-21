@@ -1,3 +1,7 @@
+const LoginUsernameInput = document.getElementById("LoginUsernameInput");
+const LoginPasswordInput = document.getElementById("LoginPasswordInput");
+const LoginButton = document.getElementById("LoginButton");
+
 LoginUsernameInput.oninput = () => {
     SetValid(LoginUsernameInput);
 }

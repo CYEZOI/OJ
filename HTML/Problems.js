@@ -1,3 +1,7 @@
+const ProblemsAddProblemButton = document.getElementById("ProblemsAddProblemButton");
+const ProblemsTable = document.getElementById("ProblemsTable");
+const ProblemsPagination = document.getElementById("ProblemsPagination");
+
 CheckTokenAvailable();
 if (Data.Page == null) {
     Data.Page = 1;
@@ -13,7 +17,7 @@ for (let i = 0; i < 10; i++) {
 }
 ProblemsPagination.children[2].children[0].innerText = Data.Page;
 ProblemsAddProblemButton.onclick = () => {
-    SwitchPage("AddProblem", {});
+    SwitchPage("UploadProblem", {});
 };
 RequestAPI("GetProblems", {
     "Page": Number(Data.Page)

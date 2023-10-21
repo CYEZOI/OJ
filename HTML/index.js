@@ -1,3 +1,8 @@
+const NavigateBar = document.getElementById("NavigateBar");
+const MainContainer = document.getElementById("MainContainer");
+const AlertList = document.getElementById("AlertList");
+const ToastList = document.getElementById("ToastList");
+
 const SubmissionResultShortTexts = ["UKE", "AC", "PE", "WA", "TLE", "ME", "OLE", "RE", "RF", "CE", "SE", "WT", "FC", "CP", "CPD", "JG", "JGD", "CMP", "SK", "RJ"];
 const SubmissionResultTexts = ["Unknown error", "Accepted", "Presentation error", "Wrong answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Output Limit Exceeded", "Runtime error", "Restricted function", "Compilation error", "System error", "Waiting", "Fetched", "Compiling", "Compiled", "Judging", "Judged", "Comparing", "Skipped", "Rejected"];
 const SubmissionResultColors = ["#0000FF", "#49CD32", "#FF778E", "#D3140D", "#0C0066", "#5300A7", "#8300A7", "#1A26C8", "#009182", "#8B7400", "#000000", "#4100D9", "#4C00FF", "#5E19FF", "#7340FF", "#844FFF", "#967FFF", "#A87DFF", "#4B4B4B", "#4E0000"];
@@ -17,6 +22,7 @@ const Requirements = {
     "EmailAddress": "Email address is invalid",
     "EmailVerificationCode": "Verification code must contain six numbers"
 };
+
 const CreateResultSelect = (Element, Value) => {
     Element.className = "form-select";
     for (let i = 0; i < SubmissionResultShortTexts.length; i++) {
@@ -361,6 +367,29 @@ const CheckTokenAvailable = () => {
         SwitchPage("Login");
     }, () => { }, false);
 };
+const CreateHorizontalLine = () => {
+    let HorizontalLine = document.createElement("hr");
+    HorizontalLine.classList.add("border");
+    HorizontalLine.classList.add("border-2");
+    HorizontalLine.classList.add("border-primary");
+    HorizontalLine.classList.add("rounded");
+    return HorizontalLine;
+};
+const CreateMarkdownEditor = (Title, Content, Parent) => {
+    let VditorEditor;
+    let Container = document.createElement("div"); Parent.appendChild(Container);
+    Container.classList.add("form-group");
+    {
+        let Label = document.createElement("label"); Container.appendChild(Label);
+        Label.classList.add("col-form-label");
+        Label.innerHTML = Title;
+        let Editor = document.createElement("div"); Container.appendChild(Editor);
+        VditorEditor = CreateVditorEditor(Editor, Content);
+        Container.appendChild(CreateHorizontalLine());
+    }
+    return VditorEditor;
+};
+
 (() => {
     if (SubmissionResultShortTexts.length != SubmissionResultTexts.length || SubmissionResultShortTexts.length != SubmissionResultColors.length) {
         MainContainer.innerHTML = "System error: SubmissionResultShortTexts, SubmissionResultTexts and SubmissionResultColors have different length";

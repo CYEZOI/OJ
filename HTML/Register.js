@@ -1,3 +1,12 @@
+const RegisterUsernameInput = document.getElementById("RegisterUsernameInput");
+const RegisterNicknameInput = document.getElementById("RegisterNicknameInput");
+const RegisterPasswordInput = document.getElementById("RegisterPasswordInput");
+const RegisterPasswordRepeatInput = document.getElementById("RegisterPasswordRepeatInput");
+const RegisterEmailInput = document.getElementById("RegisterEmailInput");
+const RegisterEmailVerificationCodeButton = document.getElementById("RegisterEmailVerificationCodeButton");
+const RegisterEmailVerificationCodeInput = document.getElementById("RegisterEmailVerificationCodeInput");
+const RegisterButton = document.getElementById("RegisterButton");
+
 RegisterUsernameInput.oninput = () => {
     RegisterNicknameInput.value = RegisterUsernameInput.value;
     SetValid(RegisterUsernameInput);

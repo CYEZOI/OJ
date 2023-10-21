@@ -1,3 +1,6 @@
+const SubmissionsTable = document.getElementById("SubmissionsTable");
+const SubmissionsPagination = document.getElementById("SubmissionsPagination");
+
 CheckTokenAvailable();
 if (Data.Page == null) {
     Data.Page = 1;
@@ -38,17 +41,12 @@ RequestAPI("GetSubmissions", {
     Response.Submissions.sort((a, b) => { return a.PID < b.PID; });
     for (let i = 0; i < Response.Submissions.length; i++) {
         let SubmissionRow = document.createElement("tr"); SubmissionsTable.children[1].appendChild(SubmissionRow);
-        SubmissionRow.role = "button";
         {
             let SubmissionID = document.createElement("td"); SubmissionRow.appendChild(SubmissionID);
             SubmissionID.innerText = Response.Submissions[i].SID;
-            SubmissionID.onclick = () => {
-                SwitchPage("Submission", {
-                    "SID": Response.Submissions[i].SID
-                });
-            };
             let ProblemID = document.createElement("td"); SubmissionRow.appendChild(ProblemID);
             ProblemID.innerText = Response.Submissions[i].PID;
+            ProblemID.role = "button";
             ProblemID.onclick = () => {
                 SwitchPage("Problem", {
                     "PID": Response.Submissions[i].PID
@@ -56,41 +54,29 @@ RequestAPI("GetSubmissions", {
             };
             let UserID = document.createElement("td"); SubmissionRow.appendChild(UserID);
             UserID.innerText = Response.Submissions[i].UID;
+            UserID.role = "button";
             UserID.onclick = () => {
                 SwitchPage("User", {
                     "UID": Response.Submissions[i].UID
                 });
             };
             let SubmissionResult = document.createElement("td"); SubmissionRow.appendChild(SubmissionResult);
-            SubmissionResult.innerText = SubmissionResultShortTexts[Response.Submissions[i].Result];
-            SubmissionResult.style.color = "white";
-            SubmissionResult.style.backgroundColor = SubmissionResultColors[Response.Submissions[i].Result];
-            SubmissionResult.onclick = () => {
+            let SubmissionResultButton = document.createElement("button"); SubmissionResult.appendChild(SubmissionResultButton);
+            SubmissionResultButton.classList.add("btn");
+            SubmissionResultButton.innerText = SubmissionResultShortTexts[Response.Submissions[i].Result];
+            SubmissionResultButton.style.color = "white";
+            SubmissionResultButton.style.backgroundColor = SubmissionResultColors[Response.Submissions[i].Result];
+            SubmissionResultButton.onclick = () => {
                 SwitchPage("Submission", {
                     "SID": Response.Submissions[i].SID
                 });
             };
             let SubmissionTime = document.createElement("td"); SubmissionRow.appendChild(SubmissionTime);
             SubmissionTime.innerText = TimeToString(Response.Submissions[i].Time);
-            SubmissionTime.onclick = () => {
-                SwitchPage("Submission", {
-                    "SID": Response.Submissions[i].SID
-                });
-            };
             let SubmissionMemory = document.createElement("td"); SubmissionRow.appendChild(SubmissionMemory);
             SubmissionMemory.innerText = MemoryToString(Response.Submissions[i].Memory);
-            SubmissionMemory.onclick = () => {
-                SwitchPage("Submission", {
-                    "SID": Response.Submissions[i].SID
-                });
-            };
             let SubmissionCreatedTime = document.createElement("td"); SubmissionRow.appendChild(SubmissionCreatedTime);
             SubmissionCreatedTime.innerText = Response.Submissions[i].CreateTime;
-            SubmissionCreatedTime.onclick = () => {
-                SwitchPage("Submission", {
-                    "SID": Response.Submissions[i].SID
-                });
-            };
             let SubmissionOperation = document.createElement("td"); SubmissionRow.appendChild(SubmissionOperation);
             {
                 let SubmissionOperationButtonGroup = document.createElement("div"); SubmissionOperation.appendChild(SubmissionOperationButtonGroup);
