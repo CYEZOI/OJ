@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Submissions.hpp"
 #include "Utilities.hpp"
 #include "Problems.hpp"
-#include <configor/json.hpp>
+#include "configor/json.hpp"
 
 void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID)
 {

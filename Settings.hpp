@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Logger.hpp"
 #include "Exception.hpp"
-#include <configor/json.hpp>
+#include "configor/json.hpp"
 
 class SETTINGS
 {

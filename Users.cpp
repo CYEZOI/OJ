@@ -34,7 +34,7 @@ void USERS::HashPassword(std::string Password, std::string &HashedPassword)
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
         StringStream << std::hex << (int)Hash[i];
     HashedPassword = StringStream.str();
-    }
+}
 
 void USERS::AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role)
 {
@@ -45,7 +45,7 @@ void USERS::AddUser(std::string Username, std::string Nickname, std::string Hash
         .Insert("EmailAddress", EmailAddress)
         .Insert("Role", Role)
         .Execute();
-    }
+}
 void USERS::CheckUsernameAvailable(std::string Username)
 {
     DATABASE::SELECT("Users")
@@ -54,10 +54,10 @@ void USERS::CheckUsernameAvailable(std::string Username)
         .Execute(
             [](auto Data)
             {
-                if (Data.size() == 0)
-                                    throw EXCEPTION("Username already exist");
+                if (Data.size() != 0)
+                    throw EXCEPTION("Username already exist");
             });
-    }
+}
 void USERS::CheckEmailAvailable(std::string EmailAddress)
 {
     DATABASE::SELECT("Users")
@@ -66,10 +66,10 @@ void USERS::CheckEmailAvailable(std::string EmailAddress)
         .Execute(
             [](auto Data)
             {
-                if (Data.size() == 0)
-                                    throw EXCEPTION("Email already exist");
+                if (Data.size() != 0)
+                    throw EXCEPTION("Email already exist");
             });
-    }
+}
 void USERS::CheckPasswordCorrect(std::string Username, std::string HashedPassword, int &UID)
 {
     DATABASE::SELECT("Users")
@@ -82,8 +82,8 @@ void USERS::CheckPasswordCorrect(std::string Username, std::string HashedPasswor
                 if (Data.size() == 0)
                     throw EXCEPTION("Username or password incorrect");
                 UID = atoi(Data[0]["UID"].c_str());
-                            });
-    }
+            });
+}
 void USERS::IsAdmin(int UID, bool &Result)
 {
     DATABASE::SELECT("Users")
@@ -95,8 +95,8 @@ void USERS::IsAdmin(int UID, bool &Result)
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
                 Result = (atoi(Data[0]["Role"].c_str()) == USER_ROLE::USER_ROLE_ADMIN);
-                            });
-    }
+            });
+}
 void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
 {
     DATABASE::UPDATE("Users")
@@ -107,13 +107,13 @@ void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std:
         .Set("Role", Role)
         .Where("UID", UID)
         .Execute();
-    }
+}
 void USERS::DeleteUser(int UID)
 {
     DATABASE::DELETE("Users")
         .Where("UID", UID)
         .Execute();
-    }
+}
 void USERS::GetUser(int UID, USER &User)
 {
     DATABASE::SELECT("Users")
@@ -133,5 +133,5 @@ void USERS::GetUser(int UID, USER &User)
                 User.EmailAddress = Data[0]["EmailAddress"];
                 User.Nickname = Data[0]["Nickname"];
                 User.Role = atoi(Data[0]["Role"].c_str());
-                            });
-    }
+            });
+}

@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Problems.hpp"
 #include "Database.hpp"
-#include <configor/json.hpp>
+#include "configor/json.hpp"
 
 void PROBLEMS::JSONToSamples(std::string JSONData, std::vector<SAMPLE> &Samples)
 {

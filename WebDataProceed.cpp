@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "WebDataProceed.hpp"
 #include "APIProceed.hpp"
-#include "Exception.hpp"
+#include "Excpetion.hpp"
 #include "Utilities.hpp"
 #include "Settings.hpp"
 #include "Files.hpp"
