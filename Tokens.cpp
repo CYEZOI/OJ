@@ -31,7 +31,7 @@ void TOKENS::CreateToken(int UID, std::string &TokenValue)
             {
                 if (Data.size() != 0)
                     DeleteToken(Data[0]["TokenValue"]);
-                            });
+            });
     TokenValue = "";
     const std::string TokenCharList = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     for (int i = 0; i < 32; i++)
@@ -40,7 +40,7 @@ void TOKENS::CreateToken(int UID, std::string &TokenValue)
         .Insert("UID", UID)
         .Insert("TokenValue", TokenValue)
         .Execute();
-    }
+}
 void TOKENS::CheckToken(std::string TokenValue)
 {
     DATABASE::SELECT("Tokens")
@@ -56,16 +56,17 @@ void TOKENS::CheckToken(std::string TokenValue)
                     DeleteToken(TokenValue);
                     throw EXCEPTION("Token expired");
                 }
-                            });
-    }
+            });
+}
 void TOKENS::DeleteToken(std::string TokenValue)
 {
     DATABASE::DELETE("Tokens")
         .Where("TokenValue", TokenValue)
         .Execute();
-    }
-void TOKENS::GetUID(std::string TokenValue, int &UID)
+}
+int TOKENS::GetUID(std::string TokenValue)
 {
+    int UID;
     DATABASE::SELECT("Tokens")
         .Select("UID")
         .Where("TokenValue", TokenValue)
@@ -75,5 +76,6 @@ void TOKENS::GetUID(std::string TokenValue, int &UID)
                 if (Data.size() != 1)
                     throw EXCEPTION("Token invalid");
                 UID = std::stoi(Data[0]["UID"]);
-                            });
-    }
+            });
+    return UID;
+}

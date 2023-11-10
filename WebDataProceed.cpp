@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "WebDataProceed.hpp"
 #include "APIProceed.hpp"
-#include "Excpetion.hpp"
+#include "Exception.hpp"
 #include "Utilities.hpp"
 #include "Settings.hpp"
 #include "Files.hpp"
@@ -60,11 +60,8 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                 std::string UserToken = HTTPRequest.Headers["X-Upload-Token"];
                 if (UserToken == "")
                     throw EXCEPTION("No token");
-                int UID;
-                TOKENS::GetUID(UserToken, UID);
-                bool IsAdmin;
-                USERS::IsAdmin(UID, IsAdmin);
-                if (!IsAdmin)
+                int UID = TOKENS::GetUID(UserToken);
+                if (!USERS::IsAdmin(UID))
                     throw EXCEPTION("Not admin");
                 size_t BoundaryStartPosition = HTTPRequest.Headers["Content-Type"].find("boundary=");
                 if (BoundaryStartPosition == std::string::npos)

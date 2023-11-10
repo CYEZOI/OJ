@@ -353,10 +353,6 @@ if (Data.PID != null) {
     RequestAPI("GetProblem", {
         "PID": String(Data.PID)
     }, () => { }, (Response) => {
-        if (!Response.IsAdmin) {
-            SwitchPage("Home");
-        }
-
         IOFilenameInput.value = Response.IOFilename;
         Title.value = Response.Title;
 

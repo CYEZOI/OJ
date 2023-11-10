@@ -32,7 +32,7 @@ public:
     static void CheckUsernameAvailable(std::string Username);
     static void CheckEmailAvailable(std::string EmailAddress);
     static void CheckPasswordCorrect(std::string Username, std::string HashedPassword, int &UID);
-    static void IsAdmin(int UID, bool &Result);
+    static bool IsAdmin(int UID);
     static void UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role);
     static void DeleteUser(int UID);
     static void GetUser(int UID, USER &User);

@@ -60,6 +60,7 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     ResponseJSON["Success"] = true;
     ResponseJSON["Message"] = "Login succeeds";
     ResponseJSON["Data"]["Token"] = Token;
+    ResponseJSON["Data"]["IsAdmin"] = USERS::IsAdmin(UID);
     return ResponseJSON;
 }
 configor::json API_PROCEED::CheckUsernameAvailable(std::string Username)
@@ -100,9 +101,11 @@ configor::json API_PROCEED::Register(std::string Username, std::string Nickname,
 }
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
 {
+    if (!IsAdmin)
+        CREATE_JSON(false, "Not admin");
     std::string HashedPassword;
     RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
-    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, USER_ROLE::USER_ROLE_USER))
+    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, Role))
     CREATE_JSON(true, "Add user succeeds");
 }
 configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
@@ -508,21 +511,6 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                     Data["EmailAddress"].as_string(),
                                     Data["VerificationCode"].as_string());
     }
-    else if (Action == "AddUser")
-    {
-        if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
-                               {"Nickname", configor::config_value_type::string},
-                               {"Password", configor::config_value_type::string},
-                               {"EmailAddress", configor::config_value_type::string},
-                               {"Role", configor::config_value_type::number_integer}}))
-            ResponseJSON["Message"] = "Invalid parameters";
-        else
-            ResponseJSON = AddUser(Data["Username"].as_string(),
-                                   Data["Nickname"].as_string(),
-                                   Data["Password"].as_string(),
-                                   Data["EmailAddress"].as_string(),
-                                   (USER_ROLE)Data["Role"].as_integer());
-    }
     else if (Action == "CheckUsernameAvailable")
     {
         if (!CheckTypes(Data, {{"Username", configor::config_value_type::string}}))
@@ -560,10 +548,25 @@ configor::json API_PROCEED::Proceed(configor::json Request)
         Token = Data["Token"].as_string();
         if (!CheckTokenAvailable(Token)["Success"].as_bool())
             CREATE_JSON(false, "Invalid token");
-        RETURN_JSON_IF_FAILED(TOKENS::GetUID(Token, UID));
-        RETURN_JSON_IF_FAILED(USERS::IsAdmin(UID, IsAdmin));
+        RETURN_JSON_IF_FAILED(UID = TOKENS::GetUID(Token));
+        RETURN_JSON_IF_FAILED(IsAdmin = USERS::IsAdmin(UID));
 
-        if (Action == "GetUser")
+        if (Action == "AddUser")
+        {
+            if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
+                                   {"Nickname", configor::config_value_type::string},
+                                   {"Password", configor::config_value_type::string},
+                                   {"EmailAddress", configor::config_value_type::string},
+                                   {"Role", configor::config_value_type::number_integer}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = AddUser(Data["Username"].as_string(),
+                                       Data["Nickname"].as_string(),
+                                       Data["Password"].as_string(),
+                                       Data["EmailAddress"].as_string(),
+                                       (USER_ROLE)Data["Role"].as_integer());
+        }
+        else if (Action == "GetUser")
         {
             if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
                 ResponseJSON["Message"] = "Invalid parameters";
@@ -760,7 +763,6 @@ configor::json API_PROCEED::Proceed(configor::json Request)
         }
         else
             ResponseJSON["Message"] = "No such action";
-        ResponseJSON["Data"]["IsAdmin"] = IsAdmin;
     }
     return ResponseJSON;
 }

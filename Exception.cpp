@@ -26,5 +26,8 @@ EXCEPTION::EXCEPTION()
 EXCEPTION::EXCEPTION(std::string Message)
 {
     this->Message = Message;
-    Logger.Warning(Message + " " + std::to_string(errno) + ":" + strerror(errno));
+    if (errno == 0)
+        Logger.Warning(Message);
+    else
+        Logger.Warning(Message + "  " + std::to_string(errno) + ": " + strerror(errno));
 }

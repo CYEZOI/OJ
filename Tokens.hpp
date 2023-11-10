@@ -26,5 +26,5 @@ public:
     static void CreateToken(int UID, std::string &TokenValue);
     static void CheckToken(std::string TokenValue);
     static void DeleteToken(std::string TokenValue);
-    static void GetUID(std::string TokenValue, int &UID);
+    static int GetUID(std::string TokenValue);
 };

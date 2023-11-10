@@ -221,7 +221,8 @@ const AddLoading = (Element) => {
 };
 const RemoveLoading = (Element) => {
     Element.disabled = false;
-    Element.removeChild(Element.lastChild);
+    if (Element.lastChild.classList.contains("spinner-border"))
+        Element.removeChild(Element.lastChild);
 };
 const SetValid = (Element, Valid = null) => {
     Element.classList.remove("is-valid");
@@ -391,6 +392,14 @@ const CreateMarkdownEditor = (Title, Content, Parent) => {
 };
 
 (() => {
+    if (localStorage.getItem("IsAdmin") !== null) {
+        const AddonStyle = document.getElementById("AddonStyle");
+        AddonStyle.innerHTML = ".NotLoginOnly { display: none; }";
+        if (localStorage.getItem("IsAdmin") != true) {
+            AddonStyle.innerHTML += ".AdminOnly { display: none; }";
+        }
+    }
+
     if (SubmissionResultShortTexts.length != SubmissionResultTexts.length || SubmissionResultShortTexts.length != SubmissionResultColors.length) {
         MainContainer.innerHTML = "System error: SubmissionResultShortTexts, SubmissionResultTexts and SubmissionResultColors have different length";
         return;
@@ -400,7 +409,6 @@ const CreateMarkdownEditor = (Title, Content, Parent) => {
             SwitchPage(NavigateBar.children[0].children[i].children[0].innerText);
         };
     }
-    CheckTokenAvailable();
     if (new URLSearchParams(window.location.search).get("Page") !== null) {
         let Data = {};
         for (let i of new URLSearchParams(window.location.search).entries()) {

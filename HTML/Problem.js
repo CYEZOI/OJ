@@ -71,10 +71,6 @@ RequestAPI("GetProblem", {
 }, () => { }, (Response) => {
     ProblemData.innerHTML = "";
     document.getElementsByTagName("h4")[0].innerHTML += ": " + Response.Title;
-    if (!Response.IsAdmin) {
-        ProblemEditButton.remove();
-        ProblemDeleteButton.remove();
-    }
 
     CreateAccordion("Description", Response.Description, "Description");
     CreateAccordion("Input", Response.Input, "Input");

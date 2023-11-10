@@ -35,6 +35,12 @@ LoginButton.onclick = () => {
         RemoveLoading(LoginButton);
     }, (Response) => {
         localStorage.setItem("Token", Response.Token);
+        localStorage.setItem("IsAdmin", Response.IsAdmin);
+        const AddonStyle = document.getElementById("AddonStyle");
+        AddonStyle.innerHTML = ".NotLoginOnly { display: none; }";
+        if (!Response.IsAdmin) {
+            AddonStyle.innerHTML += ".AdminOnly { display: none; }";
+        }
         ShowSuccess("Login success");
         setTimeout(() => {
             SwitchPage("Home");

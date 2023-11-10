@@ -33,6 +33,12 @@
 
     <link href="Libs/vditor/3.9.2/index.css" rel="stylesheet">
     <script src="Libs/vditor/3.9.2/index.min.js"></script>
+
+    <style id="AddonStyle">
+        .LoginOnly {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="placeholder-glow">
@@ -46,22 +52,28 @@
                 <div class="collapse navbar-collapse" id="NavigateBar">
                     <ul class="navbar-nav me-auto mt-2 mt-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Home</a>
+                            <a class="nav-link NotLoginOnly" href="#">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Problems</a>
+                            <a class="nav-link NotLoginOnly" href="#">Register</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Submissions</a>
+                            <a class="nav-link LoginOnly" href="#">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Users</a>
+                            <a class="nav-link LoginOnly" href="#">Problems</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Settings</a>
+                            <a class="nav-link LoginOnly" href="#">Submissions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Logout</a>
+                            <a class="nav-link LoginOnly AdminOnly" href="#">Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link LoginOnly AdminOnly" href="#">Settings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link LoginOnly" href="#">Logout</a>
                         </li>
                     </ul>
                 </div>

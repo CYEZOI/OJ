@@ -22,9 +22,6 @@ ProblemsAddProblemButton.onclick = () => {
 RequestAPI("GetProblems", {
     "Page": Number(Data.Page)
 }, () => { }, (Response) => {
-    if (!Response.IsAdmin) {
-        ProblemsTable.children[0].children[2].remove();
-    }
     ProblemsPagination.children[0].children[0].setAttribute("data-page-number", 1);
     ProblemsPagination.children[1].children[0].setAttribute("data-page-number", Math.max(Data.Page - 1, 1));
     ProblemsPagination.children[2].children[0].setAttribute("data-page-number", Data.Page);
@@ -65,22 +62,19 @@ RequestAPI("GetProblems", {
             };
             let ProblemOperationColumn = document.createElement("td"); ProblemRow.appendChild(ProblemOperationColumn);
             {
-                let ProblemOperationButtonGroup = document.createElement("div"); ProblemOperationColumn.appendChild(ProblemOperationButtonGroup);
-                ProblemOperationButtonGroup.classList.add("btn-group");
-                ProblemOperationButtonGroup.role = "group";
+                let ProblemOperationButtons = document.createElement("div"); ProblemOperationColumn.appendChild(ProblemOperationButtons);
+                ProblemOperationButtons.role = "group";
                 {
-                    let ProblemOperationSubmitButton = document.createElement("button"); ProblemOperationButtonGroup.appendChild(ProblemOperationSubmitButton);
-                    ProblemOperationSubmitButton.classList.add("btn");
-                    ProblemOperationSubmitButton.classList.add("btn-primary");
+                    let ProblemOperationSubmitButton = document.createElement("button"); ProblemOperationButtons.appendChild(ProblemOperationSubmitButton);
+                    ProblemOperationSubmitButton.classList.add("btn", "btn-primary", "me-2");
                     ProblemOperationSubmitButton.innerText = "Submit";
                     ProblemOperationSubmitButton.onclick = () => {
                         SwitchPage("Submit", {
                             "PID": Response.Problems[i].PID
                         });
                     }
-                    let ProblemOperationSubmissionsButton = document.createElement("button"); ProblemOperationButtonGroup.appendChild(ProblemOperationSubmissionsButton);
-                    ProblemOperationSubmissionsButton.classList.add("btn");
-                    ProblemOperationSubmissionsButton.classList.add("btn-secondary");
+                    let ProblemOperationSubmissionsButton = document.createElement("button"); ProblemOperationButtons.appendChild(ProblemOperationSubmissionsButton);
+                    ProblemOperationSubmissionsButton.classList.add("btn", "btn-secondary", "me-2");
                     ProblemOperationSubmissionsButton.innerText = "Submissions";
                     ProblemOperationSubmissionsButton.onclick = () => {
                         SwitchPage("Submissions", {
@@ -89,31 +83,27 @@ RequestAPI("GetProblems", {
                             ]
                         });
                     }
-                    if (Response.IsAdmin) {
-                        let ProblemOperationEditButton = document.createElement("button"); ProblemOperationButtonGroup.appendChild(ProblemOperationEditButton);
-                        ProblemOperationEditButton.classList.add("btn");
-                        ProblemOperationEditButton.classList.add("btn-warning");
-                        ProblemOperationEditButton.innerText = "Edit";
-                        ProblemOperationEditButton.onclick = () => {
-                            SwitchPage("EditProblem", {
-                                "PID": Response.Problems[i].PID
-                            });
-                        }
-                        let ProblemOperationDeleteButton = document.createElement("button"); ProblemOperationButtonGroup.appendChild(ProblemOperationDeleteButton);
-                        ProblemOperationDeleteButton.classList.add("btn");
-                        ProblemOperationDeleteButton.classList.add("btn-danger");
-                        ProblemOperationDeleteButton.innerText = "Delete";
-                        ProblemOperationDeleteButton.onclick = () => {
-                            ShowModal("Delete problem", "Are you sure to delete this problem?", () => {
-                                RequestAPI("DeleteProblem",
-                                    {
-                                        "PID": String(Response.Problems[i].PID)
-                                    }, () => { }, (Response) => {
-                                        ShowSuccess("Delete Problem Success");
-                                        ProblemRow.remove();
-                                    }, () => { }, () => { });
-                            }, () => { });
-                        }
+                    let ProblemOperationEditButton = document.createElement("button"); ProblemOperationButtons.appendChild(ProblemOperationEditButton);
+                    ProblemOperationEditButton.classList.add("btn", "btn-warning", "me-2", "AdminOnly");
+                    ProblemOperationEditButton.innerText = "Edit";
+                    ProblemOperationEditButton.onclick = () => {
+                        SwitchPage("EditProblem", {
+                            "PID": Response.Problems[i].PID
+                        });
+                    }
+                    let ProblemOperationDeleteButton = document.createElement("button"); ProblemOperationButtons.appendChild(ProblemOperationDeleteButton);
+                    ProblemOperationDeleteButton.classList.add("btn", "btn-danger", "me-2", "AdminOnly");
+                    ProblemOperationDeleteButton.innerText = "Delete";
+                    ProblemOperationDeleteButton.onclick = () => {
+                        ShowModal("Delete problem", "Are you sure to delete this problem?", () => {
+                            RequestAPI("DeleteProblem",
+                                {
+                                    "PID": String(Response.Problems[i].PID)
+                                }, () => { }, (Response) => {
+                                    ShowSuccess("Delete Problem Success");
+                                    ProblemRow.remove();
+                                }, () => { }, () => { });
+                        }, () => { });
                     }
                 }
             }

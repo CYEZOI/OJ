@@ -84,18 +84,20 @@ void USERS::CheckPasswordCorrect(std::string Username, std::string HashedPasswor
                 UID = atoi(Data[0]["UID"].c_str());
             });
 }
-void USERS::IsAdmin(int UID, bool &Result)
+bool USERS::IsAdmin(int UID)
 {
+    bool IsAdmin;
     DATABASE::SELECT("Users")
         .Select("Role")
         .Where("UID", UID)
         .Execute(
-            [&Result](auto Data)
+            [&IsAdmin](auto Data)
             {
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
-                Result = (atoi(Data[0]["Role"].c_str()) == USER_ROLE::USER_ROLE_ADMIN);
+                IsAdmin = (atoi(Data[0]["Role"].c_str()) == USER_ROLE::USER_ROLE_ADMIN);
             });
+    return IsAdmin;
 }
 void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
 {

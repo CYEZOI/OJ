@@ -34,9 +34,6 @@ TitleElement.innerText += " " + Data.SID;
 RequestAPI("GetSubmission", {
     "SID": Number(Data.SID)
 }, () => { }, (Response) => {
-    if (!Response.IsAdmin) {
-        SwitchPage("Home");
-    }
     EditSubmissionEnableO2.checked = Response.EnableO2;
     EditSubmissionPID.value = Response.PID;
     EditSubmissionUID.value = Response.UID;

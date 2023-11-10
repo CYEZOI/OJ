@@ -31,9 +31,6 @@ RequestAPI("GetUsers", {
     "Page": Number(Data.Page)
 }, () => { }, (Response) => {
     UsersData.children[1].innerHTML = "";
-    if (!Response.IsAdmin) {
-        SwitchPage("Home");
-    }
     for (let i = 0; i < Response.Users.length; i++) {
         let DataRow = document.createElement("tr"); UsersData.children[1].appendChild(DataRow);
         {

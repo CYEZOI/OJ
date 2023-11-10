@@ -124,7 +124,7 @@ RegisterEmailVerificationCodeInput.onblur = () => {
 }
 RegisterButton.onclick = () => {
     AddLoading(RegisterButton);
-    RequestAPI("AddUser", {
+    RequestAPI("Register", {
         "Username": String(RegisterUsernameInput.value),
         "Nickname": String(RegisterNicknameInput.value),
         "Password": String(RegisterPasswordInput.value),
