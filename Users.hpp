@@ -27,13 +27,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class USERS
 {
 public:
-    static void HashPassword(std::string Password, std::string &HashedPassword);
+    static std::string HashPassword(std::string Password);
     static void AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role);
     static void CheckUsernameAvailable(std::string Username);
     static void CheckEmailAvailable(std::string EmailAddress);
     static void CheckPasswordCorrect(std::string Username, std::string HashedPassword, int &UID);
     static bool IsAdmin(int UID);
     static void UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role);
+    static void UpdateUserPassword(int UID, std::string HashedPassword);
     static void DeleteUser(int UID);
     static void GetUser(int UID, USER &User);
+    static int GetUIDByEmailAddress(std::string EmailAddress);
 };

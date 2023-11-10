@@ -41,6 +41,8 @@ private:
     configor::json SendVerificationCode(std::string EmailAddress);
     configor::json Login(std::string Username, std::string Password);
     configor::json Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode);
+    configor::json ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password);
+
     configor::json AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role);
     configor::json GetUser(int UID);
     configor::json UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role);

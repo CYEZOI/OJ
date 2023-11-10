@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Settings.hpp"
 #include <openssl/sha.h>
 
-void USERS::HashPassword(std::string Password, std::string &HashedPassword)
+std::string USERS::HashPassword(std::string Password)
 {
     std::string Salt1, Salt2;
     SETTINGS::GetSettings("PasswordSalt1", Salt1);
@@ -33,7 +33,7 @@ void USERS::HashPassword(std::string Password, std::string &HashedPassword)
     std::stringstream StringStream;
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
         StringStream << std::hex << (int)Hash[i];
-    HashedPassword = StringStream.str();
+    return StringStream.str();
 }
 
 void USERS::AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role)
@@ -81,7 +81,7 @@ void USERS::CheckPasswordCorrect(std::string Username, std::string HashedPasswor
             {
                 if (Data.size() == 0)
                     throw EXCEPTION("Username or password incorrect");
-                UID = atoi(Data[0]["UID"].c_str());
+                UID = std::stoi(Data[0]["UID"]);
             });
 }
 bool USERS::IsAdmin(int UID)
@@ -95,7 +95,7 @@ bool USERS::IsAdmin(int UID)
             {
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
-                IsAdmin = (atoi(Data[0]["Role"].c_str()) == USER_ROLE::USER_ROLE_ADMIN);
+                IsAdmin = (std::stoi(Data[0]["Role"]) == USER_ROLE::USER_ROLE_ADMIN);
             });
     return IsAdmin;
 }
@@ -107,6 +107,13 @@ void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std:
         .Set("Password", HashedPassword)
         .Set("EmailAddress", EmailAddress)
         .Set("Role", Role)
+        .Where("UID", UID)
+        .Execute();
+}
+void USERS::UpdateUserPassword(int UID, std::string HashedPassword)
+{
+    DATABASE::UPDATE("Users")
+        .Set("Password", HashedPassword)
         .Where("UID", UID)
         .Execute();
 }
@@ -130,10 +137,25 @@ void USERS::GetUser(int UID, USER &User)
             {
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
-                User.UID = atoi(Data[0]["UID"].c_str());
+                User.UID = std::stoi(Data[0]["UID"]);
                 User.Username = Data[0]["Username"];
                 User.EmailAddress = Data[0]["EmailAddress"];
                 User.Nickname = Data[0]["Nickname"];
-                User.Role = atoi(Data[0]["Role"].c_str());
+                User.Role = std::stoi(Data[0]["Role"]);
             });
+}
+int USERS::GetUIDByEmailAddress(std::string EmailAddress)
+{
+    int UID = 0;
+    DATABASE::SELECT("Users")
+        .Select("UID")
+        .Where("EmailAddress", EmailAddress)
+        .Execute(
+            [&UID](auto Data)
+            {
+                if (Data.size() == 0)
+                    throw EXCEPTION("No such user");
+                UID = std::stoi(Data[0]["UID"]);
+            });
+    return UID;
 }

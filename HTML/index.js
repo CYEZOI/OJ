@@ -23,6 +23,26 @@ const Requirements = {
     "EmailVerificationCode": "Verification code must contain six numbers"
 };
 
+const PathToName = (Path) => {
+    let Name = "";
+    for (let i = 0; i < Path.length; i++) {
+        if (i != 0 && Path.charCodeAt(i) >= 65 && Path.charCodeAt(i) <= 90) {
+            Name += " " + Path[i].toLowerCase();
+        }
+        else {
+            Name += Path[i];
+        }
+    }
+    return Name;
+};
+const NameToPath = (Name) => {
+    Name = Name.split(" ");
+    let Path = "";
+    for (let i = 0; i < Name.length; i++) {
+        Path += Name[i].charAt(0).toUpperCase() + Name[i].substr(1)
+    }
+    return Path;
+};
 const CreateResultSelect = (Element, Value) => {
     Element.className = "form-select";
     for (let i = 0; i < SubmissionResultShortTexts.length; i++) {
@@ -313,16 +333,7 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
         }, Path, URLPath);
     }
 
-    let LoweredPath = "";
-    for (let i = 0; i < Path.length; i++) {
-        if (i != 0 && Path.charCodeAt(i) >= 65 && Path.charCodeAt(i) <= 90) {
-            LoweredPath += " " + Path[i].toLowerCase();
-        }
-        else {
-            LoweredPath += Path[i];
-        }
-    }
-    document.title = LoweredPath;
+    document.title = PathToName(Path);
     for (let i = 0; i < NavigateBar.children[0].children.length; i++) {
         if (NavigateBar.children[0].children[i].innerText == Path) {
             NavigateBar.children[0].children[i].children[0].classList.add("active");
@@ -348,7 +359,7 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
                 .then((JSResponse) => {
                     return JSResponse.text();
                 }).then((JSResponse) => {
-                    MainContainer.innerHTML = "<h4>" + LoweredPath + "</h4>"
+                    MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
                         + HTMLResponse;
                     window.Data = Data;
                     eval(JSResponse);
@@ -406,7 +417,7 @@ const CreateMarkdownEditor = (Title, Content, Parent) => {
     }
     for (let i = 0; i < NavigateBar.children[0].children.length; i++) {
         NavigateBar.children[0].children[i].children[0].onclick = () => {
-            SwitchPage(NavigateBar.children[0].children[i].children[0].innerText);
+            SwitchPage(NameToPath(NavigateBar.children[0].children[i].children[0].innerText));
         };
     }
     if (new URLSearchParams(window.location.search).get("Page") !== null) {

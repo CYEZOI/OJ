@@ -51,9 +51,7 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     RETURN_JSON_IF_FAILED(REGEXES::CheckUsername(Username))
     RETURN_JSON_IF_FAILED(REGEXES::CheckPassword(Password))
     int UID;
-    std::string HashedPassword;
-    RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
-    RETURN_JSON_IF_FAILED(USERS::CheckPasswordCorrect(Username, HashedPassword, UID))
+    RETURN_JSON_IF_FAILED(USERS::CheckPasswordCorrect(Username, USERS::HashPassword(Password), UID))
     std::string Token;
     RETURN_JSON_IF_FAILED(TOKENS::CreateToken(UID, Token))
     configor::json ResponseJSON = BaseJSON;
@@ -94,18 +92,24 @@ configor::json API_PROCEED::Register(std::string Username, std::string Nickname,
     RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(EmailAddress))
     RETURN_JSON_IF_FAILED(USERS::CheckUsernameAvailable(Username))
     RETURN_JSON_IF_FAILED(USERS::CheckEmailAvailable(EmailAddress))
-    std::string HashedPassword;
-    RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
-    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, USER_ROLE::USER_ROLE_USER))
+    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, USERS::HashPassword(Password), EmailAddress, USER_ROLE::USER_ROLE_USER))
     CREATE_JSON(true, "Register succeeds");
 }
+configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password)
+{
+    RETURN_JSON_IF_FAILED(REGEXES::CheckEmailAddress(EmailAddress))
+    RETURN_JSON_IF_FAILED(REGEXES::CheckVerificationCode(VerificationCode))
+    RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(EmailAddress, VerificationCode))
+    RETURN_JSON_IF_FAILED(EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(EmailAddress))
+    RETURN_JSON_IF_FAILED(USERS::UpdateUserPassword(USERS::GetUIDByEmailAddress(EmailAddress), USERS::HashPassword(Password)));
+    CREATE_JSON(true, "Reset password succeeds");
+}
+
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
 {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
-    std::string HashedPassword;
-    RETURN_JSON_IF_FAILED(USERS::HashPassword(Password, HashedPassword))
-    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, HashedPassword, EmailAddress, Role))
+    RETURN_JSON_IF_FAILED(USERS::AddUser(Username, Nickname, USERS::HashPassword(Password), EmailAddress, Role))
     CREATE_JSON(true, "Add user succeeds");
 }
 configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
@@ -187,11 +191,9 @@ configor::json API_PROCEED::HashPassword(std::string OriginalPassword)
 {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
-    std::string HashedPassword;
-    RETURN_JSON_IF_FAILED(USERS::HashPassword(OriginalPassword, HashedPassword));
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
-    ResponseJSON["Data"]["HashedPassword"] = HashedPassword;
+    ResponseJSON["Data"]["HashedPassword"] = USERS::HashPassword(OriginalPassword);
     return ResponseJSON;
 }
 
@@ -540,6 +542,17 @@ configor::json API_PROCEED::Proceed(configor::json Request)
         else
             ResponseJSON = Login(Data["Username"].as_string(),
                                  Data["Password"].as_string());
+    }
+    else if (Action == "ResetPassword")
+    {
+        if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string},
+                               {"VerificationCode", configor::config_value_type::string},
+                               {"Password", configor::config_value_type::string}}))
+            ResponseJSON["Message"] = "Invalid parameters";
+        else
+            ResponseJSON = ResetPassword(Data["EmailAddress"].as_string(),
+                                         Data["VerificationCode"].as_string(),
+                                         Data["Password"].as_string());
     }
     else
     {
