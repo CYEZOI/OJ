@@ -11,9 +11,9 @@ AddUserUsernameInput.oninput = () => {
     SetValid(AddUserUsernameInput);
 }
 AddUserUsernameInput.onblur = () => {
-    if (AddUserUsernameInput.value == "") {
+    if (!Regexes.Username.test(AddUserUsernameInput.value)) {
         SetValid(AddUserUsernameInput, false);
-        ShowError("Username can't be empty");
+        ShowError(Requirements.Username);
     }
     else {
         RequestAPI("CheckUsernameAvailable", {
@@ -29,9 +29,9 @@ AddUserNicknameInput.oninput = () => {
     SetValid(AddUserNicknameInput);
 }
 AddUserNicknameInput.onblur = () => {
-    if (AddUserNicknameInput.value == "") {
+    if (!Regexes.Nickname.test(AddUserNicknameInput.value)) {
         SetValid(AddUserNicknameInput, false);
-        ShowError("Nickname can't be empty");
+        ShowError(Requirements.Nickname);
     }
     else {
         SetValid(AddUserNicknameInput, true);
@@ -41,9 +41,9 @@ AddUserPasswordInput.oninput = () => {
     SetValid(AddUserPasswordInput);
 }
 AddUserPasswordInput.onblur = () => {
-    if (AddUserPasswordInput.value == "") {
+    if (Regexes.Password.test(AddUserPasswordInput.value)) {
         SetValid(AddUserPasswordInput, false);
-        ShowError("Password can't be empty");
+        ShowError(Requirements.Password);
     }
     else {
         SetValid(AddUserPasswordInput, true);
@@ -53,9 +53,9 @@ AddUserEmailInput.oninput = () => {
     SetValid(AddUserEmailInput);
 }
 AddUserEmailInput.onblur = () => {
-    if (AddUserEmailInput.value == "") {
+    if (!Regexes.EmailAddress.test(AddUserEmailInput.value)) {
         SetValid(AddUserEmailInput, false);
-        ShowError("Email can't be empty");
+        ShowError(Requirements.EmailAddress);
     }
     else {
         RequestAPI("CheckEmailAvailable", {

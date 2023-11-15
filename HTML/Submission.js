@@ -1,4 +1,9 @@
 const SubmissionButtonGroup = document.getElementById("SubmissionButtonGroup");
+const SubmissionGoToProblemButton = document.getElementById("SubmissionGoToProblemButton");
+const SubmissionResubmitButton = document.getElementById("SubmissionResubmitButton");
+const SubmissionRejudgeButton = document.getElementById("SubmissionRejudgeButton");
+const SubmissionEditButton = document.getElementById("SubmissionEditButton");
+const SubmissionDeleteButton = document.getElementById("SubmissionDeleteButton");
 const SubmissionSpinner = document.getElementById("SubmissionSpinner");
 const SubmissionData = document.getElementById("SubmissionData");
 const SubmissionCode = document.getElementById("SubmissionCode");
@@ -8,7 +13,54 @@ if (Data.SID == null) {
     SwitchPage("Home");
 }
 
-document.getElementsByTagName("h4")[0].innerHTML += " " + Data.SID;
+SubmissionGoToProblemButton.onclick = () => {
+    SwitchPage("Problem", {
+        "PID": Response.PID
+    });
+};
+SubmissionResubmitButton.onclick = () => {
+    SwitchPage("Submit", {
+        "PID": Response.PID
+    });
+};
+SubmissionRejudgeButton.onclick = () => {
+    ShowModal("Rejudge submission", "Are you sure to rejudge it?", () => {
+        if (Response.Result > 10) {
+            ShowModal("Rejudge submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
+                RequestAPI("RejudgeSubmission", {
+                    "SID": Number(Data.SID)
+                }, () => { }, () => {
+                    ReloadData();
+                }, () => { });
+            }, () => { });
+        }
+        else {
+            RequestAPI("RejudgeSubmission", {
+                "SID": Number(Data.SID)
+            }, () => { }, () => {
+                ReloadData();
+            }, () => { });
+        }
+    }, () => { });
+};
+SubmissionEditButton.onclick = () => {
+    SwitchPage("EditSubmission", {
+        "SID": Data.SID
+    });
+};
+SubmissionDeleteButton.onclick = () => {
+    ShowModal("Delete submission", "Are you sure to delete this submission?", () => {
+        RequestAPI("DeleteSubmission",
+            {
+                "SID": Number(Data.SID)
+            }, () => { }, (Response) => {
+                ShowSuccess("Delete Submission Success");
+                SwitchPage("Submissions");
+            }, () => { }, () => { });
+    }, () => { });
+};
+
+PageTitle.innerHTML += " " + Data.SID;
 let SubmissionSpinnerCollapse = new bootstrap.Collapse("#SubmissionSpinner", {
     toggle: false
 });
@@ -17,78 +69,7 @@ const ReloadData = () => {
     RequestAPI("GetSubmission", {
         "SID": Number(Data.SID)
     }, () => { }, (Response) => {
-        SubmissionButtonGroup.innerHTML = ``;
-        let SubmissionGoToProblemButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionGoToProblemButton);
-        SubmissionGoToProblemButton.classList.add("btn", "btn-primary");
-        SubmissionGoToProblemButton.innerText = "Go to problem";
-        SubmissionGoToProblemButton.onclick = () => {
-            SwitchPage("Problem", {
-                "PID": Response.PID
-            });
-        };
-
-        let SubmissionResubmitButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionResubmitButton);
-        SubmissionResubmitButton.classList.add("btn", "btn-secondary");
-        SubmissionResubmitButton.innerText = "Resubmit";
-        SubmissionResubmitButton.onclick = () => {
-            SwitchPage("Submit", {
-                "PID": Response.PID
-            });
-        };
-
-        let SubmissionRejudgeButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionRejudgeButton);
-        SubmissionRejudgeButton.classList.add("btn", "btn-warning", "AdminOnly");
-        SubmissionRejudgeButton.innerText = "Rejudge";
-        SubmissionRejudgeButton.onclick = () => {
-            ShowModal("Rejudge submission", "Are you sure to rejudge it?", () => {
-                if (Response.Result > 10) {
-                    ShowModal("Rejudge submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
-                        RequestAPI("RejudgeSubmission", {
-                            "SID": Number(Data.SID)
-                        }, () => { }, () => {
-                            ReloadData();
-                        }, () => { });
-                    }, () => { });
-                }
-                else {
-                    RequestAPI("RejudgeSubmission", {
-                        "SID": Number(Data.SID)
-                    }, () => { }, () => {
-                        ReloadData();
-                    }, () => { });
-                }
-            }, () => { });
-        };
-
-        let SubmissionEditButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionEditButton);
-        SubmissionEditButton.classList.add("btn", "btn-warning", "AdminOnly");
-        SubmissionEditButton.innerText = "Edit";
-        SubmissionEditButton.onclick = () => {
-            SwitchPage("EditSubmission", {
-                "SID": Data.SID
-            });
-        };
-
-        let SubmissionDeleteButton = document.createElement("button"); SubmissionButtonGroup.appendChild(SubmissionDeleteButton);
-        SubmissionDeleteButton.classList.add("btn", "btn-danger", "AdminOnly");
-        SubmissionDeleteButton.innerText = "Delete";
-        SubmissionDeleteButton.onclick = () => {
-            ShowModal("Delete submission", "Are you sure to delete this submission?", () => {
-                RequestAPI("DeleteSubmission",
-                    {
-                        "SID": Number(Data.SID)
-                    }, () => { }, (Response) => {
-                        ShowSuccess("Delete Submission Success");
-                        SwitchPage("Submissions");
-                    }, () => { }, () => { });
-            }, () => { });
-        };
-
         SubmissionData.innerHTML = "";
-        SubmissionData.className = "";
-
-        SubmissionData.classList.add("Submission");
-        // SubmissionData.classList.add("JudgeResult" + SubmissionResultShortTexts[Response.Result]);
         SubmissionData.style.backgroundColor = SubmissionResultColors[Response.Result];
         {
             let SubmissionResult = document.createElement("div"); SubmissionData.appendChild(SubmissionResult);
@@ -114,7 +95,6 @@ const ReloadData = () => {
             Response.TestGroups.map((TestGroup) => {
                 let TestGroupElement = document.createElement("div"); SubmissionData.appendChild(TestGroupElement);
                 TestGroupElement.classList.add("TestGroup");
-                // TestGroupElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestGroup.Result]);
                 TestGroupElement.style.backgroundColor = SubmissionResultColors[TestGroup.Result];
                 {
                     let TestGroupResult = document.createElement("div"); TestGroupElement.appendChild(TestGroupResult);
@@ -131,7 +111,6 @@ const ReloadData = () => {
                     TestGroup.TestCases.map((TestCase) => {
                         let TestCaseElement = document.createElement("div"); TestGroupElement.appendChild(TestCaseElement);
                         TestCaseElement.classList.add("TestCase");
-                        // TestCaseElement.classList.add("JudgeResult" + SubmissionResultShortTexts[TestCase.Result]);
                         TestCaseElement.style.backgroundColor = SubmissionResultColors[TestCase.Result];
                         if (TestCase.Description != "") {
                             TestCaseElement.classList.add("WithDescription");
@@ -187,20 +166,7 @@ const ReloadData = () => {
         }
         if (Response.Code != null && SubmissionCode.value == "") {
             SubmissionCode.value = Response.Code;
-            CodeMirror.fromTextArea(SubmissionCode, {
-                lineNumbers: true,
-                foldGutter: true,
-                readOnly: true,
-                matchBrackets: true,
-                mode: "text/x-c++src",
-                extraKeys: {
-                    "Ctrl-Space": "autocomplete",
-                    "Ctrl-Enter": () => {
-                        SubmitButton.click();
-                    }
-                },
-                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-            });
+            CreateCodeMirrorSource(SubmissionCode);
         }
         if (Response.Result <= 10) {
             SubmissionSpinnerCollapse.hide();

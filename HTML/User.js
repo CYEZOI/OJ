@@ -1,16 +1,27 @@
-const UserData = document.getElementById("UserData");
+const UserUID = document.getElementById("UserUID");
+const UserUsername = document.getElementById("UserUsername");
+const UserNickname = document.getElementById("UserNickname");
+const UserEmail = document.getElementById("UserEmail");
+const UserRole = document.getElementById("UserRole");
 
 CheckTokenAvailable();
 if (Data.UID == null) {
     SwitchPage("Home");
 }
+
+UserUID.appendChild(CreatePlaceHolder());
+UserUsername.appendChild(CreatePlaceHolder());
+UserNickname.appendChild(CreatePlaceHolder());
+UserEmail.appendChild(CreatePlaceHolder());
+UserRole.appendChild(CreatePlaceHolder());
+
 RequestAPI("GetUser", {
     UID: Number(Data.UID)
 }, () => { }, (Response) => {
-    document.getElementsByTagName("h4")[0].innerHTML += " " + Response.Username;
-    UserData.children[0].children[0].children[1].innerHTML = Data.UID;
-    UserData.children[0].children[1].children[1].innerHTML = Response.Username;
-    UserData.children[0].children[2].children[1].innerHTML = Response.Nickname;
-    UserData.children[0].children[3].children[1].innerHTML = Response.EmailAddress;
-    UserData.children[0].children[4].children[1].innerHTML = RoleName[Response.Role];
+    PageTitle.innerHTML += " " + Response.Nickname;
+    UserUID.innerHTML = Data.UID;
+    UserUsername.innerHTML = Response.Username;
+    UserNickname.innerHTML = Response.Nickname;
+    UserEmail.innerHTML = Response.EmailAddress;
+    UserRole.innerHTML = RoleName[Response.Role];
 }, () => { }, () => { })

@@ -1,7 +1,13 @@
-<div class="mb-2" role="group" id="SubmissionButtonGroup"></div>
+<div class="mb-2" role="group" id="SubmissionButtonGroup">
+    <button class="btn btn-primary" id="SubmissionGoToProblemButton">Go to problem</button>
+    <button class="btn btn-secondary" id="SubmissionResubmitButton">Resubmit</button>
+    <button class="btn btn-warning AdminOnly" id="SubmissionRejudgeButton">Rejudge</button>
+    <button class="btn btn-warning AdminOnly" id="SubmissionEditButton">Edit</button>
+    <button class="btn btn-danger AdminOnly" id="SubmissionDeleteButton">Delete</button>
+</div>
 <div class="text-center collapse show" id="SubmissionSpinner">
     <div class="spinner-border" role="status">
     </div>
 </div>
-<div id="SubmissionData"></div>
+<div id="SubmissionData" class="Submission"></div>
 <textarea style="display: none" id="SubmissionCode"></textarea>

@@ -65,12 +65,12 @@ ProblemDeleteButton.onclick = () => {
 for (let i = 0; i < 10; i++) {
     CreateAccordion(CreatePlaceHolder().outerHTML, CreatePlaceHolder().outerHTML, "");
 }
-document.getElementsByTagName("h4")[0].innerHTML += " " + Data.PID;
+PageTitle.innerHTML += " " + Data.PID;
 RequestAPI("GetProblem", {
     "PID": String(Data.PID)
 }, () => { }, (Response) => {
     ProblemData.innerHTML = "";
-    document.getElementsByTagName("h4")[0].innerHTML += ": " + Response.Title;
+    PageTitle.innerHTML += ": " + Response.Title;
 
     CreateAccordion("Description", Response.Description, "Description");
     CreateAccordion("Input", Response.Input, "Input");
@@ -111,12 +111,7 @@ RequestAPI("GetProblem", {
     CreateAccordion("Samples", Samples.outerHTML, "Samples");
     let Textarea = document.querySelectorAll("textarea.form-control");
     for (let i = 0; i < Textarea.length; i++) {
-        CodeMirror.fromTextArea(Textarea[i], {
-            cursorBlinkRate: 0,
-            gutters: ["CodeMirror-linenumbers"],
-            lineNumbers: true,
-            readOnly: true
-        }).setSize("100%", "auto");
+        CreateCodeMirrorText(Textarea[i]).setSize("100%", "auto");
     }
 
     if (Response.Range != "") {

@@ -1,38 +1,39 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <title>OJ</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <script src="Libs/popper.js/2.11.7/umd/popper.js"></script>
-    <link href="Libs/twitter-bootstrap/5.2.3/css/bootstrap.css" rel="stylesheet">
-    <script src="Libs/twitter-bootstrap/5.2.3/js/bootstrap.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/2.11.7/umd/popper.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/css/bootstrap.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.js"></script>
 
-    <link href="Libs/codemirror/6.65.7/codemirror.css" rel="stylesheet">
-    <script src="Libs/codemirror/6.65.7/codemirror.js"></script>
-    <script src="Libs/codemirror/6.65.7/mode/clike/clike.js"></script>
-    <script src="Libs/codemirror/6.65.7/addon/edit/matchbrackets.js"></script>
-    <link href="Libs/codemirror/6.65.7/addon/fold/foldgutter.css" rel="stylesheet">
-    <script src="Libs/codemirror/6.65.7/addon/fold/foldcode.js"></script>
-    <script src="Libs/codemirror/6.65.7/addon/fold/foldgutter.js"></script>
-    <script src="Libs/codemirror/6.65.7/addon/fold/brace-fold.js"></script>
-    <script src="Libs/codemirror/6.65.7/addon/fold/comment-fold.js"></script>
-    <link href="Libs/codemirror/6.65.7/addon/hint/show-hint.css" rel="stylesheet">
-    <script src="Libs/codemirror/6.65.7/addon/hint/show-hint.js"></script>
-    <script src="Libs/codemirror/6.65.7/addon/hint/anyword-hint.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/codemirror.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/mode/clike/clike.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/edit/matchbrackets.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldcode.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/foldgutter.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/brace-fold.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/fold/comment-fold.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/addon/hint/anyword-hint.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/codemirror/6.65.7/theme/material.css" rel="stylesheet">
 
-    <script src="Libs/marked/4.3.0/lib/marked.umd.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/4.3.0/lib/marked.umd.js"></script>
 
-    <link href="Libs/KaTeX/0.16.6/katex.css" rel="stylesheet">
-    <script src="Libs/KaTeX/0.16.6/katex.js"></script>
-    <script src="Libs/KaTeX/0.16.6/contrib/auto-render.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/katex.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/katex.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.6/contrib/auto-render.js"></script>
 
-    <script src="Libs/clipboard.js/2.0.11/clipboard.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.js"></script>
 
-    <link href="Libs/vditor/3.9.2/index.css" rel="stylesheet">
-    <script src="Libs/vditor/3.9.2/index.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/vditor/3.9.2/index.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/vditor/3.9.2/index.min.js"></script>
 
     <style id="AddonStyle">
         .LoginOnly {
@@ -43,7 +44,7 @@
 
 <body class="placeholder-glow">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <nav class="navbar navbar-expand-sm">
             <div class="container">
                 <a class="navbar-brand" href="#">OJ</a>
                 <button class="navbar-toggler d-lg-none" data-bs-toggle="collapse" data-bs-target="#NavigateBar">
@@ -86,6 +87,8 @@
     </header>
     <main>
         <div class="container pt-2 pb-5" id="MainContainer">
+            <h4 id="PageTitle"></h4>
+            <div id="PageContent"></div>
         </div>
     </main>
     <footer>

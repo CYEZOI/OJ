@@ -21,7 +21,6 @@ ResetPasswordEmailInput.onblur = () => {
 }
 ResetPasswordEmailVerificationCodeButton.onclick = () => {
     AddLoading(ResetPasswordEmailVerificationCodeButton);
-    ResetPasswordEmailVerificationCodeButton.disabled = true;
     RequestAPI("SendVerificationCode", {
         "EmailAddress": String(ResetPasswordEmailInput.value)
     }, () => {

@@ -87,7 +87,6 @@ RegisterEmailInput.onblur = () => {
 }
 RegisterEmailVerificationCodeButton.onclick = () => {
     AddLoading(RegisterEmailVerificationCodeButton);
-    RegisterEmailVerificationCodeButton.disabled = true;
     RequestAPI("SendVerificationCode", {
         "EmailAddress": String(RegisterEmailInput.value)
     }, () => {

@@ -6,20 +6,9 @@ CheckTokenAvailable();
 if (Data.PID == null) {
     SwitchPage("Home");
 }
-document.getElementsByTagName("h4")[0].innerHTML += " " + Data.PID;
-let SubmitCodeMirror = CodeMirror.fromTextArea(document.getElementById("SubmitCode"), {
-    lineNumbers: true,
-    foldGutter: true,
-    matchBrackets: true,
-    mode: "text/x-c++src",
-    autofocus: true,
-    extraKeys: {
-        "Ctrl-Space": "autocomplete",
-        "Ctrl-Enter": () => {
-            SubmitButton.onclick();
-        }
-    },
-    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+PageTitle.innerHTML += " " + Data.PID;
+let SubmitCodeMirror = CreateCodeMirrorSourceEditor(SubmitCode, () => {
+    SubmitButton.onclick();
 });
 SubmitButton.onclick = () => {
     AddLoading(SubmitButton);

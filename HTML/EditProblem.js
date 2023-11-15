@@ -24,20 +24,14 @@ const CreateSampleRow = (SamplesTableBody, Index) => {
         {
             let InputTextArea = document.createElement("textarea"); SamplesTableBodyRowInput.appendChild(InputTextArea);
             InputTextArea.innerText = Sample.Input;
-            Sample.InputEditor = CodeMirror.fromTextArea(InputTextArea, {
-                gutters: ["CodeMirror-linenumbers"],
-                lineNumbers: true
-            });
+            Sample.InputEditor = CreateCodeMirrorTextEditor(InputTextArea);
             Sample.InputEditor.setSize("100%", "auto");
         }
         let SamplesTableBodyRowOutput = document.createElement("td"); SamplesTableBodyRow.appendChild(SamplesTableBodyRowOutput);
         {
             let OutputTextArea = document.createElement("textarea"); SamplesTableBodyRowOutput.appendChild(OutputTextArea);
             OutputTextArea.innerText = Sample.Output;
-            Sample.OutputEditor = CodeMirror.fromTextArea(OutputTextArea, {
-                gutters: ["CodeMirror-linenumbers"],
-                lineNumbers: true
-            });
+            Sample.OutputEditor = CreateCodeMirrorTextEditor(OutputTextArea);
             Sample.OutputEditor.setSize("100%", "auto");
         }
         let SamplesTableBodyRowDescription = document.createElement("td"); SamplesTableBodyRow.appendChild(SamplesTableBodyRowDescription);
@@ -87,20 +81,14 @@ const CreateTestCaseRow = (TestCasesTableBody, Index) => {
         {
             let InputTextArea = document.createElement("textarea"); TestCasesTableBodyRowInput.appendChild(InputTextArea);
             InputTextArea.innerText = TestCase.Input;
-            TestCase.InputEditor = CodeMirror.fromTextArea(InputTextArea, {
-                gutters: ["CodeMirror-linenumbers"],
-                lineNumbers: true
-            });
+            TestCase.InputEditor = CreateCodeMirrorTextEditor(InputTextArea);
             TestCase.InputEditor.setSize("100%", "auto");
         }
         let TestCasesTableBodyRowAnswer = document.createElement("td"); TestCasesTableBodyRow.appendChild(TestCasesTableBodyRowAnswer);
         {
             let AnswerTextArea = document.createElement("textarea"); TestCasesTableBodyRowAnswer.appendChild(AnswerTextArea);
             AnswerTextArea.innerText = TestCase.Answer;
-            TestCase.AnswerEditor = CodeMirror.fromTextArea(AnswerTextArea, {
-                gutters: ["CodeMirror-linenumbers"],
-                lineNumbers: true
-            });
+            TestCase.AnswerEditor = CreateCodeMirrorTextEditor(AnswerTextArea);
             TestCase.AnswerEditor.setSize("100%", "auto");
         }
         let TestCasesTableBodyRowLimitsAndScore = document.createElement("td"); TestCasesTableBodyRow.appendChild(TestCasesTableBodyRowLimitsAndScore);
@@ -173,16 +161,15 @@ const CreateTestCaseRow = (TestCasesTableBody, Index) => {
     }
 };
 
-let TitleElement = document.getElementsByTagName("h4")[0];
 let OldTitle = Data.PID == null ? "Add problem" : "Edit problem";
-TitleElement.innerHTML = "";
-TitleElement.classList.add("row");
-TitleElement.classList.add("align-items-center");
+PageTitle.innerHTML = "";
+PageTitle.classList.add("row");
+PageTitle.classList.add("align-items-center");
 {
-    let TitleTextElement = document.createElement("div"); TitleElement.appendChild(TitleTextElement);
+    let TitleTextElement = document.createElement("div"); PageTitle.appendChild(TitleTextElement);
     TitleTextElement.classList.add("col-auto");
     TitleTextElement.innerHTML = OldTitle + " ";
-    let PIDInputElement = document.createElement("div"); TitleElement.appendChild(PIDInputElement);
+    let PIDInputElement = document.createElement("div"); PageTitle.appendChild(PIDInputElement);
     PIDInputElement.classList.add("col-auto");
     {
         let PIDInput = document.createElement("input"); PIDInputElement.appendChild(PIDInput);
@@ -194,7 +181,7 @@ TitleElement.classList.add("align-items-center");
             PIDInput.readOnly = PIDInput.disabled = true;
         }
     }
-    let TitleInputElement = document.createElement("div"); TitleElement.appendChild(TitleInputElement);
+    let TitleInputElement = document.createElement("div"); PageTitle.appendChild(TitleInputElement);
     TitleInputElement.classList.add("col-auto");
     {
         let TitleInput = document.createElement("input"); TitleInputElement.appendChild(TitleInput);

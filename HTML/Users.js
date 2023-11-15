@@ -18,9 +18,12 @@ for (let i = 0; i < 10; i++) {
     }
 }
 HashPassword.onclick = () => {
+    AddLoading(HashPassword);
     RequestAPI("HashPassword", {
         "OriginalPassword": String(OriginalPassword.value)
-    }, () => { }, (Response) => {
+    }, () => {
+        RemoveLoading(HashPassword);
+    }, (Response) => {
         HashedPassword.innerText = Response.HashedPassword;
     });
 };
@@ -58,14 +61,14 @@ RequestAPI("GetUsers", {
             {
                 DataRowEmailAddressInput = document.createElement("input"); DataRowEmail.appendChild(DataRowEmailAddressInput);
                 DataRowEmailAddressInput.type = "text";
-                DataRowEmailAddressInput.classList.add("form-control");
+                DataRowEmailAddressInput.classList.add("form-control", "BlurDefault");
                 DataRowEmailAddressInput.value = Response.Users[i].EmailAddress;
             }
             let DataRowPassword = document.createElement("td"); DataRow.appendChild(DataRowPassword);
             {
                 DataRowPasswordInput = document.createElement("input"); DataRowPassword.appendChild(DataRowPasswordInput);
                 DataRowPasswordInput.type = "text";
-                DataRowPasswordInput.classList.add("form-control");
+                DataRowPasswordInput.classList.add("form-control", "BlurDefault");
                 DataRowPasswordInput.value = Response.Users[i].Password;
             }
             let DataRowRole = document.createElement("td"); DataRow.appendChild(DataRowRole);

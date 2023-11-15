@@ -28,8 +28,7 @@ for (let i = 0; i < 10; i++) {
     }
 }
 
-let TitleElement = document.getElementsByTagName("h4")[0];
-TitleElement.innerText += " " + Data.SID;
+PageTitle.innerText += " " + Data.SID;
 
 RequestAPI("GetSubmission", {
     "SID": Number(Data.SID)
@@ -44,16 +43,7 @@ RequestAPI("GetSubmission", {
     EditSubmissionMemory.value = Response.Memory;
     EditSubmissionScore.value = Response.Score;
     EditSubmissionCode.value = Response.Code;
-    let EditSubmissionCodeEditor = CodeMirror.fromTextArea(EditSubmissionCode, {
-        lineNumbers: true,
-        foldGutter: true,
-        matchBrackets: true,
-        mode: "text/x-c++src",
-        extraKeys: {
-            "Ctrl-Space": "autocomplete"
-        },
-        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
-    });
+    let EditSubmissionCodeEditor = CreateCodeMirrorSourceEditor(EditSubmissionCode);
     EditSubmissionCodeEditor.getWrapperElement().classList.add("col-sm");
     let SubmissionTestGroupsTableBody = SubmissionTestGroupsTable.children[1];
     let SubmissionTestCasesTableBody = SubmissionTestCasesTable.children[1];

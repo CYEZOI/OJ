@@ -1,5 +1,7 @@
 const NavigateBar = document.getElementById("NavigateBar");
 const MainContainer = document.getElementById("MainContainer");
+const PageTitle = document.getElementById("PageTitle");
+const PageContent = document.getElementById("PageContent");
 const AlertList = document.getElementById("AlertList");
 const ToastList = document.getElementById("ToastList");
 
@@ -102,19 +104,6 @@ const CopyTextToClipboard = (Text) => {
     }
     document.body.removeChild(TextArea);
 };
-const CreateVditorEditor = (Editor, Content) => {
-    return new Vditor(Editor, {
-        "cache": { "enable": false },
-        "lang": "en_US",
-        "placeholder": "Input the markdown here...",
-        "preview": { "actions": [] },
-        "value": Content,
-        "upload": {
-            "url": "/api",
-            "token": localStorage.getItem("Token")
-        }
-    })
-}
 const ShowModal = (Title, Body, PrimaryButtonOnClick, SecondaryButtonOnClick, PrimaryButtonColor = "danger", SecondaryButtonColor = "secondary") => {
     let Modal = document.createElement("div"); document.body.appendChild(Modal);
     Modal.id = "Modal";
@@ -233,6 +222,7 @@ const ShowToast = (Title, Body, Small = "") => {
     bootstrap.Toast.getOrCreateInstance(Toast).show();
 }
 const AddLoading = (Element) => {
+    Element.disabled = true;
     let Loading = document.createElement("span"); Element.appendChild(Loading);
     Loading.classList.add("ms-2");
     Loading.classList.add("spinner-border");
@@ -343,12 +333,11 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
         }
     }
 
-    MainContainer.innerHTML = "";
-    let PlaceHolderTitle = document.createElement("h4"); MainContainer.appendChild(PlaceHolderTitle);
-    PlaceHolderTitle.appendChild(CreatePlaceHolder());
-    let PlaceHolderBody = document.createElement("p"); MainContainer.appendChild(PlaceHolderBody);
+    PageTitle.innerHTML = "";
+    PageTitle.appendChild(CreatePlaceHolder());
+    PageContent.innerHTML = "";
     for (let i = 0; i < 10; i++) {
-        PlaceHolderBody.appendChild(CreatePlaceHolder());
+        PageContent.appendChild(CreatePlaceHolder());
     }
 
     await fetch(Path + ".html")
@@ -359,8 +348,10 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
                 .then((JSResponse) => {
                     return JSResponse.text();
                 }).then((JSResponse) => {
-                    MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
-                        + HTMLResponse;
+                    PageTitle.innerHTML = PathToName(Path);
+                    PageContent.innerHTML = HTMLResponse;
+                    // MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
+                    //     + HTMLResponse;
                     window.Data = Data;
                     eval(JSResponse);
                 });
@@ -387,6 +378,19 @@ const CreateHorizontalLine = () => {
     HorizontalLine.classList.add("rounded");
     return HorizontalLine;
 };
+const CreateVditorEditor = (Editor, Content) => {
+    return new Vditor(Editor, {
+        "cache": { "enable": false },
+        "lang": "en_US",
+        "placeholder": "Input the markdown here...",
+        "preview": { "actions": [] },
+        "value": Content,
+        "upload": {
+            "url": "/api",
+            "token": localStorage.getItem("Token")
+        }
+    })
+}
 const CreateMarkdownEditor = (Title, Content, Parent) => {
     let VditorEditor;
     let Container = document.createElement("div"); Parent.appendChild(Container);
@@ -400,6 +404,48 @@ const CreateMarkdownEditor = (Title, Content, Parent) => {
         Container.appendChild(CreateHorizontalLine());
     }
     return VditorEditor;
+};
+const CreateCodeMirrorText = (ElementData) => {
+    return CodeMirror.fromTextArea(ElementData, {
+        cursorBlinkRate: 0,
+        gutters: ["CodeMirror-linenumbers"],
+        lineNumbers: true,
+        readOnly: true,
+        theme: "material"
+    });
+};
+const CreateCodeMirrorTextEditor = (ElementData) => {
+    return CodeMirror.fromTextArea(ElementData, {
+        gutters: ["CodeMirror-linenumbers"],
+        lineNumbers: true,
+        theme: "material"
+    });
+};
+const CreateCodeMirrorSource = (ElementData, SubmitCallback = () => { }) => {
+    return CodeMirror.fromTextArea(ElementData, {
+        cursorBlinkRate: 0,
+        lineNumbers: true,
+        foldGutter: true,
+        matchBrackets: true,
+        mode: "text/x-c++src",
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        readOnly: true,
+        theme: "material"
+    });
+};
+const CreateCodeMirrorSourceEditor = (ElementData, SubmitCallback = () => { }) => {
+    return CodeMirror.fromTextArea(ElementData, {
+        lineNumbers: true,
+        foldGutter: true,
+        matchBrackets: true,
+        mode: "text/x-c++src",
+        extraKeys: {
+            "Ctrl-Space": "autocomplete",
+            "Ctrl-Enter": SubmitCallback()
+        },
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        theme: "material"
+    });
 };
 
 (() => {
