@@ -45,6 +45,172 @@ const NameToPath = (Name) => {
     }
     return Path;
 };
+const MemoryToString = (Memory) => {
+    if (Memory < 1024) { return Memory + "B"; } else if (Memory < 1024 * 1024) { return Number(Memory / 1024).toFixed(0) + "KB"; } else { return Number(Memory / 1024 / 1024).toFixed(0) + "MB"; }
+};
+const TimeToString = (Time) => {
+    if (Time < 1000) { return Time + "ms"; } else { return Number(Time / 1000).toFixed(0) + "s"; }
+};
+const CopyTextToClipboard = (Text) => {
+    let TextArea = document.createElement("textarea"); document.body.appendChild(TextArea);
+    TextArea.value = Text;
+    TextArea.style.position = "fixed";
+    TextArea.style.top = "0";
+    TextArea.style.left = "0";
+    TextArea.style.width = "2em";
+    TextArea.style.height = "2em";
+    TextArea.style.padding = "0";
+    TextArea.style.border = "none";
+    TextArea.style.outline = "none";
+    TextArea.style.boxShadow = "none";
+    TextArea.style.background = "transparent";
+    TextArea.focus();
+    TextArea.select();
+    try {
+        document.execCommand("copy");
+        ShowSuccess("Copied!");
+    } catch (e) {
+        ShowError("Failed to copy!");
+    }
+    document.body.removeChild(TextArea);
+};
+const BufferToBase64 = (Buffer) => {
+    return btoa(String.fromCharCode(...new Uint8Array(Buffer)));
+};
+const Base64ToBuffer = (Base64) => {
+    const RawData = atob(Base64);
+    const Buffer = new Uint8Array(RawData.length);
+    for (let i = 0; i < RawData.length; i++) {
+        Buffer[i] = RawData.charCodeAt(i);
+    }
+    return Buffer.buffer;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const GetToken = () => {
+    var Token = localStorage.getItem("Token");
+    if (Token != null) {
+        RequestAPI("CheckTokenAvailable", {
+            "Token": String(localStorage.getItem("Token"))
+        }, () => { }, () => { }, () => {
+            localStorage.removeItem("Token");
+            Token = null;
+        }, () => { Token = null; }, false);
+    }
+    return Token;
+};
+const RequestAPI = async (Action, Data, CallBack, SuccessCallback, FailCallback, ErrorCallback, AddToken = true) => {
+    if (AddToken) {
+        Data.Token = GetToken();
+        if (Data.Token == null) {
+            CallBack();
+            ErrorCallback();
+            ShowError("Login expired");
+            SwitchPage("Login");
+            return;
+        }
+    }
+    // let Timeout = new AbortController();
+    // setTimeout(() => {
+    //     Timeout.abort();
+    //     CallBack();
+    //     ErrorCallback();
+    //     ShowError("Request timeout");
+    // }, 3000);
+    await fetch("/api", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        // signal: Timeout.signal,
+        body: JSON.stringify({
+            "Action": Action,
+            "Data": Data
+        })
+    }).then(Response => {
+        CallBack();
+        if (Response.status == 200) {
+            Response.json().then(Response => {
+                if (Response.Success) {
+                    SuccessCallback(Response.Data);
+                } else {
+                    ShowError(Response.Message);
+                    FailCallback();
+                }
+            });
+        } else {
+            ShowError("Request failed: " + Response.status + " " + Response.statusText);
+            ErrorCallback();
+        }
+    }).catch((Error) => {
+        CallBack();
+        ShowError("Request failed: " + Error);
+        ErrorCallback();
+    });
+};
+const SwitchPage = async (Path, Data = {}, PushState = true) => {
+    if (PushState) {
+        let URLPath = "index.html?Page=" + Path;
+        for (let i in Data) {
+            URLPath += "&" + encodeURIComponent(i) + "=" + encodeURIComponent(Data[i]);
+        }
+        history.pushState({
+            "Path": Path,
+            "Data": Data
+        }, Path, URLPath);
+    }
+
+    document.title = PathToName(Path);
+    for (let i = 0; i < NavigateBar.children[0].children.length; i++) {
+        if (NavigateBar.children[0].children[i].innerText == Path) {
+            NavigateBar.children[0].children[i].children[0].classList.add("active");
+        }
+        else {
+            NavigateBar.children[0].children[i].children[0].classList.remove("active");
+        }
+    }
+
+    PageTitle.innerHTML = "";
+    PageTitle.appendChild(CreatePlaceHolder());
+    PageContent.innerHTML = "";
+    for (let i = 0; i < 10; i++) {
+        PageContent.appendChild(CreatePlaceHolder());
+    }
+
+    await fetch(Path + ".html")
+        .then((HTMLResponse) => {
+            return HTMLResponse.text();
+        }).then(async (HTMLResponse) => {
+            await fetch(Path + ".js")
+                .then((JSResponse) => {
+                    return JSResponse.text();
+                }).then((JSResponse) => {
+                    PageTitle.innerHTML = PathToName(Path);
+                    PageContent.innerHTML = HTMLResponse;
+                    // MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
+                    //     + HTMLResponse;
+                    window.Data = Data;
+                    eval(JSResponse);
+                });
+        });
+}
+const CheckTokenAvailable = () => {
+    var Token = localStorage.getItem("Token");
+    if (Token == null) {
+        SwitchPage("Login");
+        return;
+    }
+    RequestAPI("CheckTokenAvailable", {
+        "Token": String(localStorage.getItem("Token"))
+    }, () => { }, () => { }, () => {
+        localStorage.removeItem("Token");
+        SwitchPage("Login");
+    }, () => { }, false);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const CreateResultSelect = (Element, Value) => {
     Element.className = "form-select";
     for (let i = 0; i < SubmissionResultShortTexts.length; i++) {
@@ -75,35 +241,6 @@ const CreateRoleSelect = (Element, Value) => {
     }
     Element.onchange();
 }
-const MemoryToString = (Memory) => {
-    if (Memory < 1024) { return Memory + "B"; } else if (Memory < 1024 * 1024) { return Number(Memory / 1024).toFixed(0) + "KB"; } else { return Number(Memory / 1024 / 1024).toFixed(0) + "MB"; }
-};
-const TimeToString = (Time) => {
-    if (Time < 1000) { return Time + "ms"; } else { return Number(Time / 1000).toFixed(0) + "s"; }
-};
-const CopyTextToClipboard = (Text) => {
-    let TextArea = document.createElement("textarea"); document.body.appendChild(TextArea);
-    TextArea.value = Text;
-    TextArea.style.position = "fixed";
-    TextArea.style.top = "0";
-    TextArea.style.left = "0";
-    TextArea.style.width = "2em";
-    TextArea.style.height = "2em";
-    TextArea.style.padding = "0";
-    TextArea.style.border = "none";
-    TextArea.style.outline = "none";
-    TextArea.style.boxShadow = "none";
-    TextArea.style.background = "transparent";
-    TextArea.focus();
-    TextArea.select();
-    try {
-        document.execCommand("copy");
-        ShowSuccess("Copied!");
-    } catch (e) {
-        ShowError("Failed to copy!");
-    }
-    document.body.removeChild(TextArea);
-};
 const ShowModal = (Title, Body, PrimaryButtonOnClick, SecondaryButtonOnClick, PrimaryButtonColor = "danger", SecondaryButtonColor = "secondary") => {
     let Modal = document.createElement("div"); document.body.appendChild(Modal);
     Modal.id = "Modal";
@@ -249,126 +386,6 @@ const CreatePlaceHolder = () => {
     PlaceHolder.classList.add("placeholder");
     PlaceHolder.classList.add("col-" + (Math.floor(Math.random() * 12) + 1));
     return PlaceHolder;
-};
-const GetToken = () => {
-    var Token = localStorage.getItem("Token");
-    if (Token != null) {
-        RequestAPI("CheckTokenAvailable", {
-            "Token": String(localStorage.getItem("Token"))
-        }, () => { }, () => { }, () => {
-            localStorage.removeItem("Token");
-            Token = null;
-        }, () => { Token = null; }, false);
-    }
-    return Token;
-};
-const RequestAPI = async (Action, Data, CallBack, SuccessCallback, FailCallback, ErrorCallback, AddToken = true) => {
-    if (AddToken) {
-        Data.Token = GetToken();
-        if (Data.Token == null) {
-            CallBack();
-            ErrorCallback();
-            ShowError("Login expired");
-            SwitchPage("Login");
-            return;
-        }
-    }
-    // let Timeout = new AbortController();
-    // setTimeout(() => {
-    //     Timeout.abort();
-    //     CallBack();
-    //     ErrorCallback();
-    //     ShowError("Request timeout");
-    // }, 3000);
-    await fetch("/api", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        // signal: Timeout.signal,
-        body: JSON.stringify({
-            "Action": Action,
-            "Data": Data
-        })
-    }).then(Response => {
-        CallBack();
-        if (Response.status == 200) {
-            Response.json().then(Response => {
-                if (Response.Success) {
-                    SuccessCallback(Response.Data);
-                } else {
-                    ShowError(Response.Message);
-                    FailCallback();
-                }
-            });
-        } else {
-            ShowError("Request failed: " + Response.status + " " + Response.statusText);
-            ErrorCallback();
-        }
-    }).catch((Error) => {
-        CallBack();
-        ShowError("Request failed: " + Error);
-        ErrorCallback();
-    });
-};
-const SwitchPage = async (Path, Data = {}, PushState = true) => {
-    if (PushState) {
-        let URLPath = "index.html?Page=" + Path;
-        for (let i in Data) {
-            URLPath += "&" + encodeURIComponent(i) + "=" + encodeURIComponent(Data[i]);
-        }
-        history.pushState({
-            "Path": Path,
-            "Data": Data
-        }, Path, URLPath);
-    }
-
-    document.title = PathToName(Path);
-    for (let i = 0; i < NavigateBar.children[0].children.length; i++) {
-        if (NavigateBar.children[0].children[i].innerText == Path) {
-            NavigateBar.children[0].children[i].children[0].classList.add("active");
-        }
-        else {
-            NavigateBar.children[0].children[i].children[0].classList.remove("active");
-        }
-    }
-
-    PageTitle.innerHTML = "";
-    PageTitle.appendChild(CreatePlaceHolder());
-    PageContent.innerHTML = "";
-    for (let i = 0; i < 10; i++) {
-        PageContent.appendChild(CreatePlaceHolder());
-    }
-
-    await fetch(Path + ".html")
-        .then((HTMLResponse) => {
-            return HTMLResponse.text();
-        }).then(async (HTMLResponse) => {
-            await fetch(Path + ".js")
-                .then((JSResponse) => {
-                    return JSResponse.text();
-                }).then((JSResponse) => {
-                    PageTitle.innerHTML = PathToName(Path);
-                    PageContent.innerHTML = HTMLResponse;
-                    // MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
-                    //     + HTMLResponse;
-                    window.Data = Data;
-                    eval(JSResponse);
-                });
-        });
-}
-const CheckTokenAvailable = () => {
-    var Token = localStorage.getItem("Token");
-    if (Token == null) {
-        SwitchPage("Login");
-        return;
-    }
-    RequestAPI("CheckTokenAvailable", {
-        "Token": String(localStorage.getItem("Token"))
-    }, () => { }, () => { }, () => {
-        localStorage.removeItem("Token");
-        SwitchPage("Login");
-    }, () => { }, false);
 };
 const CreateHorizontalLine = () => {
     let HorizontalLine = document.createElement("hr");

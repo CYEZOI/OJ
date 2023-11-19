@@ -36,6 +36,6 @@ public:
     static void UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role);
     static void UpdateUserPassword(int UID, std::string HashedPassword);
     static void DeleteUser(int UID);
-    static void GetUser(int UID, USER &User);
+    static USER GetUser(int UID);
     static int GetUIDByEmailAddress(std::string EmailAddress);
 };

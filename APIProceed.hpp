@@ -18,6 +18,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#define CREATE_JSON(Success, Message)             \
+    {                                             \
+        configor::json _ResponseJSON;             \
+        _ResponseJSON["Success"] = (Success);     \
+        _ResponseJSON["Message"] = (Message);     \
+        _ResponseJSON["Data"] = configor::json(); \
+        return _ResponseJSON;                     \
+    }
+
 #include <string>
 #include "configor/json.hpp"
 #include "Role.hpp"
@@ -42,6 +51,11 @@ private:
     configor::json Login(std::string Username, std::string Password);
     configor::json Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode);
     configor::json ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password);
+
+    configor::json GetPasskeyCreateOption(int UID);
+    // configor::json AddPasskey(std::string Challenge, std::string Credential, std::string PublicKey);
+    // configor::json GetPasskeyOptions(int UID);
+    // configor::json GetPasskey(std::string Credential);
 
     configor::json AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role);
     configor::json GetUser(int UID);

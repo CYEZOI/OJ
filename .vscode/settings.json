@@ -4,6 +4,7 @@
         "AUTOINCREMENT",
         "configor",
         "foldgutter",
+        "PKID",
         "sqlpp",
         "TCID",
         "TGID",

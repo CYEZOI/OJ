@@ -123,8 +123,9 @@ void USERS::DeleteUser(int UID)
         .Where("UID", UID)
         .Execute();
 }
-void USERS::GetUser(int UID, USER &User)
+USER USERS::GetUser(int UID)
 {
+    USER User;
     DATABASE::SELECT("Users")
         .Select("UID")
         .Select("Username")
@@ -143,6 +144,7 @@ void USERS::GetUser(int UID, USER &User)
                 User.Nickname = Data[0]["Nickname"];
                 User.Role = std::stoi(Data[0]["Role"]);
             });
+    return User;
 }
 int USERS::GetUIDByEmailAddress(std::string EmailAddress)
 {

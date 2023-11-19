@@ -24,6 +24,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Settings.hpp"
 #include "Utilities.hpp"
 
+std::string UTILITIES::RandomToken()
+{
+    const std::string Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    std::string Token;
+    for (int i = 0; i < 32; i++)
+        Token += Characters[rand() % Characters.length()];
+    return Token;
+}
 std::string UTILITIES::StringReplaceAll(std::string Data, std::string Search, std::string Replace)
 {
     size_t Pos = Data.find(Search);

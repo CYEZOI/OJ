@@ -22,9 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class FILES
 {
-private:
-    static std::string RandomToken();
-
 public:
     static void CreateFileDownloadLink(int FID, std::string &FileDownloadLink);
     static void GetFileContent(std::string FileToken, std::string &FileContent, std::string &Filename, std::string &FileType);

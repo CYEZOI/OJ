@@ -2,6 +2,10 @@ DROP TABLE IF EXISTS `EmailVerificationCodes`;
 
 DROP TABLE IF EXISTS `Files`;
 
+DROP TABLE IF EXISTS `Passkeys`;
+
+DROP TABLE IF EXISTS `PasskeyChallenges`;
+
 DROP TABLE IF EXISTS `Problems`;
 
 DROP TABLE IF EXISTS `Settings`;
@@ -29,17 +33,16 @@ CREATE TABLE `Files` (
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `Problems` (
-    `PID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    `Title` VARCHAR(32) NOT NULL UNIQUE,
-    `IOFilename` TEXT NOT NULL,
-    `Description` TEXT NOT NULL,
-    `Input` TEXT,
-    `Output` TEXT NOT NULL,
-    `Range` TEXT,
-    `Hint` TEXT,
-    `Samples` TEXT,
-    `TestGroups` TEXT NOT NULL
+CREATE TABLE `Passkeys` (
+    `UID` INT UNSIGNED NOT NULL,
+    `Credential` VARCHAR(64) NOT NULL,
+    `PublicKey` TEXT NOT NULL
+);
+
+CREATE TABLE `PasskeyChallenges` (
+    `UID` INT UNSIGNED NOT NULL,
+    `Challenge` VARCHAR(64) NOT NULL,
+    `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `Settings` (

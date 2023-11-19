@@ -34,6 +34,7 @@ private:
     static size_t UploadFunction(char *ptr, size_t size, size_t nmemb, void *userp);
 
 public:
+    static std::string RandomToken();
     static std::string StringReplaceAll(std::string Data, std::string Search, std::string Replace);
     static std::vector<std::string> StringSplit(std::string Data, std::string Delimiter);
     static std::string StringJoin(std::vector<std::string> Data, std::string Delimiter);

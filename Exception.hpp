@@ -18,27 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#define CREATE_JSON(Success, Message)             \
-    {                                             \
-        configor::json _ResponseJSON;             \
-        _ResponseJSON["Success"] = (Success);     \
-        _ResponseJSON["Message"] = (Message);     \
-        _ResponseJSON["Data"] = configor::json(); \
-        return _ResponseJSON;                     \
-    }
-
-#define RETURN_JSON_IF_FAILED(NewResult)           \
-    {                                              \
-        try                                        \
-        {                                          \
-            NewResult;                             \
-        }                                          \
-        catch (EXCEPTION ErrorData)                \
-        {                                          \
-            CREATE_JSON(false, ErrorData.Message); \
-        }                                          \
-    }
-
 #include <string>
 #include <string.h>
 #include "Logger.hpp"

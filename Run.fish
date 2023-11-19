@@ -6,14 +6,14 @@ echo "This is free software, and you are welcome to redistribute it under certai
 echo -e "\033[0m"
 
 # Clean
-for mount_point in (mount | awk '{print $3}')
+for mount_point in (sudo mount | awk '{print $3}')
     if string match -q --regex "/home/Judger/Run/*" "$mount_point"
-        umount "$mount_point"
+        sudo umount "$mount_point"
     end
 end
-rm -rf /home/Judger/Run
-mkdir /home/Judger/Run
-rm -f (find "/home/Judger/" -name "*.log") Log.log ./build/main
+sudo rm -rf /home/Judger/Run
+sudo mkdir /home/Judger/Run
+sudo rm -f (sudo find "/home/Judger/" -name "*.log") Log.log ./build/main
 
 # Build
 cmake -B build
@@ -23,7 +23,7 @@ cd ../
 
 # Run
 if test -f "./build/main"
-    service mysql start >/dev/null
-    ./build/main
+    sudo service mysql start >/dev/null
+    sudo ./build/main
     cat Log.log
 end

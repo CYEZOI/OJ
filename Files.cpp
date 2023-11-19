@@ -21,15 +21,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "Settings.hpp"
 
-std::string FILES::RandomToken()
-{
-    const std::string Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    std::string Token;
-    for (int i = 0; i < 32; i++)
-        Token += Characters[rand() % Characters.length()];
-    return Token;
-}
-
 void FILES::CreateFileDownloadLink(int FID, std::string &FileDownloadLink)
 {
     DATABASE::SELECT("Files")
@@ -63,7 +54,7 @@ void FILES::GetFileContent(std::string FileToken, std::string &FileContent, std:
 }
 void FILES::UploadFile(std::string Filename, std::string FileContent, std::string FileType, int UID, int &FID)
 {
-    std::string FileToken = RandomToken();
+    std::string FileToken = UTILITIES::RandomToken();
     std::string JudgeUsername;
     SETTINGS::GetSettings("JudgeUsername", JudgeUsername);
     UTILITIES::SaveFile("/home/" + JudgeUsername + "/Files/" + FileToken, FileContent);
