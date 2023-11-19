@@ -59,7 +59,7 @@ mkdir /home/Judger/Run
 chown -R Judger /home/Judger/Run
 chgrp -R judge /home/Judger/Run
 
-# config database
+# Config database
 service mysql start
 DatabaseUsername="OJUser"
 DatabasePassword=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
@@ -180,13 +180,6 @@ echo "INSERT INTO \`Settings\` (\`Key\`, \`Value\`) VALUES ('SocketPort', '80');
 echo "INSERT INTO \`Settings\` (\`Key\`, \`Value\`) VALUES ('SystemCallList', '-1,-1,0,-1,-1,-1,0,0,-1,-1,-1,-1,-1,-1,-1,0,0,-1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,-1,0,0,0,-1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0');" >>./Initiate.sql
 mysql -u $DatabaseUsername -p$DatabasePassword OJ <./Initiate.sql
 rm -f ./Initiate.sql
-
-# Compile
-cd ./OJ
-cmake -B build
-cd ./build
-make
-cd ../../
 
 # End
 echo "Installation complete."
