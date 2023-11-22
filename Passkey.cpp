@@ -2,14 +2,19 @@
 #include "Database.hpp"
 #include "Utilities.hpp"
 
-std::string PASSKEY::CreateChallenge(int UID)
+std::string PASSKEY::CreateChallenge()
 {
-    std::string Challenge = UTILITIES::RandomToken();
+    std::string ChallengeID = UTILITIES::RandomToken();
     DATABASE::INSERT("PasskeyChallenges")
-        .Insert("UID", UID)
-        .Insert("Challenge", Challenge)
+        .Insert("Challenge", ChallengeID)
         .Execute();
-    return Challenge;
+    return ChallengeID;
+}
+void PASSKEY::DeleteChallenge(std::string ChallengeID)
+{
+    DATABASE::DELETE("PasskeyChallenges")
+        .Where("Challenge", ChallengeID)
+        .Execute();
 }
 void PASSKEY::AddPasskey(std::string Challenge, int UID, std::string Credential, std::string PublicKey)
 {

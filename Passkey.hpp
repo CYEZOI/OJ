@@ -37,6 +37,7 @@ CREATE TABLE `PasskeyChallenges` (
 class PASSKEY
 {
 public:
-    static std::string CreateChallenge(int UID);
+    static std::string CreateChallenge();
+    static void DeleteChallenge(std::string ChallengeID);
     static void AddPasskey(std::string Challenge, int UID, std::string Credential, std::string PublicKey);
 };

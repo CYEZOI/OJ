@@ -11,15 +11,16 @@ add_executable(main
     APIProceed.cpp
     Database.cpp
     EmailVerificationCodes.cpp
+    Exception.cpp
     Files.cpp
     HTTPRequest.cpp
     HTTPResponse.cpp
     JudgingList.cpp
     Logger.cpp
+    Passkey.cpp
     Problem.cpp
     Problems.cpp
     Regexes.cpp
-    Exception.cpp
     Settings.cpp
     Socket.cpp
     Submission.cpp

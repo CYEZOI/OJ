@@ -1,7 +1,6 @@
 const LoginUsernameInput = document.getElementById("LoginUsernameInput");
 const LoginPasswordInput = document.getElementById("LoginPasswordInput");
 const LoginButton = document.getElementById("LoginButton");
-const LoginWithPasskey = document.getElementById("LoginWithPasskey");
 
 LoginUsernameInput.oninput = () => {
     SetValid(LoginUsernameInput);
@@ -49,9 +48,6 @@ LoginButton.onclick = () => {
     }, () => {
         SetValid(LoginPasswordInput, false);
     }, () => { }, false);
-};
-LoginWithPasskey.onclick = () => {
-    SwitchPage("LoginWithPasskey");
 };
 if (localStorage.getItem("Token") != null) {
     RequestAPI("CheckTokenAvailable",

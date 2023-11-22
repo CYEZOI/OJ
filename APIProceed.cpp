@@ -106,20 +106,18 @@ configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string 
     CREATE_JSON(true, "Reset password succeeds");
 }
 
-configor::json API_PROCEED::GetPasskeyCreateOption(int UID)
+configor::json API_PROCEED::CreatePasskeyChallenge()
 {
-    std::string Challenge = PASSKEY::CreateChallenge(UID);
+    std::string ChallengeChallengeID = PASSKEY::CreateChallenge();
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
-    ResponseJSON["Data"]["challenge"] = Challenge;
-    ResponseJSON["Data"]["rp"]["name"] = "OJ";
-    ResponseJSON["Data"]["user"]["id"] = std::to_string(UID);
-    ResponseJSON["Data"]["user"]["name"] = USERS::GetUser(UID).UID;
-    ResponseJSON["Data"]["user"]["displayName"] = USERS::GetUser(UID).UID;
-    ResponseJSON["Data"]["pubKeyCredParams"][0]["alg"] = -7;
-    ResponseJSON["Data"]["pubKeyCredParams"][0]["type"] = "public-key";
-    ResponseJSON["Data"]["timeout"] = 60000;
+    ResponseJSON["Data"]["ChallengeID"] = ChallengeChallengeID;
     return ResponseJSON;
+}
+configor::json API_PROCEED::DeletePasskeyChallenge(std::string ChallengeID)
+{
+    PASSKEY::DeleteChallenge(ChallengeID);
+    CREATE_JSON(true, "Delete passkey challenge succeeds");
 }
 
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
@@ -583,8 +581,19 @@ configor::json API_PROCEED::Proceed(configor::json Request)
             UID = TOKENS::GetUID(Token);
             IsAdmin = USERS::IsAdmin(UID);
 
-            if (Action == "GetPasskeyCreateOption")
+            if (Action == "CreatePasskeyChallenge")
             {
+                if (!CheckTypes(Data, {}))
+                    ResponseJSON["Message"] = "Invalid parameters";
+                else
+                    ResponseJSON = CreatePasskeyChallenge();
+            }
+            else if (Action == "DeletePasskeyChallenge")
+            {
+                if (!CheckTypes(Data, {{"ChallengeID", configor::config_value_type::string}}))
+                    ResponseJSON["Message"] = "Invalid parameters";
+                else
+                    ResponseJSON = DeletePasskeyChallenge(Data["ChallengeID"].as_string());
             }
             else if (Action == "AddUser")
             {

@@ -40,8 +40,7 @@ CREATE TABLE `Passkeys` (
 );
 
 CREATE TABLE `PasskeyChallenges` (
-    `UID` INT UNSIGNED NOT NULL,
-    `Challenge` VARCHAR(64) NOT NULL,
+    `Challenge` VARCHAR(64) NOT NULL PRIMARY KEY UNIQUE,
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

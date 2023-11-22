@@ -74,14 +74,13 @@ const CopyTextToClipboard = (Text) => {
     }
     document.body.removeChild(TextArea);
 };
-const BufferToBase64 = (Buffer) => {
-    return btoa(String.fromCharCode(...new Uint8Array(Buffer)));
+const BufferToString = (Buffer) => {
+    return String.fromCharCode(...new Uint8Array(Buffer));
 };
-const Base64ToBuffer = (Base64) => {
-    const RawData = atob(Base64);
-    const Buffer = new Uint8Array(RawData.length);
-    for (let i = 0; i < RawData.length; i++) {
-        Buffer[i] = RawData.charCodeAt(i);
+const StringToBuffer = (String) => {
+    const Buffer = new Uint8Array(String.length);
+    for (let i = 0; i < String.length; i++) {
+        Buffer[i] = String.charCodeAt(i);
     }
     return Buffer.buffer;
 };
