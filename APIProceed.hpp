@@ -54,7 +54,7 @@ private:
 
     configor::json CreatePasskeyChallenge();
     configor::json DeletePasskeyChallenge(std::string ChallengeID);
-    // configor::json AddPasskey(std::string Challenge, std::string Credential, std::string PublicKey);
+    configor::json CreatePasskey(std::string ChallengeID, std::string CredentialID, std::string CredentialPublicKey);
     // configor::json GetPasskeyOptions(int UID);
     // configor::json GetPasskey(std::string Credential);
 

@@ -20,24 +20,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Exception.hpp"
 
-/*
-CREATE TABLE `Passkeys` (
-    `UID` INT UNSIGNED NOT NULL,
-    `Credential` VARCHAR(64) NOT NULL,
-    `PublicKey` TEXT NOT NULL
-);
-
-CREATE TABLE `PasskeyChallenges` (
-    `UID` INT UNSIGNED NOT NULL,
-    `Challenge` VARCHAR(64) NOT NULL,
-    `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-*/
-
 class PASSKEY
 {
 public:
     static std::string CreateChallenge();
     static void DeleteChallenge(std::string ChallengeID);
-    static void AddPasskey(std::string Challenge, int UID, std::string Credential, std::string PublicKey);
+    static void CreatePasskey(int UID, std::string Challenge, std::string Credential, std::string PublicKey);
 };

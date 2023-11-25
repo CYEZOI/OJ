@@ -14,45 +14,35 @@ CreatePasskeyReady.onclick = async () => {
     RequestAPI("CreatePasskeyChallenge", {}, () => { }, async (Response) => {
         const CreateOptions = {
             "challenge": StringToBuffer(Response.ChallengeID),
-            "rp": {
-                "name": "Passkey Example",
-                "id": "example.com"
-            },
+            "rp": { "name": "OJ" },
             "user": {
-                "id": "GOVsRuhMQWNoScmh_cK02QyQwTolHSUSlX5ciH242Y4",
-                "name": "Michael",
-                "displayName": "Michael"
+                "id": StringToBuffer(localStorage.getItem("UID")),
+                "name": localStorage.getItem("Username"),
+                "displayName": localStorage.getItem("Username")
             },
-            "pubKeyCredParams": [
-                {
-                    "alg": -7,
-                    "type": "public-key"
-                }
-            ],
-            "timeout": 60000,
-            "attestation": "none",
-            "excludeCredentials": [
-            ],
-            "authenticatorSelection": {
-                "authenticatorAttachment": "platform",
-                "requireResidentKey": true,
-                "residentKey": "required"
-            },
-            "extensions": {
-                "credProps": true
-            }
+            "pubKeyCredParams": [{ "alg": -7, "type": "public-key" }],
+            "timeout": 60000
         };
-        CreateOptions.challenge = StringToBuffer(CreateOptions.challenge);
-        CreateOptions.user.id = StringToBuffer(CreateOptions.user.id);
         CreatePasskeyInformation.innerText = "Please set up your passkey.";
-        var Credential;
-        try {
-            Credential = await navigator.credentials.create({ publicKey: CreateOptions });
-            CreatePasskeyInformation.innerText = "Uploading the passkey to server...";
-            console.log(Credential);
-        } catch (e) {
-            CreatePasskeyInformation.innerText = e;
-        }
+        await navigator.credentials.create({ publicKey: CreateOptions })
+            .then((Credential) => {
+                CreatePasskeyInformation.innerText = "Uploading the passkey to server...";
+                var CredentialIdLength = btoa(BufferToString(Credential.response.getAuthenticatorData()).substr(53, 2)).charCodeAt(1);
+                RequestAPI("CreatePasskey", {
+                    "ChallengeID": String(Response.ChallengeID),
+                    "CredentialID": String(btoa(BufferToString(Credential.response.getAuthenticatorData()).substr(55, CredentialIdLength))),
+                    "CredentialPublicKey": String(btoa(BufferToString(Credential.response.getPublicKey())))
+                }, () => { }, () => {
+                    CreatePasskeyInformation.innerText = "Passkey created successfully.";
+                }, (Response) => {
+                    CreatePasskeyInformation.innerText = "Server returned error.";
+                }, () => { });
+            }).catch((Error) => {
+                CreatePasskeyInformation.innerText = Error;
+                RequestAPI("DeletePasskeyChallenge", {
+                    "ChallengeID": String(Response.ChallengeID)
+                }, () => { }, () => { }, () => { }, () => { });
+            });
     }, (Response) => {
         CreatePasskeyInformation.innerText = "Server returned error.";
     }, () => { });

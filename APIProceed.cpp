@@ -60,6 +60,7 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     ResponseJSON["Message"] = "Login succeeds";
     ResponseJSON["Data"]["Token"] = Token;
     ResponseJSON["Data"]["IsAdmin"] = USERS::IsAdmin(UID);
+    ResponseJSON["Data"]["UID"] = UID;
     return ResponseJSON;
 }
 configor::json API_PROCEED::CheckUsernameAvailable(std::string Username)
@@ -118,6 +119,11 @@ configor::json API_PROCEED::DeletePasskeyChallenge(std::string ChallengeID)
 {
     PASSKEY::DeleteChallenge(ChallengeID);
     CREATE_JSON(true, "Delete passkey challenge succeeds");
+}
+configor::json API_PROCEED::CreatePasskey(std::string ChallengeID, std::string CredentialID, std::string CredentialPublicKey)
+{
+    PASSKEY::CreatePasskey(UID, ChallengeID, CredentialID, CredentialPublicKey);
+    CREATE_JSON(true, "Create passkey succeeds");
 }
 
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
@@ -594,6 +600,17 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = DeletePasskeyChallenge(Data["ChallengeID"].as_string());
+            }
+            else if (Action == "CreatePasskey")
+            {
+                if (!CheckTypes(Data, {{"ChallengeID", configor::config_value_type::string},
+                                       {"CredentialID", configor::config_value_type::string},
+                                       {"CredentialPublicKey", configor::config_value_type::string}}))
+                    ResponseJSON["Message"] = "Invalid parameters";
+                else
+                    ResponseJSON = CreatePasskey(Data["ChallengeID"].as_string(),
+                                                 Data["CredentialID"].as_string(),
+                                                 Data["CredentialPublicKey"].as_string());
             }
             else if (Action == "AddUser")
             {

@@ -16,10 +16,9 @@ void PASSKEY::DeleteChallenge(std::string ChallengeID)
         .Where("Challenge", ChallengeID)
         .Execute();
 }
-void PASSKEY::AddPasskey(std::string Challenge, int UID, std::string Credential, std::string PublicKey)
+void PASSKEY::CreatePasskey(int UID, std::string Challenge, std::string Credential, std::string PublicKey)
 {
     DATABASE::SELECT("PasskeyChallenges")
-        .Select("UID")
         .Select("CreateTime")
         .Where("Challenge", Challenge)
         .Execute(
@@ -30,8 +29,6 @@ void PASSKEY::AddPasskey(std::string Challenge, int UID, std::string Credential,
                 DATABASE::DELETE("PasskeyChallenges")
                     .Where("Challenge", Challenge)
                     .Execute();
-                if (std::stoi(Data[0]["UID"]) != UID)
-                    throw EXCEPTION("Invalid challenge");
                 if (UTILITIES::StringToTime(Data[0]["CreateTime"]) + 60 < time(NULL))
                     throw EXCEPTION("Challenge expired");
             });

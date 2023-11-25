@@ -36,6 +36,8 @@ LoginButton.onclick = () => {
     }, (Response) => {
         localStorage.setItem("Token", Response.Token);
         localStorage.setItem("IsAdmin", Response.IsAdmin);
+        localStorage.setItem("UID", Response.UID);
+        localStorage.setItem("Username", LoginUsernameInput.value);
         const AddonStyle = document.getElementById("AddonStyle");
         AddonStyle.innerHTML = ".NotLoginOnly { display: none; }";
         if (!Response.IsAdmin) {

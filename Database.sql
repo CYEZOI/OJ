@@ -35,7 +35,7 @@ CREATE TABLE `Files` (
 
 CREATE TABLE `Passkeys` (
     `UID` INT UNSIGNED NOT NULL,
-    `Credential` VARCHAR(64) NOT NULL,
+    `Credential` TEXT NOT NULL,
     `PublicKey` TEXT NOT NULL
 );
 
