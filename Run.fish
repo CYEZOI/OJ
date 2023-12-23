@@ -22,8 +22,8 @@ make
 cd ../
 
 # Run
-if test -f "./build/main"
+if test -f "./build/OJ"
     sudo service mysql start >/dev/null
-    sudo ./build/main
+    sudo ./build/OJ
     cat Log.log
 end
