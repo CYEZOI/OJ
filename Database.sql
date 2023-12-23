@@ -44,6 +44,18 @@ CREATE TABLE `PasskeyChallenges` (
     `CreateTime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE `Problems` (
+    `PID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    `Title` VARCHAR(32) NOT NULL UNIQUE,
+    `IOFilename` TEXT NOT NULL,
+    `Description` TEXT NOT NULL,
+    `Input` TEXT,
+    `Output` TEXT NOT NULL,
+    `Range` TEXT,
+    `Hint` TEXT,
+    `Samples` TEXT,
+    `TestGroups` TEXT NOT NULL
+);
 CREATE TABLE `Settings` (
     `Key` VARCHAR(32) NOT NULL UNIQUE,
     `Value` TEXT NOT NULL
