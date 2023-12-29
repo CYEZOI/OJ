@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_executable(main
+add_executable(OJ
     APIProceed.cpp
     Database.cpp
     EmailVerificationCodes.cpp
@@ -42,5 +42,5 @@ set(LIBS
     ssl
     crypto
 )
-target_link_libraries(main PRIVATE ${LIBS})
-target_include_directories(main PRIVATE "/usr/include/mysql")
+target_link_libraries(OJ PRIVATE ${LIBS})
+target_include_directories(OJ PRIVATE "/usr/include/mysql")
