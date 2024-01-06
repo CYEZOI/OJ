@@ -1,0 +1,24 @@
+name: CMake
+on:
+  push:
+  pull_request:
+env:
+  BUILD_TYPE: Release
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install g++ make cmake libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev mount libssl-dev -y
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: Build
+      run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: OJ
+        path: ${{github.workspace}}\build\Release\OJ
