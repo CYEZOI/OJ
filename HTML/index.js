@@ -77,10 +77,10 @@ const CopyTextToClipboard = (Text) => {
 const BufferToString = (Buffer) => {
     return String.fromCharCode(...new Uint8Array(Buffer));
 };
-const StringToBuffer = (String) => {
-    const Buffer = new Uint8Array(String.length);
-    for (let i = 0; i < String.length; i++) {
-        Buffer[i] = String.charCodeAt(i);
+const StringToBuffer = (StringData) => {
+    const Buffer = new Uint8Array(StringData.length);
+    for (let i = 0; i < StringData.length; i++) {
+        Buffer[i] = StringData.charCodeAt(i);
     }
     return Buffer.buffer;
 };
