@@ -13,6 +13,9 @@ const CreateAccordion = (Title, Body, ID, AutoShow = true) => {
         {
             let AccordionTitle = document.createElement("button"); AccordionHeader.appendChild(AccordionTitle);
             AccordionTitle.classList.add("accordion-button");
+            if (!AutoShow) {
+                AccordionTitle.classList.add("collapsed");
+            }
             AccordionTitle.type = "button";
             AccordionTitle.setAttribute("data-bs-toggle", "collapse");
             AccordionTitle.setAttribute("data-bs-target", "#" + ID);
