@@ -1,3 +1,4 @@
+const EditProblemSpinner = document.getElementById("EditProblemSpinner");
 const EditProblemData = document.getElementById("EditProblemData");
 const EditProblemSaveButton = document.getElementById("EditProblemSaveButton");
 CheckTokenAvailable();
@@ -160,6 +161,10 @@ const CreateTestCaseRow = (TestCasesTableBody, Index) => {
         }
     }
 };
+
+let EditProblemSpinnerCollapse = new bootstrap.Collapse("#EditProblemSpinner", {
+    toggle: false
+});
 
 let OldTitle = Data.PID == null ? "Add problem" : "Edit problem";
 PageTitle.innerHTML = "";
@@ -337,6 +342,7 @@ EditProblemSaveButton.onclick = () => {
 };
 
 if (Data.PID != null) {
+    EditProblemSpinnerCollapse.show();
     RequestAPI("GetProblem", {
         "PID": String(Data.PID)
     }, () => { }, (Response) => {
@@ -380,5 +386,10 @@ if (Data.PID != null) {
         OutputEditor.setValue(Response.Output);
         RangeEditor.setValue(Response.Range);
         HintEditor.setValue(Response.Hint);
+
+        EditProblemSpinnerCollapse.hide();
     }, () => { }, () => { });
+}
+else {
+    EditProblemSpinnerCollapse.hide();
 }
