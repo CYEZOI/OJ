@@ -457,7 +457,7 @@ const CreateCodeMirrorSourceEditor = (ElementData, SubmitCallback = () => { }) =
         mode: "text/x-c++src",
         extraKeys: {
             "Ctrl-Space": "autocomplete",
-            "Ctrl-Enter": SubmitCallback()
+            "Ctrl-Enter": SubmitCallback
         },
         gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         theme: "material"
