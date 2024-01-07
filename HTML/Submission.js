@@ -13,19 +13,20 @@ if (Data.SID == null) {
     SwitchPage("Home");
 }
 
+let Submission;
 SubmissionGoToProblemButton.onclick = () => {
     SwitchPage("Problem", {
-        "PID": Response.PID
+        "PID": Submission.PID
     });
 };
 SubmissionResubmitButton.onclick = () => {
     SwitchPage("Submit", {
-        "PID": Response.PID
+        "PID": Submission.PID
     });
 };
 SubmissionRejudgeButton.onclick = () => {
     ShowModal("Rejudge submission", "Are you sure to rejudge it?", () => {
-        if (Response.Result > 10) {
+        if (Submission.Result > 10) {
             ShowModal("Rejudge submission", "This submission is still running, are you sure to rejudge it? This may cause the server to crash!", () => {
                 RequestAPI("RejudgeSubmission", {
                     "SID": Number(Data.SID)
@@ -69,6 +70,7 @@ const ReloadData = () => {
     RequestAPI("GetSubmission", {
         "SID": Number(Data.SID)
     }, () => { }, (Response) => {
+        Submission = Response;
         SubmissionData.innerHTML = "";
         SubmissionData.style.backgroundColor = SubmissionResultColors[Response.Result];
         {
