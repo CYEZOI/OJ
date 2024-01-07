@@ -41,7 +41,7 @@ void TEST_CASE::RedirectIO()
     if (freopen((WorkDir + "/" + Problem->IOFilename + ".in").c_str(), "r", stdin) == nullptr)
         throw EXCEPTION("Can not open input data file");
 
-    if (Problem->IOFilename == std::to_string(SID))
+    if (Problem->IOFilename == "")
     {
         if (freopen((WorkDir + "/" + Problem->IOFilename + ".out").c_str(), "w", stdout) == nullptr)
             throw EXCEPTION("Can not open output data file");
