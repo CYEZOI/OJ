@@ -89,14 +89,14 @@ RequestAPI("GetProblem", {
             {
                 let InputTextArea = document.createElement("textarea"); SampleInput.appendChild(InputTextArea);
                 InputTextArea.classList.add("form-control");
-                InputTextArea.innerText = Sample.Input;
+                InputTextArea.innerHTML = Sample.Input;
             }
             let SampleOutput = document.createElement("div"); SampleData.appendChild(SampleOutput);
             SampleOutput.classList.add("col-6");
             {
                 let OutputTextArea = document.createElement("textarea"); SampleOutput.appendChild(OutputTextArea);
                 OutputTextArea.classList.add("form-control");
-                OutputTextArea.innerText = Sample.Output;
+                OutputTextArea.innerHTML = Sample.Output;
             }
             if (Sample.Description != "") {
                 let SampleDescription = document.createElement("div"); SampleData.appendChild(SampleDescription);

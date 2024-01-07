@@ -23,14 +23,14 @@ const CreateSampleRow = (SamplesTableBody, Index) => {
         let SamplesTableBodyRowInput = document.createElement("td"); SamplesTableBodyRow.appendChild(SamplesTableBodyRowInput);
         {
             let InputTextArea = document.createElement("textarea"); SamplesTableBodyRowInput.appendChild(InputTextArea);
-            InputTextArea.innerText = Sample.Input;
+            InputTextArea.innerHTML = Sample.Input;
             Sample.InputEditor = CreateCodeMirrorTextEditor(InputTextArea);
             Sample.InputEditor.setSize("100%", "auto");
         }
         let SamplesTableBodyRowOutput = document.createElement("td"); SamplesTableBodyRow.appendChild(SamplesTableBodyRowOutput);
         {
             let OutputTextArea = document.createElement("textarea"); SamplesTableBodyRowOutput.appendChild(OutputTextArea);
-            OutputTextArea.innerText = Sample.Output;
+            OutputTextArea.innerHTML = Sample.Output;
             Sample.OutputEditor = CreateCodeMirrorTextEditor(OutputTextArea);
             Sample.OutputEditor.setSize("100%", "auto");
         }
@@ -38,7 +38,7 @@ const CreateSampleRow = (SamplesTableBody, Index) => {
         {
             let DescriptionTextArea = document.createElement("textarea"); SamplesTableBodyRowDescription.appendChild(DescriptionTextArea);
             DescriptionTextArea.classList.add("form-control");
-            DescriptionTextArea.innerText = Sample.Description;
+            DescriptionTextArea.innerHTML = Sample.Description;
             Sample.DescriptionEditor = CreateVditorEditor(SamplesTableBodyRowDescription, Sample.Description);
         }
         let SamplesTableBodyRowOperation = document.createElement("td"); SamplesTableBodyRow.appendChild(SamplesTableBodyRowOperation);
@@ -80,14 +80,14 @@ const CreateTestCaseRow = (TestCasesTableBody, Index) => {
         let TestCasesTableBodyRowInput = document.createElement("td"); TestCasesTableBodyRow.appendChild(TestCasesTableBodyRowInput);
         {
             let InputTextArea = document.createElement("textarea"); TestCasesTableBodyRowInput.appendChild(InputTextArea);
-            InputTextArea.innerText = TestCase.Input;
+            InputTextArea.innerHTML = TestCase.Input;
             TestCase.InputEditor = CreateCodeMirrorTextEditor(InputTextArea);
             TestCase.InputEditor.setSize("100%", "auto");
         }
         let TestCasesTableBodyRowAnswer = document.createElement("td"); TestCasesTableBodyRow.appendChild(TestCasesTableBodyRowAnswer);
         {
             let AnswerTextArea = document.createElement("textarea"); TestCasesTableBodyRowAnswer.appendChild(AnswerTextArea);
-            AnswerTextArea.innerText = TestCase.Answer;
+            AnswerTextArea.innerHTML = TestCase.Answer;
             TestCase.AnswerEditor = CreateCodeMirrorTextEditor(AnswerTextArea);
             TestCase.AnswerEditor.setSize("100%", "auto");
         }
