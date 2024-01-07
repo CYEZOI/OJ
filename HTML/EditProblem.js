@@ -327,7 +327,7 @@ EditProblemSaveButton.onclick = () => {
         "Samples": JSON.stringify(SubmitSamplesData),
         "TestGroups": JSON.stringify(SubmitTestGroupsData)
     }, () => { }, () => {
-        ShowSuccess(Data.PID != null ? "Update" : "Add" + " Problem Success");
+        ShowSuccess((Data.PID != null ? "Update" : "Add") + " Problem Success");
         setTimeout(() => {
             SwitchPage("Problem", {
                 "PID": PID.value
