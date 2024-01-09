@@ -298,3 +298,8 @@ time_t UTILITIES::StringToTime(std::string String)
     Time.tm_mon--;
     return mktime(&Time);
 }
+bool UTILITIES::VerifySignature(std::string Data, std::string Signature, std::string PublicKey)
+{
+    // CredentialSignature, CredentialID, PublicKey
+    return true;
+}

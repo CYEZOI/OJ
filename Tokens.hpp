@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class TOKENS
 {
 public:
-    static void CreateToken(int UID, std::string &TokenValue);
+    static std::string CreateToken(int UID);
     static void CheckToken(std::string TokenValue);
     static void DeleteToken(std::string TokenValue);
     static int GetUID(std::string TokenValue);

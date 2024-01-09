@@ -24,6 +24,7 @@ class PASSKEY
 {
 public:
     static std::string CreateChallenge();
-    static void DeleteChallenge(std::string ChallengeID);
+    static void DeleteChallenge(std::string Challenge);
     static void CreatePasskey(int UID, std::string Challenge, std::string Credential, std::string PublicKey);
+    static std::string GetPasskey(int UID, std::string Credential);
 };

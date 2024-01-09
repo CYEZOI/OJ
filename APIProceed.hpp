@@ -53,10 +53,9 @@ private:
     configor::json ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password);
 
     configor::json CreatePasskeyChallenge();
-    configor::json DeletePasskeyChallenge(std::string ChallengeID);
-    configor::json CreatePasskey(std::string ChallengeID, std::string CredentialID, std::string CredentialPublicKey);
-    // configor::json GetPasskeyOptions(int UID);
-    // configor::json GetPasskey(std::string Credential);
+    configor::json DeletePasskeyChallenge(std::string Challenge);
+    configor::json CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey);
+    configor::json LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature);
 
     configor::json AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role);
     configor::json GetUser(int UID);

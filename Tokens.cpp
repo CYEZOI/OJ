@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "Users.hpp"
 
-void TOKENS::CreateToken(int UID, std::string &TokenValue)
+std::string TOKENS::CreateToken(int UID)
 {
     DATABASE::SELECT("Tokens")
         .Select("TokenValue")
@@ -32,7 +32,7 @@ void TOKENS::CreateToken(int UID, std::string &TokenValue)
                 if (Data.size() != 0)
                     DeleteToken(Data[0]["TokenValue"]);
             });
-    TokenValue = "";
+    std::string TokenValue = "";
     const std::string TokenCharList = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     for (int i = 0; i < 32; i++)
         TokenValue.push_back(TokenCharList[rand() % TokenCharList.size()]);
@@ -40,6 +40,7 @@ void TOKENS::CreateToken(int UID, std::string &TokenValue)
         .Insert("UID", UID)
         .Insert("TokenValue", TokenValue)
         .Execute();
+    return TokenValue;
 }
 void TOKENS::CheckToken(std::string TokenValue)
 {

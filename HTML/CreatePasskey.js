@@ -13,7 +13,7 @@ CreatePasskeyReady.onclick = async () => {
     CreatePasskeyInformation.innerText = "Contact the server for information...";
     RequestAPI("CreatePasskeyChallenge", {}, () => { }, async (Response) => {
         const CreateOptions = {
-            "challenge": StringToBuffer(Response.ChallengeID),
+            "challenge": StringToBuffer(Response.Challenge),
             "rp": { "name": "OJ" },
             "user": {
                 "id": StringToBuffer(localStorage.getItem("UID")),
@@ -26,11 +26,11 @@ CreatePasskeyReady.onclick = async () => {
         CreatePasskeyInformation.innerText = "Please set up your passkey.";
         await navigator.credentials.create({ publicKey: CreateOptions })
             .then((Credential) => {
+                debugger
                 CreatePasskeyInformation.innerText = "Uploading the passkey to server...";
-                var CredentialIdLength = btoa(BufferToString(Credential.response.getAuthenticatorData()).substr(53, 2)).charCodeAt(1);
                 RequestAPI("CreatePasskey", {
-                    "ChallengeID": String(Response.ChallengeID),
-                    "CredentialID": String(btoa(BufferToString(Credential.response.getAuthenticatorData()).substr(55, CredentialIdLength))),
+                    "Challenge": String(Response.Challenge),
+                    "CredentialID": String(Credential.id),
                     "CredentialPublicKey": String(btoa(BufferToString(Credential.response.getPublicKey())))
                 }, () => { }, () => {
                     CreatePasskeyInformation.innerText = "Passkey created successfully.";
@@ -40,7 +40,7 @@ CreatePasskeyReady.onclick = async () => {
             }).catch((Error) => {
                 CreatePasskeyInformation.innerText = Error;
                 RequestAPI("DeletePasskeyChallenge", {
-                    "ChallengeID": String(Response.ChallengeID)
+                    "Challenge": String(Response.Challenge)
                 }, () => { }, () => { }, () => { }, () => { });
             });
     }, (Response) => {

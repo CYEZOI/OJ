@@ -4,16 +4,16 @@
 
 std::string PASSKEY::CreateChallenge()
 {
-    std::string ChallengeID = UTILITIES::RandomToken();
+    std::string Challenge = UTILITIES::RandomToken();
     DATABASE::INSERT("PasskeyChallenges")
-        .Insert("Challenge", ChallengeID)
+        .Insert("Challenge", Challenge)
         .Execute();
-    return ChallengeID;
+    return Challenge;
 }
-void PASSKEY::DeleteChallenge(std::string ChallengeID)
+void PASSKEY::DeleteChallenge(std::string Challenge)
 {
     DATABASE::DELETE("PasskeyChallenges")
-        .Where("Challenge", ChallengeID)
+        .Where("Challenge", Challenge)
         .Execute();
 }
 void PASSKEY::CreatePasskey(int UID, std::string Challenge, std::string Credential, std::string PublicKey)
@@ -22,7 +22,7 @@ void PASSKEY::CreatePasskey(int UID, std::string Challenge, std::string Credenti
         .Select("CreateTime")
         .Where("Challenge", Challenge)
         .Execute(
-            [UID, Challenge](auto Data)
+            [Challenge](auto Data)
             {
                 if (Data.size() != 1)
                     throw EXCEPTION("Invalid challenge");
@@ -37,4 +37,20 @@ void PASSKEY::CreatePasskey(int UID, std::string Challenge, std::string Credenti
         .Insert("Credential", Credential)
         .Insert("PublicKey", PublicKey)
         .Execute();
+}
+std::string PASSKEY::GetPasskey(int UID, std::string Credential)
+{
+    std::string Passkey;
+    DATABASE::SELECT("Passkeys")
+        .Select("PublicKey")
+        .Where("UID", UID)
+        .Where("Credential", Credential)
+        .Execute(
+            [&Passkey](auto Data)
+            {
+                if (Data.size() != 1)
+                    throw EXCEPTION("Invalid credential");
+                Passkey = Data[0]["PublicKey"];
+            });
+    return Passkey;
 }

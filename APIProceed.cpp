@@ -53,8 +53,7 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     REGEXES::CheckPassword(Password);
     int UID;
     USERS::CheckPasswordCorrect(Username, USERS::HashPassword(Password), UID);
-    std::string Token;
-    TOKENS::CreateToken(UID, Token);
+    std::string Token = TOKENS::CreateToken(UID);
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
     ResponseJSON["Message"] = "Login succeeds";
@@ -112,18 +111,49 @@ configor::json API_PROCEED::CreatePasskeyChallenge()
     std::string ChallengeChallengeID = PASSKEY::CreateChallenge();
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
-    ResponseJSON["Data"]["ChallengeID"] = ChallengeChallengeID;
+    ResponseJSON["Data"]["Challenge"] = ChallengeChallengeID;
     return ResponseJSON;
 }
-configor::json API_PROCEED::DeletePasskeyChallenge(std::string ChallengeID)
+configor::json API_PROCEED::DeletePasskeyChallenge(std::string Challenge)
 {
-    PASSKEY::DeleteChallenge(ChallengeID);
+    PASSKEY::DeleteChallenge(Challenge);
     CREATE_JSON(true, "Delete passkey challenge succeeds");
 }
-configor::json API_PROCEED::CreatePasskey(std::string ChallengeID, std::string CredentialID, std::string CredentialPublicKey)
+configor::json API_PROCEED::CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey)
 {
-    PASSKEY::CreatePasskey(UID, ChallengeID, CredentialID, CredentialPublicKey);
+    PASSKEY::CreatePasskey(UID, Challenge, CredentialID, CredentialPublicKey);
     CREATE_JSON(true, "Create passkey succeeds");
+}
+configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature)
+{
+    std::string PublicKey = PASSKEY::GetPasskey(UserHandle, CredentialID);
+    if (PublicKey == "")
+        CREATE_JSON(false, "Invalid credential");
+    DATABASE::SELECT("PasskeyChallenges")
+        .Select("CreateTime")
+        .Where("Challenge", Challenge)
+        .Execute(
+            [Challenge](auto Data)
+            {
+                if (Data.size() != 1)
+                    throw EXCEPTION("Invalid challenge");
+                DATABASE::DELETE("PasskeyChallenges")
+                    .Where("Challenge", Challenge)
+                    .Execute();
+                if (UTILITIES::StringToTime(Data[0]["CreateTime"]) + 60 < time(NULL))
+                    throw EXCEPTION("Challenge expired");
+            });
+
+    if (!UTILITIES::VerifySignature(CredentialSignature, CredentialID, PublicKey))
+        CREATE_JSON(false, "Invalid credential signature");
+    std::string Token = TOKENS::CreateToken(UserHandle);
+    configor::json ResponseJSON = BaseJSON;
+    ResponseJSON["Success"] = true;
+    ResponseJSON["Data"]["Token"] = Token;
+    ResponseJSON["Data"]["IsAdmin"] = USERS::IsAdmin(UserHandle);
+    ResponseJSON["Data"]["UID"] = UserHandle;
+    ResponseJSON["Data"]["Username"] = USERS::GetUser(UserHandle).Username;
+    return ResponseJSON;
 }
 
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
@@ -576,6 +606,33 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                              Data["VerificationCode"].as_string(),
                                              Data["Password"].as_string());
         }
+        else if (Action == "CreatePasskeyChallenge")
+        {
+            if (!CheckTypes(Data, {}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = CreatePasskeyChallenge();
+        }
+        else if (Action == "DeletePasskeyChallenge")
+        {
+            if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = DeletePasskeyChallenge(Data["Challenge"].as_string());
+        }
+        else if (Action == "LoginWithPasskey")
+        {
+            if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string},
+                                   {"CredentialID", configor::config_value_type::string},
+                                   {"UID", configor::config_value_type::number_integer},
+                                   {"CredentialSignature", configor::config_value_type::string}}))
+                ResponseJSON["Message"] = "Invalid parameters";
+            else
+                ResponseJSON = LoginWithPasskey(Data["Challenge"].as_string(),
+                                                Data["CredentialID"].as_string(),
+                                                Data["UID"].as_integer(),
+                                                Data["CredentialSignature"].as_string());
+        }
         else
         {
             if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
@@ -587,28 +644,14 @@ configor::json API_PROCEED::Proceed(configor::json Request)
             UID = TOKENS::GetUID(Token);
             IsAdmin = USERS::IsAdmin(UID);
 
-            if (Action == "CreatePasskeyChallenge")
+            if (Action == "CreatePasskey")
             {
-                if (!CheckTypes(Data, {}))
-                    ResponseJSON["Message"] = "Invalid parameters";
-                else
-                    ResponseJSON = CreatePasskeyChallenge();
-            }
-            else if (Action == "DeletePasskeyChallenge")
-            {
-                if (!CheckTypes(Data, {{"ChallengeID", configor::config_value_type::string}}))
-                    ResponseJSON["Message"] = "Invalid parameters";
-                else
-                    ResponseJSON = DeletePasskeyChallenge(Data["ChallengeID"].as_string());
-            }
-            else if (Action == "CreatePasskey")
-            {
-                if (!CheckTypes(Data, {{"ChallengeID", configor::config_value_type::string},
+                if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string},
                                        {"CredentialID", configor::config_value_type::string},
                                        {"CredentialPublicKey", configor::config_value_type::string}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
-                    ResponseJSON = CreatePasskey(Data["ChallengeID"].as_string(),
+                    ResponseJSON = CreatePasskey(Data["Challenge"].as_string(),
                                                  Data["CredentialID"].as_string(),
                                                  Data["CredentialPublicKey"].as_string());
             }
