@@ -197,14 +197,18 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
 const CheckTokenAvailable = () => {
     var Token = localStorage.getItem("Token");
     if (Token == null) {
-        SwitchPage("Login");
+        SwitchPage("Login", {
+            CallBack: location.href
+        });
         return;
     }
     RequestAPI("CheckTokenAvailable", {
         "Token": String(localStorage.getItem("Token"))
     }, () => { }, () => { }, () => {
         localStorage.removeItem("Token");
-        SwitchPage("Login");
+        SwitchPage("Login", {
+            CallBack: location.href
+        });
     }, () => { }, false);
 };
 

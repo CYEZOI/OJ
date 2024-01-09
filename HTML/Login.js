@@ -45,7 +45,12 @@ LoginButton.onclick = () => {
         }
         ShowSuccess("Login success");
         setTimeout(() => {
-            SwitchPage("Home");
+            if (new URLSearchParams(window.location.search).get("Callback") !== null) {
+                location.href = new URLSearchParams(window.location.search).get("Callback");
+            }
+            else {
+                SwitchPage("Home");
+            }
         }, 1000);
     }, () => {
         SetValid(LoginPasswordInput, false);

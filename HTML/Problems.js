@@ -1,11 +1,11 @@
 const ProblemsAddProblemButton = document.getElementById("ProblemsAddProblemButton");
 const ProblemsTable = document.getElementById("ProblemsTable");
 const ProblemsPagination = document.getElementById("ProblemsPagination");
-
 CheckTokenAvailable();
 if (Data.Page == null) {
     Data.Page = 1;
 }
+
 for (let i = 0; i < 10; i++) {
     let Row = document.createElement("tr"); ProblemsTable.children[1].appendChild(Row);
     {

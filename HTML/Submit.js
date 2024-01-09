@@ -1,11 +1,11 @@
 const SubmitCode = document.getElementById("SubmitCode");
 const SubmitEnableO2 = document.getElementById("SubmitEnableO2");
 const SubmitButton = document.getElementById("SubmitButton");
-
 CheckTokenAvailable();
 if (Data.PID == null) {
     SwitchPage("Home");
 }
+
 PageTitle.innerHTML += " " + Data.PID;
 let SubmitCodeMirror = CreateCodeMirrorSourceEditor(SubmitCode, () => {
     SubmitButton.onclick();

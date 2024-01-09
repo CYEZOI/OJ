@@ -7,8 +7,8 @@ const SettingsSystemCallBanned = document.getElementById("SettingsSystemCallBann
 const SettingsSystemCallAllowedForTimes = document.getElementById("SettingsSystemCallAllowedForTimes");
 const SettingsSystemCallAllowedForTimesInput = document.getElementById("SettingsSystemCallAllowedForTimesInput");
 const SettingsSave = document.getElementById("SettingsSave");
-
 CheckTokenAvailable();
+
 let SystemCallList = [];
 const SystemCallsNames = ["read", "write", "open", "close", "stat", "fstat", "lstat", "poll", "lseek", "mmap",
     "mprotect", "munmap", "brk", "rt_sigaction", "rt_sigprocmask", "rt_sigreturn", "ioctl", "pread64", "pwrite64", "readv",
