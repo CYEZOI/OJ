@@ -47,7 +47,11 @@ void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK 
             break;
         }
         if (Result == 0)
-            break;
+        {
+            FD_ZERO(&ReadSet);
+            FD_SET(Socket, &ReadSet);
+            continue;
+        }
         char Buffer[1024];
         int Length = recv(Socket, Buffer, 1024, 0);
         if (Length == -1)
