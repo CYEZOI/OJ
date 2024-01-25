@@ -112,7 +112,7 @@ void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::stri
     }
     catch (sql::SQLException &e)
     {
-        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
+        throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
@@ -160,7 +160,7 @@ void DATABASE::INSERT::Execute(std::function<void(int)> Callback)
     }
     catch (sql::SQLException &e)
     {
-        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
+        throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
@@ -203,7 +203,7 @@ void DATABASE::DELETE::Execute()
     }
     catch (sql::SQLException &e)
     {
-        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
+        throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
@@ -254,7 +254,7 @@ void DATABASE::UPDATE::Execute()
     }
     catch (sql::SQLException &e)
     {
-        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
+        throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
@@ -278,7 +278,7 @@ void DATABASE::SIZE::Execute(std::function<void(int)> Callback)
     }
     catch (sql::SQLException &e)
     {
-        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
+        throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 DATABASE::TRUNCATE::TRUNCATE(std::string TableName)
@@ -296,7 +296,7 @@ void DATABASE::TRUNCATE::Execute()
     }
     catch (sql::SQLException &e)
     {
-        throw EXCEPTION("SQLException" + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
+        throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
@@ -313,7 +313,7 @@ sql::Connection *DATABASE::CreateConnection()
     }
     catch (sql::SQLException &e)
     {
-        std::cout << "SQLException" << std::to_string(e.getErrorCode()) << " " << e.what() << " " << e.getSQLState() << std::endl;
+        std::cout << "SQLException " << std::to_string(e.getErrorCode()) << " " << e.what() << " " << e.getSQLState() << std::endl;
         return nullptr;
     }
     return Connection;
