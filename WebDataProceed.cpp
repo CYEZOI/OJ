@@ -34,7 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
 {
-    std::string BasicFolder = "/home/langningc2009/OJ/HTML";
+    std::string BasicFolder = "HTML";
     std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
     std::string RequestPath = HTTPRequest.Path;
