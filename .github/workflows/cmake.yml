@@ -21,4 +21,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: OJ
-        path: ${{github.workspace}}\build\Release\OJ
+        path: ${{github.workspace}}\build\OJ
