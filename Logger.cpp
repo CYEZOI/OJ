@@ -70,7 +70,7 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
 
 void LOGGER::Debug(std::string Data)
 {
-    // Output("D", "36", Data);
+    Output("D", "36", Data);
 }
 void LOGGER::Info(std::string Data) { Output("I", "32", Data); }
 void LOGGER::Warning(std::string Data) { Output("W", "33", Data); }

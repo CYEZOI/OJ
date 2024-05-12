@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <openssl/sha.h>
 #include "Settings.hpp"
 #include "Utilities.hpp"
 
@@ -301,5 +302,23 @@ time_t UTILITIES::StringToTime(std::string String)
 bool UTILITIES::VerifySignature(std::string Data, std::string Signature, std::string PublicKey)
 {
     // CredentialSignature, CredentialID, PublicKey
+    Logger.Debug(HashData(Data));
     return true;
+}
+std::string UTILITIES::HashData(std::string Data)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, Data.c_str(), Data.size());
+    SHA256_Final(hash, &sha256);
+
+    std::stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    }
+
+    std::string Hash = ss.str();
+    return Hash;
 }

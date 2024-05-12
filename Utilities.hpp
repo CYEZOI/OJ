@@ -50,4 +50,5 @@ public:
     static void SendEmail(std::string To, std::string Subject, std::string Body);
     static time_t StringToTime(std::string String);
     static bool VerifySignature(std::string Data, std::string Signature, std::string PublicKey);
+    static std::string HashData(std::string Data);
 };
