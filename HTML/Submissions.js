@@ -1,6 +1,5 @@
 const SubmissionsTable = document.getElementById("SubmissionsTable");
 const SubmissionsPagination = document.getElementById("SubmissionsPagination");
-
 CheckTokenAvailable();
 if (Data.Page == null) {
     Data.Page = 1;

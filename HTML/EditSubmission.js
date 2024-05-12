@@ -12,7 +12,6 @@ const EditSubmissionCode = document.getElementById("EditSubmissionCode");
 const SubmissionTestGroupsTable = document.getElementById("SubmissionTestGroupsTable");
 const SubmissionTestCasesTable = document.getElementById("SubmissionTestCasesTable");
 const EditSubmissionSaveButton = document.getElementById("EditSubmissionSaveButton");
-
 CheckTokenAvailable();
 if (Data.SID == null) {
     SwitchPage("Home");

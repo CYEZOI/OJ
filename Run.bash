@@ -1,19 +1,21 @@
-#!/usr/bin/fish
+#!/bin/bash
 echo -e "\033[33m"
-echo "OJ  Copyright (C) 2023  langningchen"
+echo "OJ  Copyright (C) 2024  langningchen"
 echo "This program comes with ABSOLUTELY NO WARRANTY."
 echo "This is free software, and you are welcome to redistribute it under certain conditions."
 echo -e "\033[0m"
 
 # Clean
-for mount_point in (sudo mount | awk '{print $3}')
-    if string match -q --regex "/home/Judger/Run/*" "$mount_point"
+for mount_point in $(sudo mount | awk '{print $3}')
+do
+    if [[ "$mount_point" =~ "/home/Judger/Run/"* ]]
+    then
         sudo umount "$mount_point"
-    end
-end
+    fi
+done
 sudo rm -rf /home/Judger/Run
 sudo mkdir /home/Judger/Run
-sudo rm -f (sudo find "/home/Judger/" -name "*.log") Log.log ./build/main
+sudo rm -f $(sudo find "/home/Judger/" -name "*.log") Log.log
 
 # Build
 cmake -B build
@@ -21,7 +23,7 @@ cmake --build build -j 8
 
 # Run
 if test -f "./build/OJ"
-    sudo service mysql start >/dev/null
+then
+    sudo service mysql start >/dev/null 2>&1
     sudo ./build/OJ
-    cat Log.log
-end
+fi

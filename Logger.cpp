@@ -1,6 +1,6 @@
 /**********************************************************************
 OJ: An online judge server written with only C++ and MySQL.
-Copyright (C) 2023  langningchen
+Copyright (C) 2024  langningchen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,6 +42,9 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
     if (LogFile == nullptr)
         LogFile = stdout;
 
+    if (Data.length() > 65535)
+        Data = Data.substr(0, 65535) + " ... (truncated)";
+
     struct timeval CurrentSecond;
     gettimeofday(&CurrentSecond, nullptr);
     int MilliSecond = CurrentSecond.tv_usec / 1000;
@@ -51,7 +54,12 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
     localtime_r(&CurrentSecond.tv_sec, &TempTime);
     strftime(CurrentTime, sizeof(CurrentTime), "%Y-%m-%d %H:%M:%S", &TempTime);
 
-    char Buffer[1024];
+    char* Buffer = new char[Data.length() + 100];
+    if (Buffer == nullptr)
+    {
+        std::cout << "Failed to allocate memory for log buffer" << std::endl;
+        return;
+    }
     sprintf(Buffer, "\033[%sm%s[%s.%03d][%d-%d] %s\033[0m\n",
             Style.c_str(), Type.c_str(),
             CurrentTime, MilliSecond,
@@ -61,11 +69,11 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
     OutputMutex.lock();
     fprintf(LogFile, "%s", Buffer);
     fflush(LogFile);
-    OutputMutex.unlock();
-
     errno = 0;
     if (Type == "W" || Type == "E")
         printf("%s", Buffer);
+    OutputMutex.unlock();
+    delete Buffer;
 }
 
 void LOGGER::Debug(std::string Data)

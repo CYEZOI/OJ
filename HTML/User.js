@@ -3,7 +3,6 @@ const UserUsername = document.getElementById("UserUsername");
 const UserNickname = document.getElementById("UserNickname");
 const UserEmail = document.getElementById("UserEmail");
 const UserRole = document.getElementById("UserRole");
-
 CheckTokenAvailable();
 if (Data.UID == null) {
     SwitchPage("Home");

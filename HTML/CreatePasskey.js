@@ -1,5 +1,6 @@
 const CreatePasskeyInformation = document.getElementById("CreatePasskeyInformation");
 const CreatePasskeyReady = document.getElementById("CreatePasskeyReady");
+CheckTokenAvailable();
 
 if (!navigator.credentials) {
     CreatePasskeyInformation.innerText = "We are sorry, but your browser does not support passkey.";

@@ -3,11 +3,11 @@ const HashPassword = document.getElementById("HashPassword");
 const HashedPassword = document.getElementById("HashedPassword");
 const UsersAddUserButton = document.getElementById("UsersAddUserButton");
 const UsersData = document.getElementById("UsersData");
-
 CheckTokenAvailable();
 if (Data.Page == null) {
     Data.Page = 1;
 }
+
 for (let i = 0; i < 10; i++) {
     let Row = document.createElement("tr"); UsersData.children[1].appendChild(Row);
     {

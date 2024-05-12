@@ -1,6 +1,6 @@
 /**********************************************************************
 OJ: An online judge server written with only C++ and MySQL.
-Copyright (C) 2023  langningchen
+Copyright (C) 2024  langningchen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

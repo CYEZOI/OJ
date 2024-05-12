@@ -7,7 +7,6 @@ const SubmissionDeleteButton = document.getElementById("SubmissionDeleteButton")
 const SubmissionSpinner = document.getElementById("SubmissionSpinner");
 const SubmissionData = document.getElementById("SubmissionData");
 const SubmissionCode = document.getElementById("SubmissionCode");
-
 CheckTokenAvailable();
 if (Data.SID == null) {
     SwitchPage("Home");

@@ -2,8 +2,8 @@ const ProblemSubmitButton = document.getElementById("ProblemSubmitButton");
 const ProblemEditButton = document.getElementById("ProblemEditButton");
 const ProblemDeleteButton = document.getElementById("ProblemDeleteButton");
 const ProblemData = document.getElementById("ProblemData");
-
 CheckTokenAvailable();
+
 const CreateAccordion = (Title, Body, ID, AutoShow = true) => {
     let Accordion = document.createElement("div"); ProblemData.appendChild(Accordion);
     Accordion.classList.add("accordion-item");
