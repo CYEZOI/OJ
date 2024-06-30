@@ -3,10 +3,9 @@ const HashPassword = document.getElementById("HashPassword");
 const HashedPassword = document.getElementById("HashedPassword");
 const UsersAddUserButton = document.getElementById("UsersAddUserButton");
 const UsersData = document.getElementById("UsersData");
+const UsersPagination = document.getElementById("UsersPagination");
 CheckTokenAvailable();
-if (Data.Page == null) {
-    Data.Page = 1;
-}
+Data.Page = Data.Page || 1;
 
 for (let i = 0; i < 10; i++) {
     let Row = document.createElement("tr"); UsersData.children[1].appendChild(Row);
@@ -30,9 +29,28 @@ HashPassword.onclick = () => {
 UsersAddUserButton.onclick = () => {
     SwitchPage("AddUser");
 };
+
+UsersPagination.children[2].children[0].innerText = Data.Page;
 RequestAPI("GetUsers", {
     "Page": Number(Data.Page)
 }, () => { }, (Response) => {
+    UsersPagination.children[0].children[0].setAttribute("data-page-number", 1);
+    UsersPagination.children[1].children[0].setAttribute("data-page-number", Math.max(Data.Page - 1, 1));
+    UsersPagination.children[2].children[0].setAttribute("data-page-number", Data.Page);
+    UsersPagination.children[3].children[0].setAttribute("data-page-number", Math.min(Data.Page + 1, Response.PageCount));
+    UsersPagination.children[4].children[0].setAttribute("data-page-number", Response.PageCount);
+    for (let i = 0; i < 5; i++) {
+        if (UsersPagination.children[i].children[0].getAttribute("data-page-number") ==
+            UsersPagination.children[2].children[0].getAttribute("data-page-number")) {
+            UsersPagination.children[i].children[0].classList.add("disabled");
+        }
+        UsersPagination.children[i].children[0].onclick = () => {
+            SwitchPage("Users", {
+                "Page": UsersPagination.children[i].children[0].getAttribute("data-page-number")
+            });
+        };
+    }
+
     UsersData.children[1].innerHTML = "";
     for (let i = 0; i < Response.Users.length; i++) {
         let DataRow = document.createElement("tr"); UsersData.children[1].appendChild(DataRow);

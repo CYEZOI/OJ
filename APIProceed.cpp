@@ -33,22 +33,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "WebDataProceed.hpp"
 
-bool API_PROCEED::CheckTypes(configor::json JSON, std::vector<std::pair<std::string, configor::config_value_type>> Types)
-{
+bool API_PROCEED::CheckTypes(configor::json JSON, std::vector<std::pair<std::string, configor::config_value_type>> Types) {
     for (auto i : Types)
         if (JSON[i.first].type() != i.second)
             return false;
     return true;
 }
 
-configor::json API_PROCEED::CheckTokenAvailable(std::string Token)
-{
+configor::json API_PROCEED::CheckTokenAvailable(std::string Token) {
     TOKENS::CheckToken(Token);
     CREATE_JSON(true, "Token available");
 }
 
-configor::json API_PROCEED::Login(std::string Username, std::string Password)
-{
+configor::json API_PROCEED::Login(std::string Username, std::string Password) {
     REGEXES::CheckUsername(Username);
     REGEXES::CheckPassword(Password);
     int UID;
@@ -62,28 +59,24 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password)
     ResponseJSON["Data"]["UID"] = UID;
     return ResponseJSON;
 }
-configor::json API_PROCEED::CheckUsernameAvailable(std::string Username)
-{
+configor::json API_PROCEED::CheckUsernameAvailable(std::string Username) {
     REGEXES::CheckUsername(Username);
     USERS::CheckUsernameAvailable(Username);
     CREATE_JSON(true, "Username available");
 }
-configor::json API_PROCEED::CheckEmailAvailable(std::string EmailAddress)
-{
+configor::json API_PROCEED::CheckEmailAvailable(std::string EmailAddress) {
     REGEXES::CheckEmailAddress(EmailAddress);
     USERS::CheckEmailAvailable(EmailAddress);
     CREATE_JSON(true, "Email available");
 }
-configor::json API_PROCEED::SendVerificationCode(std::string EmailAddress)
-{
+configor::json API_PROCEED::SendVerificationCode(std::string EmailAddress) {
     REGEXES::CheckEmailAddress(EmailAddress);
     std::string VerificationCode;
     EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(EmailAddress, VerificationCode);
     UTILITIES::SendEmail(EmailAddress, "Email verification Code", "Hello, here is your verification code. Your Verification code is " + VerificationCode + ". Thanks.");
     CREATE_JSON(true, "Send verification code succeeds")
 }
-configor::json API_PROCEED::Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode)
-{
+configor::json API_PROCEED::Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode) {
     REGEXES::CheckUsername(Username);
     REGEXES::CheckNickname(Nickname);
     REGEXES::CheckPassword(Password);
@@ -96,8 +89,7 @@ configor::json API_PROCEED::Register(std::string Username, std::string Nickname,
     USERS::AddUser(Username, Nickname, USERS::HashPassword(Password), EmailAddress, USER_ROLE::USER_ROLE_USER);
     CREATE_JSON(true, "Register succeeds");
 }
-configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password)
-{
+configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password) {
     REGEXES::CheckEmailAddress(EmailAddress);
     REGEXES::CheckVerificationCode(VerificationCode);
     EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(EmailAddress, VerificationCode);
@@ -106,26 +98,22 @@ configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string 
     CREATE_JSON(true, "Reset password succeeds");
 }
 
-configor::json API_PROCEED::CreatePasskeyChallenge()
-{
+configor::json API_PROCEED::CreatePasskeyChallenge() {
     std::string ChallengeChallengeID = PASSKEY::CreateChallenge();
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
     ResponseJSON["Data"]["Challenge"] = ChallengeChallengeID;
     return ResponseJSON;
 }
-configor::json API_PROCEED::DeletePasskeyChallenge(std::string Challenge)
-{
+configor::json API_PROCEED::DeletePasskeyChallenge(std::string Challenge) {
     PASSKEY::DeleteChallenge(Challenge);
     CREATE_JSON(true, "Delete passkey challenge succeeds");
 }
-configor::json API_PROCEED::CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey)
-{
+configor::json API_PROCEED::CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey) {
     PASSKEY::CreatePasskey(UID, Challenge, CredentialID, CredentialPublicKey);
     CREATE_JSON(true, "Create passkey succeeds");
 }
-configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature)
-{
+configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature) {
     std::string PublicKey = PASSKEY::GetPasskey(UserHandle, CredentialID);
     if (PublicKey == "")
         CREATE_JSON(false, "Invalid credential");
@@ -133,8 +121,7 @@ configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string 
         .Select("CreateTime")
         .Where("Challenge", Challenge)
         .Execute(
-            [Challenge](auto Data)
-            {
+            [Challenge](auto Data) {
                 if (Data.size() != 1)
                     throw EXCEPTION("Invalid challenge");
                 DATABASE::DELETE("PasskeyChallenges")
@@ -156,15 +143,13 @@ configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string 
     return ResponseJSON;
 }
 
-configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role)
-{
+configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     USERS::AddUser(Username, Nickname, USERS::HashPassword(Password), EmailAddress, Role);
     CREATE_JSON(true, "Add user succeeds");
 }
-configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
-{
+configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     REGEXES::CheckUsername(Username);
@@ -178,15 +163,13 @@ configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::strin
     USERS::UpdateUser(UID, Username, Nickname, HashedPassword, EmailAddress, Role);
     CREATE_JSON(true, "Update user succeeds");
 }
-configor::json API_PROCEED::DeleteUser(int UID)
-{
+configor::json API_PROCEED::DeleteUser(int UID) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     USERS::DeleteUser(UID);
     CREATE_JSON(true, "Delete user succeeds");
 }
-configor::json API_PROCEED::GetUser(int UID)
-{
+configor::json API_PROCEED::GetUser(int UID) {
     configor::json ResponseJSON = BaseJSON;
     USER User;
     User = USERS::GetUser(UID);
@@ -197,8 +180,7 @@ configor::json API_PROCEED::GetUser(int UID)
     ResponseJSON["Data"]["Role"] = User.Role;
     return ResponseJSON;
 }
-configor::json API_PROCEED::GetUsers(int Page)
-{
+configor::json API_PROCEED::GetUsers(int Page) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     configor::json ResponseJSON = BaseJSON;
@@ -212,12 +194,10 @@ configor::json API_PROCEED::GetUsers(int Page)
         .Limit(10)
         .Offset((Page - 1) * 10)
         .Execute(
-            [&ResponseJSON](auto Data)
-            {
+            [&ResponseJSON](auto Data) {
                 ResponseJSON["Success"] = true;
                 configor::json::array_type Users;
-                for (auto i : Data)
-                {
+                for (auto i : Data) {
                     configor::json TempUser;
                     TempUser["UID"] = i["UID"];
                     TempUser["Username"] = i["Username"];
@@ -231,14 +211,12 @@ configor::json API_PROCEED::GetUsers(int Page)
             });
     DATABASE::SIZE("Users")
         .Execute(
-            [&ResponseJSON](int Size)
-            {
+            [&ResponseJSON](int Size) {
                 ResponseJSON["Data"]["PageCount"] = ceil(Size / 10.0);
             });
     return ResponseJSON;
 }
-configor::json API_PROCEED::HashPassword(std::string OriginalPassword)
-{
+configor::json API_PROCEED::HashPassword(std::string OriginalPassword) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     configor::json ResponseJSON = BaseJSON;
@@ -247,8 +225,7 @@ configor::json API_PROCEED::HashPassword(std::string OriginalPassword)
     return ResponseJSON;
 }
 
-configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups)
-{
+configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     PROBLEM Problem;
@@ -265,8 +242,7 @@ configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::
     PROBLEMS::AddProblem(Problem);
     CREATE_JSON(true, "Add problem succeeds");
 }
-configor::json API_PROCEED::GetProblem(std::string PID)
-{
+configor::json API_PROCEED::GetProblem(std::string PID) {
     configor::json ResponseJSON = BaseJSON;
     PROBLEM Problem;
     PROBLEMS::GetProblem(PID, Problem);
@@ -277,8 +253,7 @@ configor::json API_PROCEED::GetProblem(std::string PID)
     ResponseJSON["Data"]["Input"] = Problem.Input;
     ResponseJSON["Data"]["Output"] = Problem.Output;
     configor::json::array_type Samples;
-    for (auto i : Problem.Samples)
-    {
+    for (auto i : Problem.Samples) {
         configor::json TempSample;
         TempSample["Input"] = i.Input;
         TempSample["Output"] = i.Output;
@@ -287,20 +262,17 @@ configor::json API_PROCEED::GetProblem(std::string PID)
     }
     ResponseJSON["Data"]["Samples"] = Samples;
     configor::json::array_type TestGroups;
-    for (auto i : Problem.TestGroups)
-    {
+    for (auto i : Problem.TestGroups) {
         configor::json TempTestGroup;
         TempTestGroup["TGID"] = i.TGID;
         configor::json::array_type TestCases;
-        for (auto j : i.TestCases)
-        {
+        for (auto j : i.TestCases) {
             configor::json TempTestCase;
             TempTestCase["TCID"] = j.TCID;
             TempTestCase["TimeLimit"] = j.TimeLimit;
             TempTestCase["MemoryLimit"] = j.MemoryLimit;
             TempTestCase["Score"] = j.Score;
-            if (IsAdmin)
-            {
+            if (IsAdmin) {
                 TempTestCase["Input"] = j.Input;
                 TempTestCase["Answer"] = j.Answer;
             }
@@ -315,8 +287,7 @@ configor::json API_PROCEED::GetProblem(std::string PID)
     ResponseJSON["Data"]["IOFilename"] = Problem.IOFilename;
     return ResponseJSON;
 }
-configor::json API_PROCEED::UpdateProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups)
-{
+configor::json API_PROCEED::UpdateProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     PROBLEM Problem;
@@ -333,15 +304,13 @@ configor::json API_PROCEED::UpdateProblem(std::string PID, std::string Title, st
     PROBLEMS::UpdateProblem(Problem);
     CREATE_JSON(true, "Update problem succeeds");
 }
-configor::json API_PROCEED::DeleteProblem(std::string PID)
-{
+configor::json API_PROCEED::DeleteProblem(std::string PID) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     PROBLEMS::DeleteProblem(PID);
     CREATE_JSON(true, "Delete problem succeeds");
 }
-configor::json API_PROCEED::GetProblems(int Page)
-{
+configor::json API_PROCEED::GetProblems(int Page) {
     configor::json ResponseJSON = BaseJSON;
     DATABASE::SELECT("Problems")
         .Select("PID")
@@ -349,12 +318,10 @@ configor::json API_PROCEED::GetProblems(int Page)
         .Limit(10)
         .Offset((Page - 1) * 10)
         .Execute(
-            [&ResponseJSON](auto Data)
-            {
+            [&ResponseJSON](auto Data) {
                 ResponseJSON["Success"] = true;
                 configor::json::array_type Problems;
-                for (auto i : Data)
-                {
+                for (auto i : Data) {
                     configor::json TempProblem;
                     TempProblem["PID"] = i["PID"];
                     TempProblem["Title"] = i["Title"];
@@ -364,15 +331,13 @@ configor::json API_PROCEED::GetProblems(int Page)
             });
     DATABASE::SIZE("Problems")
         .Execute(
-            [&ResponseJSON](int Size)
-            {
+            [&ResponseJSON](int Size) {
                 ResponseJSON["Data"]["PageCount"] = ceil(Size / 10.0);
             });
     return ResponseJSON;
 }
 
-configor::json API_PROCEED::AddSubmission(std::string PID, bool EnableO2, std::string Code)
-{
+configor::json API_PROCEED::AddSubmission(std::string PID, bool EnableO2, std::string Code) {
     SUBMISSION Submission;
     Submission.Set(Code, PID);
     Submission.EnableO2 = EnableO2;
@@ -385,8 +350,7 @@ configor::json API_PROCEED::AddSubmission(std::string PID, bool EnableO2, std::s
     ResponseJSON["Data"]["SID"] = Submission.SID;
     return ResponseJSON;
 }
-configor::json API_PROCEED::GetSubmission(int SID)
-{
+configor::json API_PROCEED::GetSubmission(int SID) {
     SUBMISSION Submission;
     SUBMISSIONS::GetSubmission(SID, Submission);
     configor::json ResponseJSON = BaseJSON;
@@ -406,13 +370,11 @@ configor::json API_PROCEED::GetSubmission(int SID)
     SUBMISSIONS::TestGroupsToJSON(Submission.TestGroups, TestGroupsString);
     ResponseJSON["Data"]["TestGroups"] = TestGroupsString;
     configor::json::array_type TestGroupsLimits;
-    for (auto i : Submission.TestGroups)
-    {
+    for (auto i : Submission.TestGroups) {
         configor::json TempTestGroup;
         TempTestGroup["TGID"] = i.TGID;
         configor::json::array_type TestCasesLimits;
-        for (auto j : i.TestCases)
-        {
+        for (auto j : i.TestCases) {
             configor::json TempTestCase;
             TempTestCase["TCID"] = j.TCID;
             TempTestCase["TimeLimit"] = j.UnjudgedTestCase->TimeLimit;
@@ -425,8 +387,7 @@ configor::json API_PROCEED::GetSubmission(int SID)
     ResponseJSON["Data"]["TestGroupsLimits"] = TestGroupsLimits;
     return ResponseJSON;
 }
-configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, std::string Code, int Result, std::string Description, int Time, int TimeSum, int Memory, int Score, bool EnableO2, std::string TestGroups)
-{
+configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, std::string Code, int Result, std::string Description, int Time, int TimeSum, int Memory, int Score, bool EnableO2, std::string TestGroups) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     SUBMISSION Submission;
@@ -445,20 +406,17 @@ configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, 
     SUBMISSIONS::UpdateSubmission(Submission);
     CREATE_JSON(true, "Update problem succeeds");
 }
-configor::json API_PROCEED::RejudgeSubmission(int SID)
-{
+configor::json API_PROCEED::RejudgeSubmission(int SID) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     SUBMISSION Submission;
     SUBMISSIONS::GetSubmission(SID, Submission);
     Submission.Result = JUDGE_RESULT::WAITING;
     Submission.Time = Submission.TimeSum = Submission.Memory = Submission.Score = 0;
-    for (auto &i : Submission.TestGroups)
-    {
+    for (auto &i : Submission.TestGroups) {
         i.Result = JUDGE_RESULT::WAITING;
         i.Time = i.TimeSum = i.Memory = i.TestCasesPassed = i.Score = 0;
-        for (auto &j : i.TestCases)
-        {
+        for (auto &j : i.TestCases) {
             j.Result = JUDGE_RESULT::WAITING;
             j.Output = j.StandardOutput = j.StandardError = j.Description = "";
             j.Time = j.Memory = j.Score = 0; // TODO: Score here is not correct
@@ -468,15 +426,13 @@ configor::json API_PROCEED::RejudgeSubmission(int SID)
     JudgingList.Add(Submission);
     CREATE_JSON(true, "Rejudge submission succeeds");
 }
-configor::json API_PROCEED::DeleteSubmission(int SID)
-{
+configor::json API_PROCEED::DeleteSubmission(int SID) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     SUBMISSIONS::DeleteSubmission(SID);
     CREATE_JSON(true, "Delete submission succeeds");
 }
-configor::json API_PROCEED::GetSubmissions(int Page)
-{
+configor::json API_PROCEED::GetSubmissions(int Page, int Problem, int User, int Result) {
     configor::json ResponseJSON = BaseJSON;
     DATABASE::SELECT("Submissions")
         .Select("SID")
@@ -490,12 +446,16 @@ configor::json API_PROCEED::GetSubmissions(int Page)
         .Offset((Page - 1) * 10)
         .Limit(10)
         .Execute(
-            [&ResponseJSON](auto Data)
-            {
+            [&ResponseJSON, Problem, User, Result](auto Data) {
                 ResponseJSON["Success"] = true;
                 configor::json::array_type Submissions;
-                for (auto i : Data)
-                {
+                for (auto i : Data) {
+                    if (Problem != -1 && i["PID"] != std::to_string(Problem))
+                        continue;
+                    if (User != -1 && i["UID"] != std::to_string(User))
+                        continue;
+                    if (Result != -1 && i["Result"] != std::to_string(Result))
+                        continue;
                     configor::json TempSubmission;
                     TempSubmission["SID"] = i["SID"];
                     TempSubmission["PID"] = i["PID"];
@@ -510,15 +470,13 @@ configor::json API_PROCEED::GetSubmissions(int Page)
             });
     DATABASE::SIZE("Submissions")
         .Execute(
-            [&ResponseJSON](int Size)
-            {
+            [&ResponseJSON](int Size) {
                 ResponseJSON["Data"]["PageCount"] = ceil(Size / 10.0);
             });
     return ResponseJSON;
 }
 
-configor::json API_PROCEED::GetSettings()
-{
+configor::json API_PROCEED::GetSettings() {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     configor::json ResponseJSON = BaseJSON;
@@ -526,32 +484,26 @@ configor::json API_PROCEED::GetSettings()
     SETTINGS::GetSettings(ResponseJSON["Data"]["Settings"]);
     return ResponseJSON;
 }
-configor::json API_PROCEED::SetSettings(configor::json Settings)
-{
+configor::json API_PROCEED::SetSettings(configor::json Settings) {
     if (!IsAdmin)
         CREATE_JSON(false, "Not admin");
     SETTINGS::SetSettings(Settings);
     CREATE_JSON(true, "Set settings succeeds");
 }
 
-configor::json API_PROCEED::Proceed(configor::json Request)
-{
+configor::json API_PROCEED::Proceed(configor::json Request) {
     configor::json ResponseJSON = BaseJSON;
-    try
-    {
+    try {
         if (!CheckTypes(Request, {{"Action", configor::config_value_type::string}}))
             CREATE_JSON(false, "Invalid parameters");
         Action = Request["Action"].as_string();
         Data = Request["Data"];
-        if (Action == "CheckTokenAvailable")
-        {
+        if (Action == "CheckTokenAvailable") {
             if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = CheckTokenAvailable(Data["Token"].as_string());
-        }
-        else if (Action == "Register")
-        {
+        } else if (Action == "Register") {
             if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
                                    {"Nickname", configor::config_value_type::string},
                                    {"Password", configor::config_value_type::string},
@@ -564,39 +516,29 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                         Data["Password"].as_string(),
                                         Data["EmailAddress"].as_string(),
                                         Data["VerificationCode"].as_string());
-        }
-        else if (Action == "CheckUsernameAvailable")
-        {
+        } else if (Action == "CheckUsernameAvailable") {
             if (!CheckTypes(Data, {{"Username", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = CheckUsernameAvailable(Data["Username"].as_string());
-        }
-        else if (Action == "CheckEmailAvailable")
-        {
+        } else if (Action == "CheckEmailAvailable") {
             if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = CheckEmailAvailable(Data["EmailAddress"].as_string());
-        }
-        else if (Action == "SendVerificationCode")
-        {
+        } else if (Action == "SendVerificationCode") {
             if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = SendVerificationCode(Data["EmailAddress"].as_string());
-        }
-        else if (Action == "Login")
-        {
+        } else if (Action == "Login") {
             if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
                                    {"Password", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = Login(Data["Username"].as_string(),
                                      Data["Password"].as_string());
-        }
-        else if (Action == "ResetPassword")
-        {
+        } else if (Action == "ResetPassword") {
             if (!CheckTypes(Data, {{"EmailAddress", configor::config_value_type::string},
                                    {"VerificationCode", configor::config_value_type::string},
                                    {"Password", configor::config_value_type::string}}))
@@ -605,23 +547,17 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                 ResponseJSON = ResetPassword(Data["EmailAddress"].as_string(),
                                              Data["VerificationCode"].as_string(),
                                              Data["Password"].as_string());
-        }
-        else if (Action == "CreatePasskeyChallenge")
-        {
+        } else if (Action == "CreatePasskeyChallenge") {
             if (!CheckTypes(Data, {}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = CreatePasskeyChallenge();
-        }
-        else if (Action == "DeletePasskeyChallenge")
-        {
+        } else if (Action == "DeletePasskeyChallenge") {
             if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
             else
                 ResponseJSON = DeletePasskeyChallenge(Data["Challenge"].as_string());
-        }
-        else if (Action == "LoginWithPasskey")
-        {
+        } else if (Action == "LoginWithPasskey") {
             if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string},
                                    {"CredentialID", configor::config_value_type::string},
                                    {"UID", configor::config_value_type::number_integer},
@@ -632,9 +568,7 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                                 Data["CredentialID"].as_string(),
                                                 Data["UID"].as_integer(),
                                                 Data["CredentialSignature"].as_string());
-        }
-        else
-        {
+        } else {
             if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
                 CREATE_JSON(false, "Invalid parameters");
             Token = Data["Token"].as_string();
@@ -644,8 +578,7 @@ configor::json API_PROCEED::Proceed(configor::json Request)
             UID = TOKENS::GetUID(Token);
             IsAdmin = USERS::IsAdmin(UID);
 
-            if (Action == "CreatePasskey")
-            {
+            if (Action == "CreatePasskey") {
                 if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string},
                                        {"CredentialID", configor::config_value_type::string},
                                        {"CredentialPublicKey", configor::config_value_type::string}}))
@@ -654,9 +587,7 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                     ResponseJSON = CreatePasskey(Data["Challenge"].as_string(),
                                                  Data["CredentialID"].as_string(),
                                                  Data["CredentialPublicKey"].as_string());
-            }
-            else if (Action == "AddUser")
-            {
+            } else if (Action == "AddUser") {
                 if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
                                        {"Nickname", configor::config_value_type::string},
                                        {"Password", configor::config_value_type::string},
@@ -669,16 +600,12 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                            Data["Password"].as_string(),
                                            Data["EmailAddress"].as_string(),
                                            (USER_ROLE)Data["Role"].as_integer());
-            }
-            else if (Action == "GetUser")
-            {
+            } else if (Action == "GetUser") {
                 if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = GetUser(Data["UID"].as_integer());
-            }
-            else if (Action == "UpdateUser")
-            {
+            } else if (Action == "UpdateUser") {
                 if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer},
                                        {"Username", configor::config_value_type::string},
                                        {"Nickname", configor::config_value_type::string},
@@ -693,30 +620,22 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                               Data["Password"].as_string(),
                                               Data["EmailAddress"].as_string(),
                                               (USER_ROLE)Data["Role"].as_integer());
-            }
-            else if (Action == "DeleteUser")
-            {
+            } else if (Action == "DeleteUser") {
                 if (!CheckTypes(Data, {{"UID", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = DeleteUser(Data["UID"].as_integer());
-            }
-            else if (Action == "GetUsers")
-            {
+            } else if (Action == "GetUsers") {
                 if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = GetUsers(Data["Page"].as_integer());
-            }
-            else if (Action == "HashPassword")
-            {
+            } else if (Action == "HashPassword") {
                 if (!CheckTypes(Data, {{"OriginalPassword", configor::config_value_type::string}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = HashPassword(Data["OriginalPassword"].as_string());
-            }
-            else if (Action == "AddProblem")
-            {
+            } else if (Action == "AddProblem") {
                 if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
                                        {"Title", configor::config_value_type::string},
                                        {"IOFilename", configor::config_value_type::string},
@@ -739,16 +658,12 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                               Data["Hint"].as_string(),
                                               Data["Samples"].as_string(),
                                               Data["TestGroups"].as_string());
-            }
-            else if (Action == "GetProblem")
-            {
+            } else if (Action == "GetProblem") {
                 if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = GetProblem(Data["PID"].as_string());
-            }
-            else if (Action == "UpdateProblem")
-            {
+            } else if (Action == "UpdateProblem") {
                 if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
                                        {"Title", configor::config_value_type::string},
                                        {"IOFilename", configor::config_value_type::string},
@@ -771,23 +686,17 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                                  Data["Hint"].as_string(),
                                                  Data["Samples"].as_string(),
                                                  Data["TestGroups"].as_string());
-            }
-            else if (Action == "DeleteProblem")
-            {
+            } else if (Action == "DeleteProblem") {
                 if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = DeleteProblem(Data["PID"].as_string());
-            }
-            else if (Action == "GetProblems")
-            {
+            } else if (Action == "GetProblems") {
                 if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = GetProblems(Data["Page"].as_integer());
-            }
-            else if (Action == "AddSubmission")
-            {
+            } else if (Action == "AddSubmission") {
                 if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
                                        {"EnableO2", configor::config_value_type::boolean},
                                        {"Code", configor::config_value_type::string}}))
@@ -796,16 +705,12 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                     ResponseJSON = AddSubmission(Data["PID"].as_string(),
                                                  Data["EnableO2"].as_bool(),
                                                  Data["Code"].as_string());
-            }
-            else if (Action == "GetSubmission")
-            {
+            } else if (Action == "GetSubmission") {
                 if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = GetSubmission(Data["SID"].as_integer());
-            }
-            else if (Action == "UpdateSubmission")
-            {
+            } else if (Action == "UpdateSubmission") {
                 if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer},
                                        {"PID", configor::config_value_type::string},
                                        {"UID", configor::config_value_type::number_integer},
@@ -832,45 +737,35 @@ configor::json API_PROCEED::Proceed(configor::json Request)
                                                     Data["Score"].as_integer(),
                                                     Data["EnableO2"].as_bool(),
                                                     Data["TestGroups"].as_string());
-            }
-            else if (Action == "RejudgeSubmission")
-            {
+            } else if (Action == "RejudgeSubmission") {
                 if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = RejudgeSubmission(Data["SID"].as_integer());
-            }
-            else if (Action == "DeleteSubmission")
-            {
+            } else if (Action == "DeleteSubmission") {
                 if (!CheckTypes(Data, {{"SID", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = DeleteSubmission(Data["SID"].as_integer());
-            }
-            else if (Action == "GetSubmissions")
-            {
-                if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer}}))
+            } else if (Action == "GetSubmissions") {
+                if (!CheckTypes(Data, {{"Page", configor::config_value_type::number_integer},
+                                       {"Problem", configor::config_value_type::number_integer},
+                                       {"User", configor::config_value_type::number_integer},
+                                       {"Result", configor::config_value_type::number_integer}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
-                    ResponseJSON = GetSubmissions(Data["Page"].as_integer());
-            }
-            else if (Action == "GetSettings")
-            {
+                    ResponseJSON = GetSubmissions(Data["Page"].as_integer(), Data["Problem"].as_integer(), Data["User"].as_integer(), Data["Result"].as_integer());
+            } else if (Action == "GetSettings") {
                 ResponseJSON = GetSettings();
-            }
-            else if (Action == "SetSettings")
-            {
+            } else if (Action == "SetSettings") {
                 if (!CheckTypes(Data, {{"Settings", configor::config_value_type::object}}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
                     ResponseJSON = SetSettings(Data["Settings"]);
-            }
-            else
+            } else
                 ResponseJSON["Message"] = "No such action";
         }
-    }
-    catch (EXCEPTION ErrorData)
-    {
+    } catch (EXCEPTION ErrorData) {
         ResponseJSON["Success"] = false;
         ResponseJSON["Message"] = ErrorData.Message;
         ResponseJSON["Data"] = configor::json();

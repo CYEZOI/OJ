@@ -215,7 +215,7 @@ const CheckTokenAvailable = () => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const CreateResultSelect = (Element, Value) => {
-    Element.className = "form-select";
+    Element.classList.add("form-select");
     for (let i = 0; i < SubmissionResultShortTexts.length; i++) {
         let Option = document.createElement("option"); Element.appendChild(Option);
         Option.innerText = SubmissionResultTexts[i];

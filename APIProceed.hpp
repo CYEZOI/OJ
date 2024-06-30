@@ -75,7 +75,7 @@ private:
     configor::json UpdateSubmission(int SID, std::string PID, int UID, std::string Code, int Result, std::string Description, int Time, int TimeSum, int Memory, int Score, bool EnableO2, std::string TestGroups);
     configor::json RejudgeSubmission(int SID);
     configor::json DeleteSubmission(int SID);
-    configor::json GetSubmissions(int Page);
+    configor::json GetSubmissions(int Page, int Problem, int User, int Result);
 
     configor::json GetSettings();
     configor::json SetSettings(configor::json SettingsJSON);

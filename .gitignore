@@ -1,3 +1,4 @@
 # Ingore generated and temp files
 build/
+Build/
 **/*.log

@@ -1,9 +1,23 @@
+const SubmissionsProblemResult = document.getElementById("SubmissionsProblemResult");
+const SubmissionsUserResult = document.getElementById("SubmissionsUserResult");
+const SubmissionsSelectResult = document.getElementById("SubmissionsSelectResult");
+const SubmissionsSelectButton = document.getElementById("SubmissionsSelectButton");
 const SubmissionsTable = document.getElementById("SubmissionsTable");
 const SubmissionsPagination = document.getElementById("SubmissionsPagination");
 CheckTokenAvailable();
-if (Data.Page == null) {
-    Data.Page = 1;
-}
+Data.Page = Data.Page || 1;
+
+SubmissionsProblemResult.value = Data.Problem;
+SubmissionsUserResult.value = Data.User;
+CreateResultSelect(SubmissionsSelectResult, Data.Result);
+SubmissionsSelectButton.onclick = () => {
+    SwitchPage("Submissions", {
+        "Page": Data.Page,
+        "Problem": SubmissionsProblemResult.value,
+        "User": SubmissionsUserResult.value,
+        "Result": SubmissionsSelectResult.selectedIndex,
+    })
+};
 
 for (let i = 0; i < 10; i++) {
     let Row = document.createElement("tr"); SubmissionsTable.children[1].appendChild(Row);
@@ -17,7 +31,10 @@ for (let i = 0; i < 10; i++) {
 
 SubmissionsPagination.children[2].children[0].innerText = Data.Page;
 RequestAPI("GetSubmissions", {
-    "Page": Number(Data.Page)
+    "Page": Number(Data.Page),
+    "Problem": Number(Data.Problem || -1),
+    "User": Number(Data.User || -1),
+    "Result": Number(Data.Result || -1),
 }, () => { }, (Response) => {
     SubmissionsPagination.children[0].children[0].setAttribute("data-page-number", 1);
     SubmissionsPagination.children[1].children[0].setAttribute("data-page-number", Math.max(Data.Page - 1, 1));

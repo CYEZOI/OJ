@@ -46,6 +46,11 @@ int main()
             {
                 HTTPResponse.SetCode(400);
             }
+            catch (std::exception &ErrorData)
+            {
+                HTTPResponse.SetCode(400);
+                Logger.Error(ErrorData.what());
+            }
             return HTTPResponse.Stringify();
         });
     return 0;

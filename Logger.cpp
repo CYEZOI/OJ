@@ -17,28 +17,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
 #include "Logger.hpp"
-#include <sys/time.h>
 #include <string.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 LOGGER::LOGGER() { SetLogFilename("Log.log"); }
 LOGGER::~LOGGER() { fclose(LogFile); }
 
-void LOGGER::SetLogFilename(std::string LogFilename)
-{
+void LOGGER::SetLogFilename(std::string LogFilename) {
     LogFile = fopen(LogFilename.c_str(), "a+");
-    if (LogFile == nullptr)
-    {
+    if (LogFile == nullptr) {
         LogFile = stdout;
         this->LogFilename = "";
         Error("Failed to open log file: " + LogFilename);
-    }
-    else
+    } else
         this->LogFilename = LogFilename;
 }
 
-void LOGGER::Output(std::string Type, std::string Style, std::string Data)
-{
+void LOGGER::Output(std::string Type, std::string Style, std::string Data) {
     if (LogFile == nullptr)
         LogFile = stdout;
 
@@ -54,9 +50,8 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
     localtime_r(&CurrentSecond.tv_sec, &TempTime);
     strftime(CurrentTime, sizeof(CurrentTime), "%Y-%m-%d %H:%M:%S", &TempTime);
 
-    char* Buffer = new char[Data.length() + 100];
-    if (Buffer == nullptr)
-    {
+    char *Buffer = new char[Data.length() + 100];
+    if (Buffer == nullptr) {
         std::cout << "Failed to allocate memory for log buffer" << std::endl;
         return;
     }
@@ -76,15 +71,13 @@ void LOGGER::Output(std::string Type, std::string Style, std::string Data)
     delete Buffer;
 }
 
-void LOGGER::Debug(std::string Data)
-{
+void LOGGER::Debug(std::string Data) {
     Output("D", "36", Data);
 }
 void LOGGER::Info(std::string Data) { Output("I", "32", Data); }
 void LOGGER::Warning(std::string Data) { Output("W", "33", Data); }
 void LOGGER::Error(std::string Data) { Output("E", "31", Data + ", " + std::to_string(errno) + ": " + std::string(strerror(errno))); }
-void LOGGER::Fetal(std::string Data)
-{
+void LOGGER::Fetal(std::string Data) {
     Output("F", "1;4;5;31", Data);
     exit(1);
 }
