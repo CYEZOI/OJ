@@ -17,17 +17,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
 #include "Submissions.hpp"
-#include "Utilities.hpp"
 #include "Problems.hpp"
+#include "Utilities.hpp"
 #include "configor/json.hpp"
 
-void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID)
-{
-    try
-    {
+void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID) {
+    try {
         configor::json JSON = configor::json::parse(JSONData);
-        for (auto TestGroup : JSON)
-        {
+        for (auto TestGroup : JSON) {
             size_t TGID = TestGroup["TGID"].as_integer();
             while (TestGroups.size() <= TGID)
                 TestGroups.push_back({});
@@ -39,8 +36,7 @@ void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP>
             TestGroups[TGID].TimeSum = TestGroup["TimeSum"].as_integer();
             TestGroups[TGID].Memory = TestGroup["Memory"].as_integer();
             TestGroups[TGID].Score = TestGroup["Score"].as_integer();
-            for (auto TestCase : TestGroup["TestCases"])
-            {
+            for (auto TestCase : TestGroup["TestCases"]) {
                 size_t TCID = TestCase["TCID"].as_integer();
                 while (TestGroups[TGID].TestCases.size() <= TCID)
                     TestGroups[TGID].TestCases.push_back({});
@@ -57,19 +53,14 @@ void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP>
                 TestGroups[TGID].TestCases[TCID].Score = TestCase["Score"].as_integer();
             }
         }
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         throw EXCEPTION(e.what());
     }
-    }
-void SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData)
-{
-    try
-    {
+}
+void SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData) {
+    try {
         configor::json JSON = configor::json::array({});
-        for (auto &TestGroup : TestGroups)
-        {
+        for (auto &TestGroup : TestGroups) {
             configor::json NewTestGroup;
             NewTestGroup["TGID"] = TestGroup.TGID;
             NewTestGroup["Result"] = (int)TestGroup.Result;
@@ -91,24 +82,20 @@ void SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::stri
             JSON.push_back(std::move(NewTestGroup));
         }
         JSONData = JSON.dump();
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         throw EXCEPTION(e.what());
     }
-    }
+}
 
-void SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
-{
+void SUBMISSIONS::AddSubmission(SUBMISSION &Submission) {
     DATABASE::SELECT("Submissions")
         .Select("PID")
         .Where("SID", Submission.SID)
         .Execute(
-            [](auto Data)
-            {
+            [](auto Data) {
                 if (Data.size() != 0)
                     throw EXCEPTION("Submission already exists");
-                            });
+            });
     std::string TestGroupsData;
     TestGroupsToJSON(Submission.TestGroups, TestGroupsData);
     DATABASE::INSERT("Submissions")
@@ -124,13 +111,11 @@ void SUBMISSIONS::AddSubmission(SUBMISSION &Submission)
         .Insert("EnableO2", std::to_string(Submission.EnableO2))
         .Insert("TestGroups", TestGroupsData)
         .Execute(
-            [&Submission](int SID)
-            {
+            [&Submission](int SID) {
                 Submission.SID = SID;
-                            });
-    }
-void SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
-{
+            });
+}
+void SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission) {
     DATABASE::SELECT("Submissions")
         .Select("PID")
         .Select("UID")
@@ -146,8 +131,7 @@ void SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
         .Select("TestGroups")
         .Where("SID", SID)
         .Execute(
-            [SID, &Submission](auto Data)
-            {
+            [SID, &Submission](auto Data) {
                 if (Data.size() == 0)
                     throw EXCEPTION("Submission not found");
                 Submission.SID = SID;
@@ -164,14 +148,12 @@ void SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
                 Submission.CreateTime = UTILITIES::StringToTime(Data[0]["CreateTime"]);
 
                 PROBLEMS::GetProblem(Submission.PID, Submission.Problem);
-                for (size_t TGID = 0; TGID < Submission.Problem.TestGroups.size(); TGID++)
-                {
+                for (size_t TGID = 0; TGID < Submission.Problem.TestGroups.size(); TGID++) {
                     TEST_GROUP TempTestGroup;
                     TempTestGroup.PID = Submission.PID;
                     TempTestGroup.SID = Submission.SID;
                     TempTestGroup.TGID = TGID;
-                    for (size_t TCID = 0; TCID < Submission.Problem.TestGroups[TGID].TestCases.size(); TCID++)
-                    {
+                    for (size_t TCID = 0; TCID < Submission.Problem.TestGroups[TGID].TestCases.size(); TCID++) {
                         TEST_CASE TempTestCase;
                         TempTestCase.PID = Submission.PID;
                         TempTestCase.SID = Submission.SID;
@@ -185,10 +167,9 @@ void SUBMISSIONS::GetSubmission(int SID, SUBMISSION &Submission)
                 }
 
                 JSONToTestGroups(Data[0]["TestGroups"], Submission.TestGroups, Submission.PID, Submission.SID);
-                            });
-    }
-void SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
-{
+            });
+}
+void SUBMISSIONS::UpdateSubmission(SUBMISSION Submission) {
     std::string TestGroupsData;
     TestGroupsToJSON(Submission.TestGroups, TestGroupsData);
     DATABASE::UPDATE("Submissions")
@@ -205,10 +186,9 @@ void SUBMISSIONS::UpdateSubmission(SUBMISSION Submission)
         .Set("TestGroups", TestGroupsData)
         .Where("SID", Submission.SID)
         .Execute();
-    }
-void SUBMISSIONS::DeleteSubmission(int SID)
-{
+}
+void SUBMISSIONS::DeleteSubmission(int SID) {
     DATABASE::DELETE("Submissions")
         .Where("SID", SID)
         .Execute();
-    }
+}

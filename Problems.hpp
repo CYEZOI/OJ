@@ -21,9 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Exception.hpp"
 #include "Problem.hpp"
 
-class PROBLEMS
-{
-private:
+class PROBLEMS {
+  private:
     static void JSONToSamples(std::string JSONData, std::vector<SAMPLE> &Samples);
     static void JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_GROUP_DATA> &UnjudgedTestGroups);
     static void SamplesToJSON(std::vector<SAMPLE> Samples, std::string &JSONData);
@@ -31,7 +30,7 @@ private:
 
     friend class API_PROCEED;
 
-public:
+  public:
     static void AddProblem(PROBLEM Problem);
     static void GetProblem(std::string PID, PROBLEM &Problem);
     static void UpdateProblem(PROBLEM Problem);

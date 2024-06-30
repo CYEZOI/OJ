@@ -18,16 +18,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Logger.hpp"
 #include "Exception.hpp"
-#include <string>
+#include "Logger.hpp"
 #include <map>
+#include <string>
 
 class WEB_DATA_PROCEED;
 
-class HTTP_REQUEST
-{
-private:
+class HTTP_REQUEST {
+  private:
     std::string Version;
     std::string Verb;
     std::string Path;
@@ -36,6 +35,6 @@ private:
 
     friend class WEB_DATA_PROCEED;
 
-public:
+  public:
     void Parse(std::string Data);
 };

@@ -19,21 +19,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "WebDataProceed.hpp"
 #include "APIProceed.hpp"
 #include "Exception.hpp"
-#include "Utilities.hpp"
-#include "Settings.hpp"
 #include "Files.hpp"
+#include "Settings.hpp"
 #include "Tokens.hpp"
 #include "Users.hpp"
-#include <string>
-#include <regex>
-#include <unistd.h>
-#include <stdarg.h>
-#include <sys/stat.h>
-#include <list>
+#include "Utilities.hpp"
 #include <algorithm>
+#include <list>
+#include <regex>
+#include <stdarg.h>
+#include <string>
+#include <sys/stat.h>
+#include <unistd.h>
 
-HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
-{
+HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest) {
     std::string BasicFolder = "HTML";
     std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
@@ -41,22 +40,17 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
     size_t SearchParamsStartPosition = RequestPath.find("?");
     if (SearchParamsStartPosition != std::string::npos)
         RequestPath = RequestPath.substr(0, SearchParamsStartPosition);
-    if (RequestPath == "/api")
-    {
+    if (RequestPath == "/api") {
         HTTPResponse.SetHeader("Content-Type", "application/json");
-        if (HTTPRequest.Verb != "POST")
-        {
+        if (HTTPRequest.Verb != "POST") {
             HTTPResponse.SetCode(405);
             HTTPResponse.SetHeader("Allow", "POST");
-        }
-        else if (HTTPRequest.Headers["Content-Type"].find("multipart/form-data") != std::string::npos)
-        {
+        } else if (HTTPRequest.Headers["Content-Type"].find("multipart/form-data") != std::string::npos) {
             configor::json ResponseJSON;
             ResponseJSON["msg"] = "";
             ResponseJSON["code"] = 0;
             ResponseJSON["data"]["errFiles"] = configor::json::array({});
-            try
-            {
+            try {
                 std::string UserToken = HTTPRequest.Headers["X-Upload-Token"];
                 if (UserToken == "")
                     throw EXCEPTION("No token");
@@ -68,23 +62,18 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                     throw EXCEPTION("No boundary");
                 std::string Boundary = HTTPRequest.Headers["Content-Type"].substr(BoundaryStartPosition + 9);
                 std::vector<std::string> Data = UTILITIES::StringSplit(HTTPRequest.Body, "--" + Boundary);
-                for (auto &i : Data)
-                {
+                for (auto &i : Data) {
                     std::string OriginalFilename = "";
-                    try
-                    {
+                    try {
                         i = UTILITIES::RemoveSpaces(i);
                         if (i == "--" || i == "")
                             continue;
                         std::string Line;
                         std::map<std::string, std::string> Headers;
                         std::string Body;
-                        for (size_t j = 0; j < i.length(); j++)
-                        {
-                            if (i[j] == '\n')
-                            {
-                                if (Line == "")
-                                {
+                        for (size_t j = 0; j < i.length(); j++) {
+                            if (i[j] == '\n') {
+                                if (Line == "") {
                                     Body = i.substr(j + 1);
                                     UTILITIES::SaveFile("/mnt/c/Data/data.wav", Body);
                                     break;
@@ -100,8 +89,7 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                                 Headers[Name] = Value;
 
                                 Line = "";
-                            }
-                            else
+                            } else
                                 Line.push_back(i[j]);
                         }
                         if (Headers["Content-Disposition"] == "")
@@ -124,79 +112,57 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest)
                             Filename = UTILITIES::StringReplaceAll(Filename, BadCharacters.substr(i, 1), "");
                         if (Filename == "")
                             throw EXCEPTION("No filename");
-                        else
-                        {
+                        else {
                             int FID;
                             FILES::UploadFile(Filename, Body, Headers["Content-Type"], UID, FID);
                             std::string FileDownloadLink;
                             FILES::CreateFileDownloadLink(FID, FileDownloadLink);
                             ResponseJSON["data"]["succMap"][OriginalFilename] = FileDownloadLink;
                         }
-                    }
-                    catch (std::string Exception)
-                    {
+                    } catch (std::string Exception) {
                         ResponseJSON["data"]["errFiles"].push_back(OriginalFilename);
                         ResponseJSON["msg"] = Exception;
                     }
                 }
-            }
-            catch (EXCEPTION ErrorData)
-            {
+            } catch (EXCEPTION ErrorData) {
                 ResponseJSON["code"] = 400;
                 ResponseJSON["msg"] = ErrorData.Message;
             }
             HTTPResponse.SetBody(ResponseJSON.dump());
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 configor::json RequestJSON = configor::json::parse(HTTPRequest.Body);
                 API_PROCEED APIProceed;
                 configor::json ResponseJSON = APIProceed.Proceed(RequestJSON);
                 HTTPResponse.SetBody(ResponseJSON.dump());
-            }
-            catch (const configor::configor_exception &e)
-            {
+            } catch (const configor::configor_exception &e) {
                 HTTPResponse.SetCode(400);
                 HTTPResponse.SetBody(e.what());
             }
         }
-    }
-    else if (RequestPath.length() == 39 && RequestPath.substr(0, 7) == "/Files/")
-    {
+    } else if (RequestPath.length() == 39 && RequestPath.substr(0, 7) == "/Files/") {
         std::string FileToken = RequestPath.substr(7);
         std::string FileContent;
         std::string Filename;
         std::string FileType;
-        try
-        {
+        try {
             FILES::GetFileContent(FileToken, FileContent, Filename, FileType);
             HTTPResponse.SetBody(FileContent);
             HTTPResponse.SetHeader("Content-Disposition", "attachment; filename=\"" + Filename + "\"");
             HTTPResponse.SetHeader("Content-Type", FileType);
-        }
-        catch (EXCEPTION ErrorData)
-        {
+        } catch (EXCEPTION ErrorData) {
             HTTPResponse.SetCode(404);
         }
-    }
-    else if (RequestPath == "/Shutdown")
+    } else if (RequestPath == "/Shutdown")
         exit(0);
-    else if (RequestPath == "/")
-    {
+    else if (RequestPath == "/") {
         HTTPResponse.SetCode(302);
         HTTPResponse.SetHeader("location", "/index.html");
-    }
-    else
-    {
+    } else {
         std::string Data;
-        try
-        {
+        try {
             UTILITIES::LoadFile(BasicFolder + RequestPath, Data);
-        }
-        catch (EXCEPTION ErrorData)
-        {
+        } catch (EXCEPTION ErrorData) {
             HTTPResponse.SetCode(404);
         }
         HTTPResponse.SetBody(Data);

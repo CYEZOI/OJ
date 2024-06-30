@@ -17,11 +17,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
 #include "HTTPRequest.hpp"
-#include "Utilities.hpp"
 #include "Settings.hpp"
+#include "Utilities.hpp"
 
-void HTTP_REQUEST::Parse(std::string Data)
-{
+void HTTP_REQUEST::Parse(std::string Data) {
     Data = UTILITIES::StringReplaceAll(Data, "\r", "");
 
     size_t VerbStartPosition = 0;
@@ -43,12 +42,9 @@ void HTTP_REQUEST::Parse(std::string Data)
     Version = Data.substr(VersionStartPosition, VersionEndPosition - VersionStartPosition);
 
     std::string Line;
-    for (size_t i = VersionEndPosition + 1; i < Data.length(); i++)
-    {
-        if (Data[i] == '\n')
-        {
-            if (Line == "")
-            {
+    for (size_t i = VersionEndPosition + 1; i < Data.length(); i++) {
+        if (Data[i] == '\n') {
+            if (Line == "") {
                 Body = Data.substr(i);
                 break;
             }
@@ -65,8 +61,7 @@ void HTTP_REQUEST::Parse(std::string Data)
             Headers[Name] = Value;
 
             Line = "";
-        }
-        else
+        } else
             Line.push_back(Data[i]);
     }
-    }
+}

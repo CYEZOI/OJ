@@ -16,38 +16,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "Utilities.hpp"
+#include "TestCase.hpp"
 #include "Logger.hpp"
 #include "Settings.hpp"
-#include "TestCase.hpp"
 #include "Submissions.hpp"
 #include "TempTestData.hpp"
-#include <map>
+#include "Utilities.hpp"
 #include <fstream>
-#include <thread>
+#include <map>
 #include <math.h>
-#include <string.h>
 #include <signal.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/user.h>
-#include <sys/stat.h>
+#include <string.h>
 #include <sys/mount.h>
 #include <sys/ptrace.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
+#include <sys/user.h>
+#include <sys/wait.h>
+#include <thread>
+#include <unistd.h>
 
-void TEST_CASE::RedirectIO()
-{
+void TEST_CASE::RedirectIO() {
     if (freopen((WorkDir + "/" + Problem->IOFilename + ".in").c_str(), "r", stdin) == nullptr)
         throw EXCEPTION("Can not open input data file");
 
-    if (Problem->IOFilename == "")
-    {
+    if (Problem->IOFilename == "") {
         if (freopen((WorkDir + "/" + Problem->IOFilename + ".out").c_str(), "w", stdout) == nullptr)
             throw EXCEPTION("Can not open output data file");
-    }
-    else
-    {
+    } else {
         if (freopen((WorkDir + "/std.out").c_str(), "w", stdout) == nullptr)
             throw EXCEPTION("Can not open output data file");
     }
@@ -55,8 +51,7 @@ void TEST_CASE::RedirectIO()
     if (freopen((WorkDir + "/std.err").c_str(), "w", stderr) == nullptr)
         throw EXCEPTION("Can not open error data file");
 }
-void TEST_CASE::SetupEnvrionment()
-{
+void TEST_CASE::SetupEnvrionment() {
     const std::string DirsToMake[7] = {
         "./root",
         "./usr",
@@ -65,8 +60,7 @@ void TEST_CASE::SetupEnvrionment()
         "./proc",
         "./tmp",
         "./dev"};
-    for (int i = 0; i < 7; i++)
-    {
+    for (int i = 0; i < 7; i++) {
         if (mkdir(DirsToMake[i].c_str(), 0755) == -1)
             throw EXCEPTION("Can not create dir for the new root");
     }
@@ -98,8 +92,7 @@ void TEST_CASE::SetupEnvrionment()
         "lib32",
         "libx32",
         "lib64"};
-    for (int i = 0; i < 5; i++)
-    {
+    for (int i = 0; i < 5; i++) {
         if (symlink(("/usr/" + DirsToLink[i]).c_str(), DirsToLink[i].c_str()) == -1)
             throw EXCEPTION("Can not create symlink for the new root");
     }
@@ -109,8 +102,7 @@ void TEST_CASE::SetupEnvrionment()
     if (chroot(WorkDir.c_str()) != 0)
         throw EXCEPTION("Can not change root dir");
 }
-void TEST_CASE::RemoveEnvrionment()
-{
+void TEST_CASE::RemoveEnvrionment() {
     if (chdir(WorkDir.c_str()) == -1)
         throw EXCEPTION("Can not change directory");
 
@@ -141,8 +133,7 @@ void TEST_CASE::RemoveEnvrionment()
     for (int i = 0; i < 6; i++)
         UTILITIES::RemoveDir(DirsToRemove[i].c_str());
 }
-void TEST_CASE::ChangeUser()
-{
+void TEST_CASE::ChangeUser() {
     if (setgid(JudgeUserGroupID) != 0)
         throw EXCEPTION("Can not change gid");
     if (setuid(JudgeUserID) != 0)
@@ -156,8 +147,7 @@ void TEST_CASE::ChangeUser()
                   JudgeUserID) != 0)
         throw EXCEPTION("Can not change real uid");
 }
-void TEST_CASE::SetLimits()
-{
+void TEST_CASE::SetLimits() {
     struct rlimit Limit;
     Limit.rlim_cur = Limit.rlim_max = UnjudgedTestCase->TimeLimit + 1;
     if (setrlimit(RLIMIT_CPU, &Limit))
@@ -189,8 +179,7 @@ void TEST_CASE::SetLimits()
     if (setrlimit(RLIMIT_CORE, &Limit))
         throw EXCEPTION("Can not set core limit");
 }
-void TEST_CASE::ChildProcess()
-{
+void TEST_CASE::ChildProcess() {
     if (nice(19) != 19)
         throw EXCEPTION("Can not change nice value");
     if (chdir(WorkDir.c_str()) == -1)
@@ -208,19 +197,16 @@ void TEST_CASE::ChildProcess()
 
     throw EXCEPTION("Can not execute program");
 }
-bool TEST_CASE::CheckSignal()
-{
+bool TEST_CASE::CheckSignal() {
     int Status;
     struct rusage Usage;
     if (wait4(ProcessID, &Status, 0, &Usage) == -1)
         throw EXCEPTION("Can not wait for child process");
     Time = (Usage.ru_utime.tv_sec * 1000 + Usage.ru_utime.tv_usec / 1000) +
            (Usage.ru_stime.tv_sec * 1000 + Usage.ru_stime.tv_usec / 1000);
-    if (WIFEXITED(Status))
-    {
+    if (WIFEXITED(Status)) {
         int ExitCode = WEXITSTATUS(Status);
-        if (ExitCode != 0)
-        {
+        if (ExitCode != 0) {
             Result = JUDGE_RESULT::RUNTIME_ERROR;
             Description = "Child process exited with code " + std::to_string(ExitCode) + " which is recognized as runtime error";
             return false;
@@ -228,59 +214,44 @@ bool TEST_CASE::CheckSignal()
         Result = JUDGE_RESULT::JUDGED;
         return false;
     }
-    if (WIFSIGNALED(Status))
-    {
+    if (WIFSIGNALED(Status)) {
         int Signal = WTERMSIG(Status);
-        if (Signal == SIGVTALRM || Signal == SIGALRM || Signal == SIGXCPU)
-        {
+        if (Signal == SIGVTALRM || Signal == SIGALRM || Signal == SIGXCPU) {
             Result = JUDGE_RESULT::TIME_LIMIT_EXCEEDED;
             return false;
-        }
-        else if (Signal == SIGXFSZ)
-        {
+        } else if (Signal == SIGXFSZ) {
             Result = JUDGE_RESULT::OUTPUT_LIMIT_EXCEEDED;
             return false;
-        }
-        else if (Signal == SIGSEGV)
-        {
+        } else if (Signal == SIGSEGV) {
             Result = JUDGE_RESULT::MEMORY_LIMIT_EXCEEDED;
             return false;
-        }
-        else
-        {
+        } else {
             Result = JUDGE_RESULT::RUNTIME_ERROR;
             Description = "Received an unknown signal";
             return false;
         }
     }
-    if (WIFSTOPPED(Status))
-    {
+    if (WIFSTOPPED(Status)) {
         int Signal = WSTOPSIG(Status);
-        if (Signal == SIGTRAP)
-        {
+        if (Signal == SIGTRAP) {
             if (ptrace(PTRACE_SYSCALL, ProcessID, nullptr, nullptr) == -1)
                 throw EXCEPTION("Can not continue child process");
-        }
-        else
-        {
+        } else {
             if (ptrace(PTRACE_SYSCALL, ProcessID, nullptr, Signal) == -1)
                 throw EXCEPTION("Can not continue child process");
         }
     }
     return true;
 }
-bool TEST_CASE::CheckMemory()
-{
+bool TEST_CASE::CheckMemory() {
     std::ifstream ProcessStatus("/proc/" + std::to_string(ProcessID) + "/status");
     if (!ProcessStatus.is_open())
         throw EXCEPTION("Can not open process status file");
     std::string Line;
     while (std::getline(ProcessStatus, Line))
-        if (Line.substr(0, 6) == "VmPeak")
-        {
+        if (Line.substr(0, 6) == "VmPeak") {
             Memory = std::max(Memory, std::stoi(Line.substr(7, Line.find("kB") - 7)) * 1024);
-            if (Memory > UnjudgedTestCase->MemoryLimit)
-            {
+            if (Memory > UnjudgedTestCase->MemoryLimit) {
                 Result = JUDGE_RESULT::MEMORY_LIMIT_EXCEEDED;
                 return false;
             }
@@ -289,29 +260,24 @@ bool TEST_CASE::CheckMemory()
     ProcessStatus.close();
     return true;
 }
-bool TEST_CASE::CheckSystemCall()
-{
+bool TEST_CASE::CheckSystemCall() {
     struct user_regs_struct Regs;
     if (ptrace(PTRACE_GETREGS, ProcessID, nullptr, &Regs) == -1)
         return true;
     int CallID = (unsigned int)Regs.REG_SYSCALL % SystemCallList.size();
-    if (SystemCallList[CallID] == 0)
-    {
+    if (SystemCallList[CallID] == 0) {
         Result = JUDGE_RESULT::RESTRICTED_FUNCTION;
         Description = "Child process tried to execute system call " + std::to_string(CallID);
         kill(ProcessID, SIGKILL);
         return false;
-    }
-    else
+    } else
         SystemCallList[CallID]--;
     if (ptrace(PTRACE_SYSCALL, ProcessID, nullptr, nullptr) != 0)
         throw EXCEPTION("Can not trace system calls");
     return true;
 }
-void TEST_CASE::ParentProcess()
-{
-    while (true)
-    {
+void TEST_CASE::ParentProcess() {
+    while (true) {
         if (!CheckSignal())
             break;
         if (!CheckMemory())
@@ -320,8 +286,7 @@ void TEST_CASE::ParentProcess()
             break;
     }
 }
-void TEST_CASE::Run()
-{
+void TEST_CASE::Run() {
     std::ofstream InputFile(WorkDir + "/" + Problem->IOFilename + ".in");
     if (!InputFile.is_open())
         throw EXCEPTION("Can not open data file");
@@ -356,21 +321,17 @@ void TEST_CASE::Run()
     StandardErrorFile.close();
 
     pid_t ProcessID = fork();
-    if (ProcessID == 0)
-    {
+    if (ProcessID == 0) {
         ChildProcess();
         exit(0);
-    }
-    else
-    {
+    } else {
         this->ProcessID = ProcessID;
         ParentProcess();
         kill(ProcessID, SIGKILL);
         RemoveEnvrionment();
     }
 }
-void TEST_CASE::Compare()
-{
+void TEST_CASE::Compare() {
     if (Result != JUDGE_RESULT::JUDGED)
 
         Result = JUDGE_RESULT::COMPARING;
@@ -411,34 +372,26 @@ void TEST_CASE::Compare()
     FixedAnswer = UTILITIES::StringReplaceAll(FixedAnswer, "\t", "");
     FixedAnswer = UTILITIES::StringReplaceAll(FixedAnswer, " ", "");
 
-    if (StandardError != "")
-    {
+    if (StandardError != "") {
         Result = JUDGE_RESULT::RUNTIME_ERROR;
         Description = "Do not output to stderr if you do so. ";
-    }
-    else if (Output == UnjudgedTestCase->Answer)
+    } else if (Output == UnjudgedTestCase->Answer)
         Result = JUDGE_RESULT::ACCEPTED;
-    else
-    {
+    else {
         if (FixedOutput == FixedAnswer)
             Result = JUDGE_RESULT::PRESENTATION_ERROR;
-        else if (Output == "" && StandardOutput != "")
-        {
+        else if (Output == "" && StandardOutput != "") {
             Result = JUDGE_RESULT::RUNTIME_ERROR;
             Description = "Your program outputs data to stdout instead of a file";
-        }
-        else if (Output == "" && StandardOutput == "")
-        {
+        } else if (Output == "" && StandardOutput == "") {
             Result = JUDGE_RESULT::RUNTIME_ERROR;
             Description = "Output is empty, checking if the program output it's data to a wrong file";
-        }
-        else
+        } else
             Result = JUDGE_RESULT::WRONG_ANSWER;
     }
 }
 
-void TEST_CASE::Judge()
-{
+void TEST_CASE::Judge() {
     SETTINGS::GetSettings("JudgeUserID", JudgeUserID);
     SETTINGS::GetSettings("JudgeUserGroupID", JudgeUserGroupID);
     SETTINGS::GetSettings("JudgeUsername", JudgeUsername);
@@ -454,10 +407,8 @@ void TEST_CASE::Judge()
 
     bool UpdateDatabaseSignal = true;
     std::thread UpdateDatabase(
-        [this, &UpdateDatabaseSignal]()
-        {
-            while (UpdateDatabaseSignal)
-            {
+        [this, &UpdateDatabaseSignal]() {
+            while (UpdateDatabaseSignal) {
                 TEMP_TEST_DATA::Update(*this);
                 usleep(500'000);
             }
@@ -465,11 +416,9 @@ void TEST_CASE::Judge()
 
     Result = JUDGE_RESULT::JUDGING;
 
-    try
-    {
+    try {
         Run();
-        if (Time > UnjudgedTestCase->TimeLimit)
-        {
+        if (Time > UnjudgedTestCase->TimeLimit) {
             Result = JUDGE_RESULT::TIME_LIMIT_EXCEEDED;
             UpdateDatabaseSignal = false;
             UpdateDatabase.join();
@@ -479,9 +428,7 @@ void TEST_CASE::Judge()
         waitpid(ProcessID, nullptr, 0);
         if (Result == JUDGE_RESULT::JUDGED)
             Compare();
-    }
-    catch (EXCEPTION ErrorData)
-    {
+    } catch (EXCEPTION ErrorData) {
         Result = JUDGE_RESULT::SYSTEM_ERROR;
         Description = ErrorData.Message;
         UpdateDatabaseSignal = false;

@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <string>
 
-class USER
-{
-public:
+class USER {
+  public:
     int UID;
     std::string Username;
     std::string EmailAddress;

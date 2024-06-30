@@ -18,13 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <string>
 #include "HTTPRequest.hpp"
-#include "configor/json.hpp"
 #include "HTTPResponse.hpp"
+#include "configor/json.hpp"
+#include <string>
 
-class WEB_DATA_PROCEED
-{
-public:
+class WEB_DATA_PROCEED {
+  public:
     HTTP_RESPONSE Proceed(HTTP_REQUEST HTTPRequest);
 };

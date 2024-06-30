@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Exception.hpp"
 
-class PASSKEY
-{
-public:
+class PASSKEY {
+  public:
     static std::string CreateChallenge();
     static void DeleteChallenge(std::string Challenge);
     static void CreatePasskey(int UID, std::string Challenge, std::string Credential, std::string PublicKey);

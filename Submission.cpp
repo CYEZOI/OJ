@@ -16,43 +16,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "Settings.hpp"
 #include "Submission.hpp"
-#include "Utilities.hpp"
 #include "Problems.hpp"
+#include "Settings.hpp"
 #include "Submissions.hpp"
 #include "TempTestData.hpp"
-#include <fstream>
+#include "Utilities.hpp"
 #include <algorithm>
+#include <dirent.h>
+#include <fstream>
 #include <math.h>
-#include <string.h>
-#include <unistd.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <thread>
-#include <sys/wait.h>
-#include <dirent.h>
-#include <sys/stat.h>
+#include <string.h>
 #include <sys/mount.h>
 #include <sys/ptrace.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <thread>
+#include <unistd.h>
 
-void SUBMISSION::UpdateAllResults(JUDGE_RESULT Result)
-{
+void SUBMISSION::UpdateAllResults(JUDGE_RESULT Result) {
     this->Result = Result;
     for (size_t i = 0; i < TestGroups.size(); i++)
         TestGroups[i].UpdateAllResults(Result);
 }
-void SUBMISSION::RedirectIO()
-{
+void SUBMISSION::RedirectIO() {
     if (freopen((WorkDir + "/main.log").c_str(), "w", stdout) == nullptr)
         throw EXCEPTION("Can not open output data file");
 
     if (freopen((WorkDir + "/main.log").c_str(), "w", stderr) == nullptr)
         throw EXCEPTION("Can not open error data file");
 }
-void SUBMISSION::SetupEnvrionment()
-{
+void SUBMISSION::SetupEnvrionment() {
     const std::string DirsToMake[7] = {
         "./root",
         "./usr",
@@ -61,8 +58,7 @@ void SUBMISSION::SetupEnvrionment()
         "./proc",
         "./tmp",
         "./dev"};
-    for (int i = 0; i < 7; i++)
-    {
+    for (int i = 0; i < 7; i++) {
         if (mkdir(DirsToMake[i].c_str(), 0755) == -1)
             throw EXCEPTION("Can not create dir for the new root");
     }
@@ -94,8 +90,7 @@ void SUBMISSION::SetupEnvrionment()
         "lib32",
         "libx32",
         "lib64"};
-    for (int i = 0; i < 5; i++)
-    {
+    for (int i = 0; i < 5; i++) {
         if (symlink(("/usr/" + DirsToLink[i]).c_str(), DirsToLink[i].c_str()) == -1)
             throw EXCEPTION("Can not create symlink for the new root");
     }
@@ -105,8 +100,7 @@ void SUBMISSION::SetupEnvrionment()
     if (chroot(WorkDir.c_str()) != 0)
         throw EXCEPTION("Can not change root dir");
 }
-void SUBMISSION::RemoveEnvrionment()
-{
+void SUBMISSION::RemoveEnvrionment() {
     if (chdir(WorkDir.c_str()) == -1)
         throw EXCEPTION("Can not change directory");
 
@@ -136,8 +130,7 @@ void SUBMISSION::RemoveEnvrionment()
     for (int i = 0; i < 6; i++)
         UTILITIES::RemoveDir(DirsToRemove[i].c_str());
 }
-void SUBMISSION::ChangeUser()
-{
+void SUBMISSION::ChangeUser() {
     if (setgid(JudgeUserGroupID) != 0)
         throw EXCEPTION("Can not change gid");
     if (setuid(JudgeUserID) != 0)
@@ -151,8 +144,7 @@ void SUBMISSION::ChangeUser()
                   JudgeUserID) != 0)
         throw EXCEPTION("Can not change real uid");
 }
-void SUBMISSION::SetLimits()
-{
+void SUBMISSION::SetLimits() {
     struct rlimit Limit;
     Limit.rlim_cur = Limit.rlim_max = TimeLimit + 1;
     if (setrlimit(RLIMIT_CPU, &Limit))
@@ -170,8 +162,7 @@ void SUBMISSION::SetLimits()
     if (setrlimit(RLIMIT_CORE, &Limit))
         throw EXCEPTION("Can not set core limit");
 }
-void SUBMISSION::ChildProcess()
-{
+void SUBMISSION::ChildProcess() {
     std::vector<std::string>
         CompileCommands = {Compiler,
                            "-fno-diagnostics-color",
@@ -198,8 +189,7 @@ void SUBMISSION::ChildProcess()
     SetLimits();
 
     char **CompileArguments = new char *[CompileCommands.size() + 1];
-    for (size_t i = 0; i < CompileCommands.size(); i++)
-    {
+    for (size_t i = 0; i < CompileCommands.size(); i++) {
         CompileArguments[i] = (char *)CompileCommands[i].c_str();
     }
     CompileArguments[CompileCommands.size()] = nullptr;
@@ -208,14 +198,11 @@ void SUBMISSION::ChildProcess()
 
     throw EXCEPTION("Can not execute program");
 }
-void SUBMISSION::ParentProcess()
-{
-    while (true)
-    {
+void SUBMISSION::ParentProcess() {
+    while (true) {
         int Status;
         struct rusage Usage;
-        if (wait4(ProcessID, &Status, 0, &Usage) == -1)
-        {
+        if (wait4(ProcessID, &Status, 0, &Usage) == -1) {
             ptrace(PTRACE_KILL, ProcessID, nullptr, nullptr);
             throw EXCEPTION("Can not wait for child process");
         }
@@ -223,8 +210,7 @@ void SUBMISSION::ParentProcess()
             break;
     }
 }
-void SUBMISSION::CreateFiles()
-{
+void SUBMISSION::CreateFiles() {
     std::ofstream LogFile(WorkDir + "/main.log");
     if (!LogFile.is_open())
         throw EXCEPTION("Can not open data file");
@@ -247,20 +233,16 @@ void SUBMISSION::CreateFiles()
     if (chmod((WorkDir + "/main").c_str(), 0760) == -1)
         throw EXCEPTION("Can not change permission of compile output file");
 }
-void SUBMISSION::Compile()
-{
+void SUBMISSION::Compile() {
     UpdateAllResults(JUDGE_RESULT::COMPILING);
 
     CreateFiles();
 
     pid_t PID = fork();
-    if (PID == 0)
-    {
+    if (PID == 0) {
         ChildProcess();
         exit(0);
-    }
-    else
-    {
+    } else {
         this->ProcessID = PID;
         ParentProcess();
         RemoveEnvrionment();
@@ -270,8 +252,7 @@ void SUBMISSION::Compile()
         if (stat((WorkDir + "/main").c_str(), &OutputFileStatus) < 0)
             throw EXCEPTION("Can not open check compile output file status");
 
-        if (OutputFileStatus.st_size != 0)
-        {
+        if (OutputFileStatus.st_size != 0) {
             UpdateAllResults(JUDGE_RESULT::COMPILED);
             return;
         }
@@ -292,26 +273,21 @@ void SUBMISSION::Compile()
         Description = CompileResult;
     }
 }
-void SUBMISSION::RunTestGroups()
-{
+void SUBMISSION::RunTestGroups() {
     if (Result != JUDGE_RESULT::COMPILED)
         if (Problem.IOFilename == "")
             Problem.IOFilename = std::to_string(SID);
-    for (size_t i = 0; i < TestGroups.size(); i++)
-    {
+    for (size_t i = 0; i < TestGroups.size(); i++) {
         TEMP_TEST_DATA::Insert(TestGroups[i]);
-        if (fork() == 0)
-        {
+        if (fork() == 0) {
             TestGroups[i].Judge();
             exit(0);
         }
     }
     bool Judged = false;
-    while (!Judged)
-    {
+    while (!Judged) {
         Judged = true;
-        for (size_t i = 0; i < TestGroups.size(); i++)
-        {
+        for (size_t i = 0; i < TestGroups.size(); i++) {
             TEMP_TEST_DATA::Select(TestGroups[i]);
             if (TestGroups[i].Result >= JUDGE_RESULT::WAITING)
                 Judged = false;
@@ -319,8 +295,7 @@ void SUBMISSION::RunTestGroups()
         SUBMISSIONS::UpdateSubmission(*this);
         usleep(500'000);
     }
-    for (size_t i = 0; i < TestGroups.size(); i++)
-    {
+    for (size_t i = 0; i < TestGroups.size(); i++) {
         TEMP_TEST_DATA::Select(TestGroups[i]);
         TEMP_TEST_DATA::Delete(TestGroups[i]);
         Score += TestGroups[i].Score;
@@ -335,23 +310,19 @@ void SUBMISSION::RunTestGroups()
     int SecondMaxCount = 0;
     JUDGE_RESULT SecondMaxResult = JUDGE_RESULT::UNKNOWN_ERROR;
     for (size_t i = 0; i < JUDGE_RESULT::REJECTED; i++)
-        if (ResultCount[i] > MaxCount)
-        {
+        if (ResultCount[i] > MaxCount) {
             SecondMaxCount = MaxCount;
             SecondMaxResult = MaxResult;
             MaxCount = ResultCount[i];
             MaxResult = (JUDGE_RESULT)i;
-        }
-        else if (ResultCount[i] > SecondMaxCount)
-        {
+        } else if (ResultCount[i] > SecondMaxCount) {
             SecondMaxCount = ResultCount[i];
             SecondMaxResult = (JUDGE_RESULT)i;
         }
     Result = (SecondMaxCount == 0 || MaxResult != JUDGE_RESULT::ACCEPTED) ? MaxResult : SecondMaxResult;
 }
 
-void SUBMISSION::Set(std::string Code, std::string PID)
-{
+void SUBMISSION::Set(std::string Code, std::string PID) {
     UpdateAllResults(JUDGE_RESULT::WAITING);
     this->Code = Code;
     this->PID = PID;
@@ -359,8 +330,7 @@ void SUBMISSION::Set(std::string Code, std::string PID)
         throw EXCEPTION("Source code is too long");
 }
 
-void SUBMISSION::Judge()
-{
+void SUBMISSION::Judge() {
     if (Result != JUDGE_RESULT::WAITING)
         throw EXCEPTION("Submission has been judged");
 
@@ -382,14 +352,11 @@ void SUBMISSION::Judge()
     SourceFile << Code;
     SourceFile.close();
 
-    try
-    {
+    try {
         Compile();
         if (Result == JUDGE_RESULT::COMPILED)
             RunTestGroups();
-    }
-    catch (EXCEPTION ErrorData)
-    {
+    } catch (EXCEPTION ErrorData) {
         UpdateAllResults(JUDGE_RESULT::SYSTEM_ERROR);
         Description = ErrorData.Message;
     }

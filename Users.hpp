@@ -18,15 +18,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "User.hpp"
+#include "Database.hpp"
 #include "Exception.hpp"
 #include "Regexes.hpp"
-#include "Database.hpp"
 #include "Role.hpp"
+#include "User.hpp"
 
-class USERS
-{
-public:
+class USERS {
+  public:
     static std::string HashPassword(std::string Password);
     static void AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role);
     static void CheckUsernameAvailable(std::string Username);

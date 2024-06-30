@@ -18,9 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 #include "Submission.hpp"
-class TEMP_TEST_DATA
-{
-public:
+class TEMP_TEST_DATA {
+  public:
     static void Insert(TEST_GROUP TestGroup);
     static void Update(TEST_GROUP TestGroup);
     static void Select(TEST_GROUP &TestGroup);

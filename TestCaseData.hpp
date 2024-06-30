@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <string>
 
-class TEST_CASE_DATA
-{
-private:
+class TEST_CASE_DATA {
+  private:
     int TCID = 0;
     std::string Input;
     std::string Answer;

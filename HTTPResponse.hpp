@@ -19,12 +19,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Logger.hpp"
-#include <string>
 #include <map>
+#include <string>
 
-class HTTP_RESPONSE
-{
-private:
+class HTTP_RESPONSE {
+  private:
     std::map<unsigned short, std::string> Messages = {
         {100, "Continue"},
         {101, "Switching Protocols"},
@@ -95,7 +94,7 @@ private:
         {"Content-Type", "text/html; charset=utf-8"}};
     std::string Body;
 
-public:
+  public:
     HTTP_RESPONSE();
 
     void SetVersion(std::string Version);

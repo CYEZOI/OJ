@@ -18,14 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "TestGroup.hpp"
 #include "Logger.hpp"
 #include "Problem.hpp"
+#include "TestGroup.hpp"
 #include <vector>
 
-class SUBMISSION
-{
-private:
+class SUBMISSION {
+  private:
     int SID = 0;
     int UID = 0;
     int ProcessID = 0;
@@ -68,7 +67,7 @@ private:
     friend class JUDGING_LIST;
     friend class SUBMISSIONS;
 
-public:
+  public:
     void Set(std::string Code, std::string PID);
     void Judge();
 };

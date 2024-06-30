@@ -16,19 +16,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "Settings.hpp"
 #include "Socket.hpp"
-#include <thread>
-#include <string.h>
-#include <unistd.h>
-#include <signal.h>
+#include "Settings.hpp"
 #include <arpa/inet.h>
+#include <signal.h>
+#include <string.h>
 #include <sys/socket.h>
+#include <thread>
+#include <unistd.h>
 
 using namespace std::literals::string_literals;
 
-void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK CallBack)
-{
+void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK CallBack) {
     std::string ClientName = std::to_string(Socket) + "(" + inet_ntoa(ClientAddress.sin_addr) + ":" + std::to_string(ntohs(ClientAddress.sin_port)) + ")";
 
     std::string RequestHTTPData = "";
@@ -38,24 +37,20 @@ void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK 
     timeval TimeOut;
     TimeOut.tv_sec = 1;
     TimeOut.tv_usec = 0;
-    while (true)
-    {
+    while (true) {
         int Result = select(Socket + 1, &ReadSet, NULL, NULL, &TimeOut);
-        if (Result == -1)
-        {
+        if (Result == -1) {
             Logger.Error("Can not select from socket " + ClientName);
             break;
         }
-        if (Result == 0)
-        {
+        if (Result == 0) {
             FD_ZERO(&ReadSet);
             FD_SET(Socket, &ReadSet);
             continue;
         }
         char Buffer[1024];
         int Length = recv(Socket, Buffer, 1024, 0);
-        if (Length == -1)
-        {
+        if (Length == -1) {
             Logger.Error("Can not receive from socket " + ClientName);
             break;
         }
@@ -67,12 +62,10 @@ void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK 
     }
 
     std::string ResponseHTTPData = CallBack(RequestHTTPData);
-    for (size_t i = 0; i < ResponseHTTPData.length(); i += 1024)
-    {
+    for (size_t i = 0; i < ResponseHTTPData.length(); i += 1024) {
         size_t Length = std::min(ResponseHTTPData.length() - i, (size_t)1024);
         int SendLength = send(Socket, ResponseHTTPData.substr(i, Length).c_str(), Length, 0);
-        if (SendLength == -1)
-        {
+        if (SendLength == -1) {
             Logger.Error("Can not send to socket " + ClientName);
             break;
         }
@@ -82,8 +75,7 @@ void SOCKET::SubThread(int Socket, sockaddr_in ClientAddress, SOCKET::CALL_BACK 
         Logger.Error("Can not close socket " + ClientName);
 }
 
-SOCKET::SOCKET(CALL_BACK CallBack)
-{
+SOCKET::SOCKET(CALL_BACK CallBack) {
     signal(SIGPIPE, SIG_IGN);
 
     SETTINGS::GetSettings("SocketPort", Port);
@@ -107,23 +99,20 @@ SOCKET::SOCKET(CALL_BACK CallBack)
         Logger.Fetal("Can not listen");
     Logger.Warning("Listening on port " + std::to_string(Port));
 
-    while (true)
-    {
+    while (true) {
         struct sockaddr_in ClientAddress;
         socklen_t ClientAddressLength = sizeof(ClientAddress);
         int ClientSocket = accept(ListenSocket, (struct sockaddr *)&ClientAddress, &ClientAddressLength);
         if (ClientSocket == -1)
             Logger.Error("Can not accept");
         new std::thread(
-            [this, ClientSocket, ClientAddress, CallBack]
-            {
+            [this, ClientSocket, ClientAddress, CallBack] {
                 this->SubThread(ClientSocket, ClientAddress, CallBack);
                 close(ClientSocket);
             });
     }
 }
 
-SOCKET::~SOCKET()
-{
+SOCKET::~SOCKET() {
     close(ListenSocket);
 }

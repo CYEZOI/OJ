@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Exception.hpp"
 
-class FILES
-{
-public:
+class FILES {
+  public:
     static void CreateFileDownloadLink(int FID, std::string &FileDownloadLink);
     static void GetFileContent(std::string FileToken, std::string &FileContent, std::string &Filename, std::string &FileType);
     static void UploadFile(std::string Filename, std::string FileContent, std::string FileType, int UID, int &FID);

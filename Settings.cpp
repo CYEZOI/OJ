@@ -17,15 +17,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
 #include "Settings.hpp"
-#include "Utilities.hpp"
 #include "Database.hpp"
-#include <unistd.h>
+#include "Utilities.hpp"
 #include <fstream>
-#include <vector>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <vector>
 
-void SETTINGS::Init()
-{
+void SETTINGS::Init() {
     UTILITIES::LoadFile("/etc/OJ/DatabaseHost", DatabaseHost);
     UTILITIES::LoadFile("/etc/OJ/DatabasePort", DatabasePort);
     UTILITIES::LoadFile("/etc/OJ/DatabaseUsername", DatabaseUsername);
@@ -37,52 +36,41 @@ void SETTINGS::Init()
     DatabaseName = UTILITIES::RemoveSpaces(DatabaseName);
 }
 
-void SETTINGS::GetSettings(std::string Key, std::string &Value)
-{
+void SETTINGS::GetSettings(std::string Key, std::string &Value) {
     DATABASE::SELECT("Settings")
         .Where("Key", Key)
         .Execute(
-            [Key, &Value](auto Data)
-            {
-                if (Data.size() == 0)
-                {
+            [Key, &Value](auto Data) {
+                if (Data.size() == 0) {
                     throw EXCEPTION("Settings not found");
                 }
                 Value = Data[0]["Value"];
             });
 }
-void SETTINGS::GetSettings(std::string Key, int &Value)
-{
+void SETTINGS::GetSettings(std::string Key, int &Value) {
     std::string ValueString;
     GetSettings(Key, ValueString);
     Value = std::stoi(ValueString);
 }
-void SETTINGS::GetSettings(configor::json &Value)
-{
+void SETTINGS::GetSettings(configor::json &Value) {
     DATABASE::SELECT("Settings")
         .Execute(
-            [&Value](auto Data)
-            {
+            [&Value](auto Data) {
                 for (auto &Row : Data)
                     Value[Row["Key"]] = Row["Value"];
             });
 }
-void SETTINGS::SetSettings(std::string Key, std::string Value)
-{
+void SETTINGS::SetSettings(std::string Key, std::string Value) {
     DATABASE::SELECT("Settings")
         .Where("Key", Key)
         .Execute(
-            [Key, &Value](auto Data)
-            {
-                if (Data.size() == 0)
-                {
+            [Key, &Value](auto Data) {
+                if (Data.size() == 0) {
                     DATABASE::INSERT("Settings")
                         .Insert("Key", Key)
                         .Insert("Value", Value)
                         .Execute();
-                }
-                else
-                {
+                } else {
                     DATABASE::UPDATE("Settings")
                         .Set("Value", Value)
                         .Where("Key", Key)
@@ -90,15 +78,12 @@ void SETTINGS::SetSettings(std::string Key, std::string Value)
                 }
             });
 }
-void SETTINGS::SetSettings(std::string Key, int Value)
-{
+void SETTINGS::SetSettings(std::string Key, int Value) {
     return SetSettings(Key, std::to_string(Value));
 }
-void SETTINGS::SetSettings(configor::json Value)
-{
+void SETTINGS::SetSettings(configor::json Value) {
     DATABASE::TRUNCATE("Settings").Execute();
-    for (auto i = Value.begin(); i != Value.end(); i++)
-    {
+    for (auto i = Value.begin(); i != Value.end(); i++) {
         DATABASE::INSERT("Settings")
             .Insert("Key", i.key())
             .Insert("Value", i.value().as_string())

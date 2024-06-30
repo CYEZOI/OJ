@@ -21,15 +21,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Database.hpp"
 #include "Submission.hpp"
 
-class SUBMISSIONS
-{
-private:
+class SUBMISSIONS {
+  private:
     static void JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP> &TestGroups, std::string PID, int SID);
     static void TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::string &JSONData);
 
     friend class API_PROCEED;
 
-public:
+  public:
     static void AddSubmission(SUBMISSION &Submission);
     static void GetSubmission(int SID, SUBMISSION &Submission);
     static void UpdateSubmission(SUBMISSION Submission);

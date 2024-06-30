@@ -17,20 +17,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
 #include "JudgingList.hpp"
-#include "Submissions.hpp"
-#include "Settings.hpp"
 #include "Problems.hpp"
+#include "Settings.hpp"
+#include "Submissions.hpp"
+#include <dirent.h>
 #include <thread>
 #include <unistd.h>
-#include <dirent.h>
 
-void JUDGING_LIST::Init()
-{
+void JUDGING_LIST::Init() {
     new std::thread(
-        [this]()
-        {
-            while (true)
-            {
+        [this]() {
+            while (true) {
                 while (JudgingList.empty())
                     usleep(500'000);
                 SUBMISSION Submission;
@@ -41,9 +38,8 @@ void JUDGING_LIST::Init()
         });
 }
 
-void JUDGING_LIST::Add(SUBMISSION &Submission)
-{
+void JUDGING_LIST::Add(SUBMISSION &Submission) {
     JudgingList.push(Submission.SID);
-    }
+}
 
 JUDGING_LIST JudgingList;

@@ -16,38 +16,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "WebDataProceed.hpp"
-#include "Socket.hpp"
-#include "Problems.hpp"
-#include "Submission.hpp"
-#include "JudgingList.hpp"
-#include <unistd.h>
-#include "HTTPRequest.hpp"
-#include "Utilities.hpp"
 #include "Database.hpp"
+#include "HTTPRequest.hpp"
+#include "JudgingList.hpp"
+#include "Problems.hpp"
+#include "Socket.hpp"
+#include "Submission.hpp"
+#include "Utilities.hpp"
+#include "WebDataProceed.hpp"
+#include <unistd.h>
 
-int main()
-{
+int main() {
     srand(time(NULL));
     Settings.Init();
     JudgingList.Init();
     new SOCKET(
-        [](std::string RequestHTTPData) -> std::string
-        {
+        [](std::string RequestHTTPData) -> std::string {
             WEB_DATA_PROCEED Data;
             HTTP_REQUEST HTTPRequest;
             HTTP_RESPONSE HTTPResponse;
-            try
-            {
+            try {
                 HTTPRequest.Parse(RequestHTTPData);
                 HTTPResponse = Data.Proceed(HTTPRequest);
-            }
-            catch (EXCEPTION ErrorData)
-            {
+            } catch (EXCEPTION ErrorData) {
                 HTTPResponse.SetCode(400);
-            }
-            catch (std::exception &ErrorData)
-            {
+            } catch (std::exception &ErrorData) {
                 HTTPResponse.SetCode(400);
                 Logger.Error(ErrorData.what());
             }

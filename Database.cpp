@@ -20,45 +20,37 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Settings.hpp"
 #include "Utilities.hpp"
 
-DATABASE::SELECT::SELECT(std::string TableName)
-{
+DATABASE::SELECT::SELECT(std::string TableName) {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
 DATABASE::SELECT::~SELECT() { DATABASE::CloseConnection(Connection); }
-DATABASE::SELECT &DATABASE::SELECT::Select(std::string Column)
-{
+DATABASE::SELECT &DATABASE::SELECT::Select(std::string Column) {
     this->Columns.push_back(Column);
     return *this;
 }
-DATABASE::SELECT &DATABASE::SELECT::Where(std::string Column, std::string Value)
-{
+DATABASE::SELECT &DATABASE::SELECT::Where(std::string Column, std::string Value) {
     this->Conditions.push_back({Column, Value});
     return *this;
 }
 DATABASE::SELECT &DATABASE::SELECT::Where(std::string Column, int Value) { return Where(Column, std::to_string(Value)); }
-DATABASE::SELECT &DATABASE::SELECT::Order(std::string Column, bool Ascending)
-{
+DATABASE::SELECT &DATABASE::SELECT::Order(std::string Column, bool Ascending) {
     this->Orders.push_back({Column, Ascending});
     this->UseOrder = true;
     return *this;
 }
-DATABASE::SELECT &DATABASE::SELECT::Limit(int Limits)
-{
+DATABASE::SELECT &DATABASE::SELECT::Limit(int Limits) {
     this->Limits = Limits;
     return *this;
 }
-DATABASE::SELECT &DATABASE::SELECT::Offset(int Offsets)
-{
+DATABASE::SELECT &DATABASE::SELECT::Offset(int Offsets) {
     this->Offsets = Offsets;
     return *this;
 }
-void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::string, std::string>>)> Callback)
-{
+void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::string, std::string>>)> Callback) {
     if (Connection == nullptr)
         throw EXCEPTION("Not connected");
-    if (Columns.empty())
-    {
+    if (Columns.empty()) {
         sql::ResultSet *ResultSet(Connection->createStatement()->executeQuery("DESCRIBE " + TableName));
         while (ResultSet->next())
             Columns.push_back(ResultSet->getString("Field"));
@@ -70,15 +62,13 @@ void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::stri
         Query += "`" + Column + "`, ";
     Query.erase(Query.end() - 2, Query.end());
     Query += " FROM `" + TableName + "`";
-    if (!Conditions.empty())
-    {
+    if (!Conditions.empty()) {
         Query += " WHERE ";
         for (auto &Condition : Conditions)
             Query += "`" + Condition.first + "`=? AND ";
         Query.erase(Query.end() - 5, Query.end());
     }
-    if (!Orders.empty())
-    {
+    if (!Orders.empty()) {
         Query += " ORDER BY ";
         for (auto &Order : Orders)
             Query += "`" + Order.first + "` " + (Order.second ? "ASC" : "DESC") + ", ";
@@ -88,8 +78,7 @@ void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::stri
         Query += " LIMIT " + std::to_string(Limits);
     if (Offsets)
         Query += " OFFSET " + std::to_string(Offsets);
-    try
-    {
+    try {
         sql::PreparedStatement *PreparedStatement(Connection->prepareStatement(Query));
         int Index = 1;
         for (auto &Condition : Conditions)
@@ -98,8 +87,7 @@ void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::stri
         PreparedStatement->close();
         delete PreparedStatement;
         std::vector<std::map<std::string, std::string>> Data;
-        while (ResultSet->next())
-        {
+        while (ResultSet->next()) {
             std::map<std::string, std::string> Row;
             for (auto &Column : Columns)
                 Row[Column] = ResultSet->getString(Column);
@@ -109,28 +97,23 @@ void DATABASE::SELECT::Execute(std::function<void(std::vector<std::map<std::stri
             Callback(Data);
         ResultSet->close();
         delete ResultSet;
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
-DATABASE::INSERT::INSERT(std::string TableName)
-{
+DATABASE::INSERT::INSERT(std::string TableName) {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
 DATABASE::INSERT::~INSERT() { DATABASE::CloseConnection(Connection); }
-DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, std::string Value)
-{
+DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, std::string Value) {
     this->Columns.push_back(Column);
     this->Values.push_back(Value);
     return *this;
 }
 DATABASE::INSERT &DATABASE::INSERT::Insert(std::string Column, int Value) { return Insert(Column, std::to_string(Value)); }
-void DATABASE::INSERT::Execute(std::function<void(int)> Callback)
-{
+void DATABASE::INSERT::Execute(std::function<void(int)> Callback) {
     if (Connection == nullptr)
         throw EXCEPTION("Not connected");
     std::string Query = "INSERT INTO " + TableName + " (";
@@ -142,8 +125,7 @@ void DATABASE::INSERT::Execute(std::function<void(int)> Callback)
         Query += "?, ";
     Query.erase(Query.end() - 2, Query.end());
     Query += ")";
-    try
-    {
+    try {
         sql::PreparedStatement *PreparedStatement(Connection->prepareStatement(Query));
         int Index = 1;
         for (auto &Value : Values)
@@ -157,42 +139,34 @@ void DATABASE::INSERT::Execute(std::function<void(int)> Callback)
             Callback(ResultSet->getInt(1));
         ResultSet->close();
         delete ResultSet;
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
-DATABASE::DELETE::DELETE(std::string TableName)
-{
+DATABASE::DELETE::DELETE(std::string TableName) {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
 DATABASE::DELETE::~DELETE() { DATABASE::CloseConnection(Connection); }
-DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, std::string Value)
-{
+DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, std::string Value) {
     this->Conditions.push_back({Column, Value});
     return *this;
 }
-DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, int Value)
-{
+DATABASE::DELETE &DATABASE::DELETE::Where(std::string Column, int Value) {
     return Where(Column, std::to_string(Value));
 }
-void DATABASE::DELETE::Execute()
-{
+void DATABASE::DELETE::Execute() {
     if (Connection == nullptr)
         throw EXCEPTION("Not connected");
     std::string Query = "DELETE FROM " + TableName;
-    if (!Conditions.empty())
-    {
+    if (!Conditions.empty()) {
         Query += " WHERE ";
         for (auto &Condition : Conditions)
             Query += "`" + Condition.first + "`=? AND ";
         Query.erase(Query.end() - 5, Query.end());
     }
-    try
-    {
+    try {
         sql::PreparedStatement *PreparedStatement(Connection->prepareStatement(Query));
         int Index = 1;
         for (auto &Condition : Conditions)
@@ -200,48 +174,40 @@ void DATABASE::DELETE::Execute()
         PreparedStatement->execute();
         PreparedStatement->close();
         delete PreparedStatement;
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
-DATABASE::UPDATE::UPDATE(std::string TableName)
-{
+DATABASE::UPDATE::UPDATE(std::string TableName) {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
 DATABASE::UPDATE::~UPDATE() { DATABASE::CloseConnection(Connection); }
-DATABASE::UPDATE &DATABASE::UPDATE::Set(std::string Column, std::string Value)
-{
+DATABASE::UPDATE &DATABASE::UPDATE::Set(std::string Column, std::string Value) {
     this->Columns.push_back({Column, Value});
     return *this;
 }
 DATABASE::UPDATE &DATABASE::UPDATE::Set(std::string Column, int Value) { return Set(Column, std::to_string(Value)); }
-DATABASE::UPDATE &DATABASE::UPDATE::Where(std::string Column, std::string Value)
-{
+DATABASE::UPDATE &DATABASE::UPDATE::Where(std::string Column, std::string Value) {
     this->Conditions.push_back({Column, Value});
     return *this;
 }
 DATABASE::UPDATE &DATABASE::UPDATE::Where(std::string Column, int Value) { return Where(Column, std::to_string(Value)); }
-void DATABASE::UPDATE::Execute()
-{
+void DATABASE::UPDATE::Execute() {
     if (Connection == nullptr)
         throw EXCEPTION("Not connected");
     std::string Query = "UPDATE " + TableName + " SET ";
     for (auto &Column : Columns)
         Query += "`" + Column.first + "`=?, ";
     Query.erase(Query.end() - 2, Query.end());
-    if (!Conditions.empty())
-    {
+    if (!Conditions.empty()) {
         Query += " WHERE ";
         for (auto &Condition : Conditions)
             Query += "`" + Condition.first + "`=? AND ";
         Query.erase(Query.end() - 5, Query.end());
     }
-    try
-    {
+    try {
         sql::PreparedStatement *PreparedStatement(Connection->prepareStatement(Query));
         int Index = 1;
         for (auto &Column : Columns)
@@ -251,75 +217,58 @@ void DATABASE::UPDATE::Execute()
         PreparedStatement->execute();
         PreparedStatement->close();
         delete PreparedStatement;
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
-DATABASE::SIZE::SIZE(std::string TableName)
-{
+DATABASE::SIZE::SIZE(std::string TableName) {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
-void DATABASE::SIZE::Execute(std::function<void(int)> Callback)
-{
+void DATABASE::SIZE::Execute(std::function<void(int)> Callback) {
     if (Connection == nullptr)
         throw EXCEPTION("Not connected");
-    try
-    {
+    try {
         sql::ResultSet *ResultSet(Connection->createStatement()->executeQuery("SELECT COUNT(*) FROM " + TableName));
         ResultSet->next();
         if (Callback != nullptr)
             Callback(ResultSet->getInt(1));
         ResultSet->close();
         delete ResultSet;
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
-DATABASE::TRUNCATE::TRUNCATE(std::string TableName)
-{
+DATABASE::TRUNCATE::TRUNCATE(std::string TableName) {
     this->Connection = DATABASE::CreateConnection();
     this->TableName = TableName;
 }
-void DATABASE::TRUNCATE::Execute()
-{
+void DATABASE::TRUNCATE::Execute() {
     if (Connection == nullptr)
         throw EXCEPTION("Not connected");
-    try
-    {
+    try {
         Connection->createStatement()->execute("TRUNCATE TABLE " + TableName);
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         throw EXCEPTION("SQLException " + std::to_string(e.getErrorCode()) + " " + e.what() + " " + e.getSQLState());
     }
 }
 
-sql::Connection *DATABASE::CreateConnection()
-{
+sql::Connection *DATABASE::CreateConnection() {
     sql::Connection *Connection;
-    try
-    {
+    try {
         sql::Driver *Driver = sql::mysql::get_mysql_driver_instance();
         Connection = Driver->connect(Settings.DatabaseHost.c_str(),
                                      Settings.DatabaseUsername.c_str(),
                                      Settings.DatabasePassword.c_str());
         Connection->setSchema(Settings.DatabaseName.c_str());
-    }
-    catch (sql::SQLException &e)
-    {
+    } catch (sql::SQLException &e) {
         std::cout << "SQLException " << std::to_string(e.getErrorCode()) << " " << e.what() << " " << e.getSQLState() << std::endl;
         return nullptr;
     }
     return Connection;
 }
-void DATABASE::CloseConnection(sql::Connection *Connection)
-{
+void DATABASE::CloseConnection(sql::Connection *Connection) {
     Connection->close();
     delete Connection;
 }

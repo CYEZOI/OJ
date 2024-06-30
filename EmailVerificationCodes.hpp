@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Exception.hpp"
 
-class EMAIL_VERIFICATION_CODES
-{
-public:
+class EMAIL_VERIFICATION_CODES {
+  public:
     static void CreateEmailVerificationCode(std::string EmailAddress, std::string &VerificationCode);
     static void CheckEmailVerificationCode(std::string EmailAddress, std::string VerificationCode);
     static void DeleteEmailVerificationCode(std::string EmailAddress);

@@ -19,12 +19,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Exception.hpp"
 #include "Logger.hpp"
 
-EXCEPTION::EXCEPTION()
-{
+EXCEPTION::EXCEPTION() {
     Message = "No message";
 }
-EXCEPTION::EXCEPTION(std::string Message)
-{
+EXCEPTION::EXCEPTION(std::string Message) {
     this->Message = Message;
     if (errno == 0)
         Logger.Warning(Message);

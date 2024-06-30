@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <string>
 
-class SAMPLE
-{
-private:
+class SAMPLE {
+  private:
     std::string Input;
     std::string Output;
     std::string Description;

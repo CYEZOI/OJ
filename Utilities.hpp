@@ -18,9 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <vector>
-#include "Logger.hpp"
 #include "Exception.hpp"
+#include "Logger.hpp"
+#include <vector>
 
 #define DEBUG_HERE                                                                                                    \
     {                                                                                                                 \
@@ -28,12 +28,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         std::cout << __FILE__ << ":" << __LINE__ << " " << __PRETTY_FUNCTION__ << std::endl;                          \
     }
 
-class UTILITIES
-{
-private:
+class UTILITIES {
+  private:
     static size_t UploadFunction(char *ptr, size_t size, size_t nmemb, void *userp);
 
-public:
+  public:
     static std::string RandomToken();
     static std::string StringReplaceAll(std::string Data, std::string Search, std::string Replace);
     static std::vector<std::string> StringSplit(std::string Data, std::string Delimiter);

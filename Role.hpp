@@ -18,8 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-enum USER_ROLE
-{
+enum USER_ROLE {
     USER_ROLE_ADMIN,
     USER_ROLE_USER,
     USER_ROLE_GUEST,

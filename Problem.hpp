@@ -21,9 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Sample.hpp"
 #include "TestGroupData.hpp"
 
-class PROBLEM
-{
-private:
+class PROBLEM {
+  private:
     std::string PID;
     std::string Title;
     std::string Description;
@@ -43,7 +42,7 @@ private:
     friend class SUBMISSIONS;
     friend class TEST_CASE;
 
-public:
+  public:
     bool
     operator<(const PROBLEM &Compare) const;
 };

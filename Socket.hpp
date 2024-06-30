@@ -19,22 +19,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Logger.hpp"
-#include <string>
 #include <arpa/inet.h>
+#include <string>
 
-class SOCKET
-{
-public:
+class SOCKET {
+  public:
     typedef std::string (*CALL_BACK)(std::string RequestHTTPData);
 
-private:
+  private:
     int Port;
     int ListenSocket;
     struct sockaddr_in ServerAddress;
 
     void SubThread(int Socket, sockaddr_in ClientAddress, CALL_BACK CallBack);
 
-public:
+  public:
     SOCKET(CALL_BACK CallBack);
     ~SOCKET();
 };

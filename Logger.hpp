@@ -19,12 +19,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <iostream>
-#include <string>
 #include <mutex>
+#include <string>
 
-class LOGGER
-{
-private:
+class LOGGER {
+  private:
     std::string LogFilename;
     FILE *LogFile = NULL;
     std::mutex OutputMutex;
@@ -32,7 +31,7 @@ private:
 
     friend class API_PROCEED;
 
-public:
+  public:
     LOGGER();
     ~LOGGER();
 

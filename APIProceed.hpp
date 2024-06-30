@@ -27,13 +27,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         return _ResponseJSON;                     \
     }
 
-#include <string>
-#include "configor/json.hpp"
 #include "Role.hpp"
+#include "configor/json.hpp"
+#include <string>
 
-class API_PROCEED
-{
-private:
+class API_PROCEED {
+  private:
     std::string Token;
     int UID;
     bool IsAdmin;
@@ -80,6 +79,6 @@ private:
     configor::json GetSettings();
     configor::json SetSettings(configor::json SettingsJSON);
 
-public:
+  public:
     configor::json Proceed(configor::json Request);
 };

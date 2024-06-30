@@ -20,9 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "Exception.hpp"
 
-class TOKENS
-{
-public:
+class TOKENS {
+  public:
     static std::string CreateToken(int UID);
     static void CheckToken(std::string TokenValue);
     static void DeleteToken(std::string TokenValue);

@@ -20,39 +20,30 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Database.hpp"
 #include "configor/json.hpp"
 
-void PROBLEMS::JSONToSamples(std::string JSONData, std::vector<SAMPLE> &Samples)
-{
+void PROBLEMS::JSONToSamples(std::string JSONData, std::vector<SAMPLE> &Samples) {
     Samples.clear();
-    try
-    {
+    try {
         configor::json JSON = configor::json::parse(JSONData);
-        for (auto &Sample : JSON)
-        {
+        for (auto &Sample : JSON) {
             SAMPLE NewSample;
             NewSample.Input = Sample["Input"].as_string();
             NewSample.Output = Sample["Output"].as_string();
             NewSample.Description = Sample["Description"].as_string();
             Samples.push_back(NewSample);
         }
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         throw EXCEPTION(e.what());
     }
-    }
-void PROBLEMS::JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_GROUP_DATA> &UnjudgedTestGroups)
-{
+}
+void PROBLEMS::JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_GROUP_DATA> &UnjudgedTestGroups) {
     UnjudgedTestGroups.clear();
-    try
-    {
+    try {
         configor::json JSON = configor::json::parse(JSONData);
-        for (auto &TestGroup : JSON)
-        {
+        for (auto &TestGroup : JSON) {
             TEST_GROUP_DATA NewTestGroup;
             NewTestGroup.TGID = TestGroup["TGID"].as_integer();
             NewTestGroup.TestCases.clear();
-            for (auto &TestCase : TestGroup["TestCases"])
-            {
+            for (auto &TestCase : TestGroup["TestCases"]) {
                 TEST_CASE_DATA NewTestCase;
                 NewTestCase.TCID = TestCase["TCID"].as_integer();
                 NewTestCase.Input = TestCase["Input"].as_string();
@@ -64,35 +55,26 @@ void PROBLEMS::JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_G
             }
             UnjudgedTestGroups.push_back(NewTestGroup);
         }
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         throw EXCEPTION(e.what());
     }
-    }
-void PROBLEMS::SamplesToJSON(std::vector<SAMPLE> Samples, std::string &JSONData)
-{
-    try
-    {
+}
+void PROBLEMS::SamplesToJSON(std::vector<SAMPLE> Samples, std::string &JSONData) {
+    try {
         configor::json JSON = configor::json::array({});
         for (auto &Sample : Samples)
             JSON.push_back({{"Input", Sample.Input},
                             {"Output", Sample.Output},
                             {"Description", Sample.Description}});
         JSONData = JSON.dump();
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         throw EXCEPTION(e.what());
     }
-    }
-void PROBLEMS::UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTestGroups, std::string &JSONData)
-{
-    try
-    {
+}
+void PROBLEMS::UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTestGroups, std::string &JSONData) {
+    try {
         configor::json JSON = configor::json::array({});
-        for (auto &TestGroup : UnjudgedTestGroups)
-        {
+        for (auto &TestGroup : UnjudgedTestGroups) {
             configor::json NewTestGroup;
             NewTestGroup["TGID"] = TestGroup.TGID;
             NewTestGroup["TestCases"] = configor::json::array({});
@@ -106,15 +88,12 @@ void PROBLEMS::UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTes
             JSON.push_back(std::move(NewTestGroup));
         }
         JSONData = JSON.dump();
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         throw EXCEPTION(e.what());
     }
-    }
+}
 
-void PROBLEMS::AddProblem(PROBLEM Problem)
-{
+void PROBLEMS::AddProblem(PROBLEM Problem) {
     std::string SamplesJSON, TestGroupsJSON;
     SamplesToJSON(Problem.Samples, SamplesJSON);
     UnjudgedTestGroupsToJSON(Problem.TestGroups, TestGroupsJSON);
@@ -130,9 +109,8 @@ void PROBLEMS::AddProblem(PROBLEM Problem)
         .Insert("Samples", SamplesJSON)
         .Insert("TestGroups", TestGroupsJSON)
         .Execute();
-    }
-void PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem)
-{
+}
+void PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem) {
     DATABASE::SELECT("Problems")
         .Select("Title")
         .Select("IOFilename")
@@ -145,8 +123,7 @@ void PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem)
         .Select("TestGroups")
         .Where("PID", PID)
         .Execute(
-            [PID, &Problem](auto Data)
-            {
+            [PID, &Problem](auto Data) {
                 if (Data.size() == 0)
                     throw EXCEPTION("Problem not found");
                 Problem.PID = PID;
@@ -159,10 +136,9 @@ void PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem)
                 JSONToSamples(Data[0]["Samples"], Problem.Samples);
                 JSONToUnjudgedTestGroups(Data[0]["TestGroups"], Problem.TestGroups);
                 Problem.IOFilename = Data[0]["IOFilename"];
-                            });
-    }
-void PROBLEMS::UpdateProblem(PROBLEM Problem)
-{
+            });
+}
+void PROBLEMS::UpdateProblem(PROBLEM Problem) {
     std::string SamplesJSON, TestGroupsJSON;
     SamplesToJSON(Problem.Samples, SamplesJSON);
     UnjudgedTestGroupsToJSON(Problem.TestGroups, TestGroupsJSON);
@@ -178,10 +154,9 @@ void PROBLEMS::UpdateProblem(PROBLEM Problem)
         .Set("TestGroups", TestGroupsJSON)
         .Where("PID", Problem.PID)
         .Execute();
-    }
-void PROBLEMS::DeleteProblem(std::string PID)
-{
+}
+void PROBLEMS::DeleteProblem(std::string PID) {
     DATABASE::DELETE("Problems")
         .Where("PID", PID)
         .Execute();
-    }
+}

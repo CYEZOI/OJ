@@ -18,11 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "TempTestData.hpp"
 #include "Database.hpp"
-void TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup)
-{
+void TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup) {
     configor::json::array_type TestCasesJSON;
-    for (size_t i = 0; i < TestGroup.TestCases.size(); i++)
-    {
+    for (size_t i = 0; i < TestGroup.TestCases.size(); i++) {
         TestCasesJSON.push_back(configor::json({{"Output", TestGroup.TestCases[i].Output},
                                                 {"StandardOutput", TestGroup.TestCases[i].StandardOutput},
                                                 {"StandardError", TestGroup.TestCases[i].StandardError},
@@ -44,11 +42,9 @@ void TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup)
                     .dump())
         .Execute();
 }
-void TEMP_TEST_DATA::Update(TEST_GROUP TestGroup)
-{
+void TEMP_TEST_DATA::Update(TEST_GROUP TestGroup) {
     configor::json::array_type TestCasesJSON;
-    for (size_t i = 0; i < TestGroup.TestCases.size(); i++)
-    {
+    for (size_t i = 0; i < TestGroup.TestCases.size(); i++) {
         TestCasesJSON.push_back(configor::json({{"Output", TestGroup.TestCases[i].Output},
                                                 {"StandardOutput", TestGroup.TestCases[i].StandardOutput},
                                                 {"StandardError", TestGroup.TestCases[i].StandardError},
@@ -70,22 +66,19 @@ void TEMP_TEST_DATA::Update(TEST_GROUP TestGroup)
         .Where("Index", std::to_string(TestGroup.SID) + "-" + std::to_string(TestGroup.TGID))
         .Execute();
 }
-void TEMP_TEST_DATA::Select(TEST_GROUP &TestGroup)
-{
+void TEMP_TEST_DATA::Select(TEST_GROUP &TestGroup) {
     return DATABASE::SELECT("TempTestData")
         .Select("Data")
         .Where("Index", std::to_string(TestGroup.SID) + "-" + std::to_string(TestGroup.TGID))
         .Execute(
-            [&TestGroup](auto Data)
-            {
+            [&TestGroup](auto Data) {
                 configor::json JSONData = configor::json::parse(Data[0]["Data"]);
                 TestGroup.Result = (JUDGE_RESULT)JSONData["Result"].as_integer();
                 TestGroup.Score = JSONData["Score"].as_integer();
                 TestGroup.Time = JSONData["Time"].as_integer();
                 TestGroup.TimeSum = JSONData["TimeSum"].as_integer();
                 TestGroup.Memory = JSONData["Memory"].as_integer();
-                for (size_t i = 0; i < JSONData["TestCases"].size(); i++)
-                {
+                for (size_t i = 0; i < JSONData["TestCases"].size(); i++) {
                     TestGroup.TestCases[i].Output = JSONData["TestCases"][i]["Output"].as_string();
                     TestGroup.TestCases[i].StandardOutput = JSONData["TestCases"][i]["StandardOutput"].as_string();
                     TestGroup.TestCases[i].StandardError = JSONData["TestCases"][i]["StandardError"].as_string();
@@ -95,17 +88,15 @@ void TEMP_TEST_DATA::Select(TEST_GROUP &TestGroup)
                     TestGroup.TestCases[i].Memory = JSONData["TestCases"][i]["Memory"].as_integer();
                     TestGroup.TestCases[i].Score = JSONData["TestCases"][i]["Score"].as_integer();
                 }
-                            });
+            });
 }
-void TEMP_TEST_DATA::Delete(TEST_GROUP TestGroup)
-{
+void TEMP_TEST_DATA::Delete(TEST_GROUP TestGroup) {
     return DATABASE::DELETE("TempTestData")
         .Where("Index", std::to_string(TestGroup.SID) + "-" + std::to_string(TestGroup.TGID))
         .Execute();
 }
 
-void TEMP_TEST_DATA::Insert(TEST_CASE TestCase)
-{
+void TEMP_TEST_DATA::Insert(TEST_CASE TestCase) {
     return DATABASE::INSERT("TempTestData")
         .Insert("Index", std::to_string(TestCase.SID) + "-" + std::to_string(TestCase.TGID) + "-" + std::to_string(TestCase.TCID))
         .Insert("Data",
@@ -120,8 +111,7 @@ void TEMP_TEST_DATA::Insert(TEST_CASE TestCase)
                     .dump())
         .Execute();
 }
-void TEMP_TEST_DATA::Update(TEST_CASE TestCase)
-{
+void TEMP_TEST_DATA::Update(TEST_CASE TestCase) {
     return DATABASE::UPDATE("TempTestData")
         .Set("Data",
              configor::json({{"Output", TestCase.Output},
@@ -136,14 +126,12 @@ void TEMP_TEST_DATA::Update(TEST_CASE TestCase)
         .Where("Index", std::to_string(TestCase.SID) + "-" + std::to_string(TestCase.TGID) + "-" + std::to_string(TestCase.TCID))
         .Execute();
 }
-void TEMP_TEST_DATA::Select(TEST_CASE &TestCase)
-{
+void TEMP_TEST_DATA::Select(TEST_CASE &TestCase) {
     return DATABASE::SELECT("TempTestData")
         .Select("Data")
         .Where("Index", std::to_string(TestCase.SID) + "-" + std::to_string(TestCase.TGID) + "-" + std::to_string(TestCase.TCID))
         .Execute(
-            [&TestCase](auto Data)
-            {
+            [&TestCase](auto Data) {
                 configor::json JSONData = configor::json::parse(Data[0]["Data"]);
                 TestCase.Output = JSONData["Output"].as_string();
                 TestCase.StandardOutput = JSONData["StandardOutput"].as_string();
@@ -153,10 +141,9 @@ void TEMP_TEST_DATA::Select(TEST_CASE &TestCase)
                 TestCase.Time = JSONData["Time"].as_integer();
                 TestCase.Memory = JSONData["Memory"].as_integer();
                 TestCase.Score = JSONData["Score"].as_integer();
-                            });
+            });
 }
-void TEMP_TEST_DATA::Delete(TEST_CASE TestCase)
-{
+void TEMP_TEST_DATA::Delete(TEST_CASE TestCase) {
     return DATABASE::DELETE("TempTestData")
         .Where("Index", std::to_string(TestCase.SID) + "-" + std::to_string(TestCase.TGID) + "-" + std::to_string(TestCase.TCID))
         .Execute();

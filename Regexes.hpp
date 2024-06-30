@@ -18,12 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <regex>
 #include "Exception.hpp"
+#include <regex>
 
-class REGEXES
-{
-public:
+class REGEXES {
+  public:
     static void CheckUsername(std::string Username);
     static void CheckPassword(std::string Password);
     static void CheckNickname(std::string Nickname);

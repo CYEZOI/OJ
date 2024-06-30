@@ -16,61 +16,52 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
-#include "Utilities.hpp"
-#include "Logger.hpp"
 #include "TestGroup.hpp"
+#include "Logger.hpp"
 #include "Submissions.hpp"
 #include "TempTestData.hpp"
-#include <string>
-#include <thread>
+#include "Utilities.hpp"
 #include <algorithm>
 #include <dirent.h>
+#include <string>
+#include <thread>
 
-void TEST_GROUP::UpdateAllResults(JUDGE_RESULT Result)
-{
+void TEST_GROUP::UpdateAllResults(JUDGE_RESULT Result) {
     this->Result = Result;
     for (size_t i = 0; i < TestCases.size(); i++)
         TestCases[i].Result = Result;
 }
 
-void TEST_GROUP::Judge()
-{
+void TEST_GROUP::Judge() {
     Result = JUDGE_RESULT::JUDGING;
 
     bool UpdateDatabaseSignal = true;
     std::thread UpdateDatabase(
-        [this, &UpdateDatabaseSignal]()
-        {
-            while (UpdateDatabaseSignal)
-            {
+        [this, &UpdateDatabaseSignal]() {
+            while (UpdateDatabaseSignal) {
                 TEMP_TEST_DATA::Update(*this);
                 usleep(500'000);
             }
         });
 
-    for (size_t i = 0; i < TestCases.size(); i++)
-    {
+    for (size_t i = 0; i < TestCases.size(); i++) {
         TEMP_TEST_DATA::Insert(TestCases[i]);
-        if (fork() == 0)
-        {
+        if (fork() == 0) {
             TestCases[i].Judge();
             exit(0);
         }
     }
     bool Judged = false;
-    while (!Judged)
-    {
+    while (!Judged) {
         Judged = true;
-        for (size_t i = 0; i < TestCases.size(); i++)
-        {
+        for (size_t i = 0; i < TestCases.size(); i++) {
             TEMP_TEST_DATA::Select(TestCases[i]);
             if (TestCases[i].Result >= JUDGE_RESULT::WAITING)
                 Judged = false;
         }
         usleep(500'000);
     }
-    for (size_t i = 0; i < TestCases.size(); i++)
-    {
+    for (size_t i = 0; i < TestCases.size(); i++) {
         TEMP_TEST_DATA::Select(TestCases[i]);
         TEMP_TEST_DATA::Delete(TestCases[i]);
         TestCases[i].TGID = TGID;
@@ -88,15 +79,12 @@ void TEST_GROUP::Judge()
     int SecondMaxCount = 0;
     JUDGE_RESULT SecondMaxResult = JUDGE_RESULT::UNKNOWN_ERROR;
     for (size_t i = 0; i < JUDGE_RESULT::REJECTED; i++)
-        if (ResultCount[i] > MaxCount)
-        {
+        if (ResultCount[i] > MaxCount) {
             SecondMaxCount = MaxCount;
             SecondMaxResult = MaxResult;
             MaxCount = ResultCount[i];
             MaxResult = (JUDGE_RESULT)i;
-        }
-        else if (ResultCount[i] > SecondMaxCount)
-        {
+        } else if (ResultCount[i] > SecondMaxCount) {
             SecondMaxCount = ResultCount[i];
             SecondMaxResult = (JUDGE_RESULT)i;
         }

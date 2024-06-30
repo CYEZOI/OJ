@@ -19,14 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Problem.hpp"
 #include "TestGroup.hpp"
 #include "Utilities.hpp"
-#include <string>
-#include <vector>
-#include <fstream>
 #include <dirent.h>
-#include <unistd.h>
+#include <fstream>
+#include <string>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <vector>
 
-bool PROBLEM::operator<(const PROBLEM &Compare) const
-{
+bool PROBLEM::operator<(const PROBLEM &Compare) const {
     return PID < Compare.PID;
 }

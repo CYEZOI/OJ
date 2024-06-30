@@ -19,14 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Exception.hpp"
-#include "Settings.hpp"
 #include "JudgeResult.hpp"
 #include "Logger.hpp"
 #include "Problem.hpp"
+#include "Settings.hpp"
 
-class TEST_CASE
-{
-private:
+class TEST_CASE {
+  private:
     int TCID = 0;
     pid_t ProcessID = 0;
     std::string Output;
@@ -69,7 +68,7 @@ private:
     friend class SUBMISSION;
     friend class TEMP_TEST_DATA;
 
-public:
+  public:
     void Judge();
 };
 

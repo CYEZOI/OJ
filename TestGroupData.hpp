@@ -18,13 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include "TestCaseData.hpp"
 #include <string>
 #include <vector>
-#include "TestCaseData.hpp"
 
-class TEST_GROUP_DATA
-{
-private:
+class TEST_GROUP_DATA {
+  private:
     int TGID = 0;
     std::vector<TEST_CASE_DATA> TestCases;
 
@@ -33,6 +32,6 @@ private:
     friend class TEST_CASE;
     friend class API_PROCEED;
 
-public:
+  public:
     void AddTestCase(std::string Input, std::string Answer, int TimeLimit, int MemoryLimit, int Score);
 };

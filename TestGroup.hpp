@@ -18,14 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "TestCase.hpp"
 #include "Logger.hpp"
-#include <vector>
+#include "TestCase.hpp"
 #include <map>
+#include <vector>
 
-class TEST_GROUP
-{
-private:
+class TEST_GROUP {
+  private:
     int TGID;
     std::string PID;
     int SID;
@@ -48,6 +47,6 @@ private:
     friend class SUBMISSIONS;
     friend class TEMP_TEST_DATA;
 
-public:
+  public:
     void Judge();
 };

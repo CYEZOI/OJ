@@ -18,15 +18,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <string>
-#include <string.h>
 #include "Logger.hpp"
+#include <string.h>
+#include <string>
 
 using namespace std::literals::string_literals;
 
-class EXCEPTION
-{
-public:
+class EXCEPTION {
+  public:
     std::string Message;
 
     EXCEPTION();

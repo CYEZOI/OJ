@@ -18,13 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include "Logger.hpp"
 #include "Exception.hpp"
+#include "Logger.hpp"
 #include "configor/json.hpp"
 
-class SETTINGS
-{
-private:
+class SETTINGS {
+  private:
     std::string DatabaseHost;
     int DatabasePort;
     std::string DatabaseUsername;
@@ -34,7 +33,7 @@ private:
     friend class API_PROCEED;
     friend class DATABASE;
 
-public:
+  public:
     void Init();
     static void GetSettings(std::string Key, std::string &Value);
     static void GetSettings(std::string Key, int &Value);

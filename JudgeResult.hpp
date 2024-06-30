@@ -20,8 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <string>
 
-enum JUDGE_RESULT
-{
+enum JUDGE_RESULT {
     UNKNOWN_ERROR,
     ACCEPTED,
     PRESENTATION_ERROR,

@@ -18,21 +18,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <mysql_connection.h>
-#include <mysql_driver.h>
+#include "Exception.hpp"
+#include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
-#include <cppconn/prepared_statement.h>
+#include <mysql_connection.h>
+#include <mysql_driver.h>
 #include <string>
 #include <vector>
-#include "Exception.hpp"
 
-class DATABASE
-{
-public:
-    class SELECT
-    {
-    private:
+class DATABASE {
+  public:
+    class SELECT {
+      private:
         bool UseOrder = false;
         sql::Connection *Connection;
         std::string TableName;
@@ -42,7 +40,7 @@ public:
         int Limits = 0;
         int Offsets = 0;
 
-    public:
+      public:
         SELECT(std::string TableName);
         ~SELECT();
         SELECT &Select(std::string Column);
@@ -53,44 +51,41 @@ public:
         SELECT &Offset(int Offsets);
         void Execute(std::function<void(std::vector<std::map<std::string, std::string>>)> Callback = nullptr);
     };
-    class INSERT
-    {
-    private:
+    class INSERT {
+      private:
         sql::Connection *Connection;
         std::string TableName;
         std::vector<std::string> Columns;
         std::vector<std::string> Values;
 
-    public:
+      public:
         INSERT(std::string TableName);
         ~INSERT();
         INSERT &Insert(std::string Column, std::string Value);
         INSERT &Insert(std::string Column, int Value);
         void Execute(std::function<void(int)> Callback = nullptr);
     };
-    class DELETE
-    {
-    private:
+    class DELETE {
+      private:
         sql::Connection *Connection;
         std::string TableName;
         std::vector<std::pair<std::string, std::string>> Conditions;
 
-    public:
+      public:
         DELETE(std::string TableName);
         ~DELETE();
         DELETE &Where(std::string Column, std::string Value);
         DELETE &Where(std::string Column, int Value);
         void Execute();
     };
-    class UPDATE
-    {
-    private:
+    class UPDATE {
+      private:
         sql::Connection *Connection;
         std::string TableName;
         std::vector<std::pair<std::string, std::string>> Columns;
         std::vector<std::pair<std::string, std::string>> Conditions;
 
-    public:
+      public:
         UPDATE(std::string TableName);
         ~UPDATE();
         UPDATE &Set(std::string Column, std::string Value);
@@ -99,23 +94,21 @@ public:
         UPDATE &Where(std::string Column, int Value);
         void Execute();
     };
-    class SIZE
-    {
-    private:
+    class SIZE {
+      private:
         sql::Connection *Connection;
         std::string TableName;
 
-    public:
+      public:
         SIZE(std::string TableName);
         void Execute(std::function<void(int)> Callback = nullptr);
     };
-    class TRUNCATE
-    {
-    private:
+    class TRUNCATE {
+      private:
         sql::Connection *Connection;
         std::string TableName;
 
-    public:
+      public:
         TRUNCATE(std::string TableName);
         void Execute();
     };

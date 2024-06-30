@@ -18,16 +18,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <queue>
 #include "Logger.hpp"
 #include "Submission.hpp"
+#include <queue>
 
-class JUDGING_LIST
-{
-private:
+class JUDGING_LIST {
+  private:
     std::queue<int> JudgingList;
 
-public:
+  public:
     void Init();
     void Add(SUBMISSION &Submission);
 };

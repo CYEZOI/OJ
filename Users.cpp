@@ -17,13 +17,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **********************************************************************/
 
 #include "Users.hpp"
-#include "Utilities.hpp"
 #include "Role.hpp"
 #include "Settings.hpp"
+#include "Utilities.hpp"
 #include <openssl/sha.h>
 
-std::string USERS::HashPassword(std::string Password)
-{
+std::string USERS::HashPassword(std::string Password) {
     std::string Salt1, Salt2;
     SETTINGS::GetSettings("PasswordSalt1", Salt1);
     SETTINGS::GetSettings("PasswordSalt2", Salt2);
@@ -36,8 +35,7 @@ std::string USERS::HashPassword(std::string Password)
     return StringStream.str();
 }
 
-void USERS::AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role)
-{
+void USERS::AddUser(std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, int Role) {
     DATABASE::INSERT("Users")
         .Insert("Username", Username)
         .Insert("Password", HashedPassword)
@@ -46,61 +44,52 @@ void USERS::AddUser(std::string Username, std::string Nickname, std::string Hash
         .Insert("Role", Role)
         .Execute();
 }
-void USERS::CheckUsernameAvailable(std::string Username)
-{
+void USERS::CheckUsernameAvailable(std::string Username) {
     DATABASE::SELECT("Users")
         .Select("UID")
         .Where("Username", Username)
         .Execute(
-            [](auto Data)
-            {
+            [](auto Data) {
                 if (Data.size() != 0)
                     throw EXCEPTION("Username already exist");
             });
 }
-void USERS::CheckEmailAvailable(std::string EmailAddress)
-{
+void USERS::CheckEmailAvailable(std::string EmailAddress) {
     DATABASE::SELECT("Users")
         .Select("UID")
         .Where("EmailAddress", EmailAddress)
         .Execute(
-            [](auto Data)
-            {
+            [](auto Data) {
                 if (Data.size() != 0)
                     throw EXCEPTION("Email already exist");
             });
 }
-void USERS::CheckPasswordCorrect(std::string Username, std::string HashedPassword, int &UID)
-{
+void USERS::CheckPasswordCorrect(std::string Username, std::string HashedPassword, int &UID) {
     DATABASE::SELECT("Users")
         .Select("UID")
         .Where("Username", Username)
         .Where("Password", HashedPassword)
         .Execute(
-            [&UID](auto Data)
-            {
+            [&UID](auto Data) {
                 if (Data.size() == 0)
                     throw EXCEPTION("Username or password incorrect");
                 UID = std::stoi(Data[0]["UID"]);
             });
 }
-bool USERS::IsAdmin(int UID)
-{
+bool USERS::IsAdmin(int UID) {
     bool IsAdmin;
     DATABASE::SELECT("Users")
         .Select("Role")
         .Where("UID", UID)
         .Execute(
-            [&IsAdmin](auto Data)
-            {
+            [&IsAdmin](auto Data) {
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
                 IsAdmin = (std::stoi(Data[0]["Role"]) == USER_ROLE::USER_ROLE_ADMIN);
             });
     return IsAdmin;
 }
-void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role)
-{
+void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role) {
     DATABASE::UPDATE("Users")
         .Set("Username", Username)
         .Set("Nickname", Nickname)
@@ -110,21 +99,18 @@ void USERS::UpdateUser(int UID, std::string Username, std::string Nickname, std:
         .Where("UID", UID)
         .Execute();
 }
-void USERS::UpdateUserPassword(int UID, std::string HashedPassword)
-{
+void USERS::UpdateUserPassword(int UID, std::string HashedPassword) {
     DATABASE::UPDATE("Users")
         .Set("Password", HashedPassword)
         .Where("UID", UID)
         .Execute();
 }
-void USERS::DeleteUser(int UID)
-{
+void USERS::DeleteUser(int UID) {
     DATABASE::DELETE("Users")
         .Where("UID", UID)
         .Execute();
 }
-USER USERS::GetUser(int UID)
-{
+USER USERS::GetUser(int UID) {
     USER User;
     DATABASE::SELECT("Users")
         .Select("UID")
@@ -134,8 +120,7 @@ USER USERS::GetUser(int UID)
         .Select("Role")
         .Where("UID", UID)
         .Execute(
-            [&User](auto Data)
-            {
+            [&User](auto Data) {
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
                 User.UID = std::stoi(Data[0]["UID"]);
@@ -146,15 +131,13 @@ USER USERS::GetUser(int UID)
             });
     return User;
 }
-int USERS::GetUIDByEmailAddress(std::string EmailAddress)
-{
+int USERS::GetUIDByEmailAddress(std::string EmailAddress) {
     int UID = 0;
     DATABASE::SELECT("Users")
         .Select("UID")
         .Where("EmailAddress", EmailAddress)
         .Execute(
-            [&UID](auto Data)
-            {
+            [&UID](auto Data) {
                 if (Data.size() == 0)
                     throw EXCEPTION("No such user");
                 UID = std::stoi(Data[0]["UID"]);
