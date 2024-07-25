@@ -109,9 +109,7 @@ RequestAPI("GetUsers", {
                         "EmailAddress": String(DataRowEmailAddressInput.value),
                         "Password": String(DataRowPasswordInput.value),
                         "Role": Number(DataRowRoleSelect.selectedIndex)
-                    }, () => { }, () => {
-                        ShowSuccess("Update User Success");
-                    }, () => { }, () => { });
+                    }, () => { }, () => { }, () => { }, () => { });
                 }
                 let DataRowActionDeleteButton = document.createElement("button"); DataRowAction.appendChild(DataRowActionDeleteButton);
                 DataRowActionDeleteButton.innerText = "Delete";
@@ -123,7 +121,6 @@ RequestAPI("GetUsers", {
                         RequestAPI("DeleteUser", {
                             "UID": Number(Response.Users[i].UID)
                         }, () => { }, () => {
-                            ShowSuccess("Delete User Success");
                             DataRow.remove();
                         }, () => { }, () => { });
                     }, () => { });

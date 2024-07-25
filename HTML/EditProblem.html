@@ -2,5 +2,42 @@
     <div class="spinner-border" role="status">
     </div>
 </div>
-<div id="EditProblemData" class="mb-2"></div>
+<div id="EditProblemData" class="mb-2">
+    <div class="input-group mb-3">
+        <input class="form-control" id="EditProblemIOFilename" placeholder="IO Filename">
+        <span class="input-group-text">.in/out</span>
+    </div>
+    <hr>
+    <label class="col-form-label">Description</label>
+    <div id="EditProblemDescription"></div>
+    <hr>
+    <label class="col-form-label">Input</label>
+    <div id="EditProblemInput"></div>
+    <hr>
+    <label class="col-form-label">Output</label>
+    <div id="EditProblemOutput"></div>
+    <hr>
+    <label class="col-form-label">Range</label>
+    <div id="EditProblemRange"></div>
+    <hr>
+    <label class="col-form-label">Hint</label>
+    <div id="EditProblemHint"></div>
+    <hr>
+    <label class="col-form-label">Samples</label>
+    <table class="table">
+        <thead>
+            <tr class="col-4">
+                <th class="col-3">Input</th>
+                <th class="col-3">Output</th>
+                <th class="col-4">Description</th>
+                <th class="col-2">Operation</th>
+            </tr>
+        </thead>
+        <tbody id="EditProblemSample"></tbody>
+    </table>
+    <button class="btn btn-secondary" id="EditProblemAddSample">Add Sample</button>
+    <hr>
+    <button class="btn btn-outline-secondary" id="EditProblemUploadTestCase">Upload Test Case</button>
+    <hr>
+</div>
 <button type="button" class="btn btn-primary" id="EditProblemSaveButton">Save changes</button>

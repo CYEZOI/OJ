@@ -60,7 +60,6 @@ ProblemDeleteButton.onclick = () => {
             {
                 "PID": String(Data.PID)
             }, () => { }, (Response) => {
-                ShowSuccess("Delete Problem Success");
                 SwitchPage("Problems");
             }, () => { }, () => { });
     }, () => { });

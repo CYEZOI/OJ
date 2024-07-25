@@ -34,5 +34,6 @@ class PROBLEMS {
     static void AddProblem(PROBLEM Problem);
     static void GetProblem(std::string PID, PROBLEM &Problem);
     static void UpdateProblem(PROBLEM Problem);
+    static void UpdateTestCase(std::string PID, std::string TestCase);
     static void DeleteProblem(std::string PID);
 };

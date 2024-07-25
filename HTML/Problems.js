@@ -98,7 +98,6 @@ RequestAPI("GetProblems", {
                                 {
                                     "PID": String(Response.Problems[i].PID)
                                 }, () => { }, (Response) => {
-                                    ShowSuccess("Delete Problem Success");
                                     ProblemRow.remove();
                                 }, () => { }, () => { });
                         }, () => { });

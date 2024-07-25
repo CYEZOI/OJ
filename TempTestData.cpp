@@ -21,10 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 void TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup) {
     configor::json::array_type TestCasesJSON;
     for (size_t i = 0; i < TestGroup.TestCases.size(); i++) {
-        TestCasesJSON.push_back(configor::json({{"Output", TestGroup.TestCases[i].Output},
-                                                {"StandardOutput", TestGroup.TestCases[i].StandardOutput},
-                                                {"StandardError", TestGroup.TestCases[i].StandardError},
-                                                {"Result", (int)TestGroup.TestCases[i].Result},
+        TestCasesJSON.push_back(configor::json({{"Result", (int)TestGroup.TestCases[i].Result},
                                                 {"Description", TestGroup.TestCases[i].Description},
                                                 {"Time", TestGroup.TestCases[i].Time},
                                                 {"Memory", TestGroup.TestCases[i].Memory},
@@ -45,10 +42,7 @@ void TEMP_TEST_DATA::Insert(TEST_GROUP TestGroup) {
 void TEMP_TEST_DATA::Update(TEST_GROUP TestGroup) {
     configor::json::array_type TestCasesJSON;
     for (size_t i = 0; i < TestGroup.TestCases.size(); i++) {
-        TestCasesJSON.push_back(configor::json({{"Output", TestGroup.TestCases[i].Output},
-                                                {"StandardOutput", TestGroup.TestCases[i].StandardOutput},
-                                                {"StandardError", TestGroup.TestCases[i].StandardError},
-                                                {"Result", (int)TestGroup.TestCases[i].Result},
+        TestCasesJSON.push_back(configor::json({{"Result", (int)TestGroup.TestCases[i].Result},
                                                 {"Description", TestGroup.TestCases[i].Description},
                                                 {"Time", TestGroup.TestCases[i].Time},
                                                 {"Memory", TestGroup.TestCases[i].Memory},
@@ -79,9 +73,6 @@ void TEMP_TEST_DATA::Select(TEST_GROUP &TestGroup) {
                 TestGroup.TimeSum = JSONData["TimeSum"].as_integer();
                 TestGroup.Memory = JSONData["Memory"].as_integer();
                 for (size_t i = 0; i < JSONData["TestCases"].size(); i++) {
-                    TestGroup.TestCases[i].Output = JSONData["TestCases"][i]["Output"].as_string();
-                    TestGroup.TestCases[i].StandardOutput = JSONData["TestCases"][i]["StandardOutput"].as_string();
-                    TestGroup.TestCases[i].StandardError = JSONData["TestCases"][i]["StandardError"].as_string();
                     TestGroup.TestCases[i].Result = (JUDGE_RESULT)JSONData["TestCases"][i]["Result"].as_integer();
                     TestGroup.TestCases[i].Description = JSONData["TestCases"][i]["Description"].as_string();
                     TestGroup.TestCases[i].Time = JSONData["TestCases"][i]["Time"].as_integer();
@@ -100,10 +91,7 @@ void TEMP_TEST_DATA::Insert(TEST_CASE TestCase) {
     return DATABASE::INSERT("TempTestData")
         .Insert("Index", std::to_string(TestCase.SID) + "-" + std::to_string(TestCase.TGID) + "-" + std::to_string(TestCase.TCID))
         .Insert("Data",
-                configor::json({{"Output", TestCase.Output},
-                                {"StandardOutput", TestCase.StandardOutput},
-                                {"StandardError", TestCase.StandardError},
-                                {"Result", (int)TestCase.Result},
+                configor::json({{"Result", (int)TestCase.Result},
                                 {"Description", TestCase.Description},
                                 {"Time", TestCase.Time},
                                 {"Memory", TestCase.Memory},
@@ -114,10 +102,7 @@ void TEMP_TEST_DATA::Insert(TEST_CASE TestCase) {
 void TEMP_TEST_DATA::Update(TEST_CASE TestCase) {
     return DATABASE::UPDATE("TempTestData")
         .Set("Data",
-             configor::json({{"Output", TestCase.Output},
-                             {"StandardOutput", TestCase.StandardOutput},
-                             {"StandardError", TestCase.StandardError},
-                             {"Result", (int)TestCase.Result},
+             configor::json({{"Result", (int)TestCase.Result},
                              {"Description", TestCase.Description},
                              {"Time", TestCase.Time},
                              {"Memory", TestCase.Memory},
@@ -133,9 +118,6 @@ void TEMP_TEST_DATA::Select(TEST_CASE &TestCase) {
         .Execute(
             [&TestCase](auto Data) {
                 configor::json JSONData = configor::json::parse(Data[0]["Data"]);
-                TestCase.Output = JSONData["Output"].as_string();
-                TestCase.StandardOutput = JSONData["StandardOutput"].as_string();
-                TestCase.StandardError = JSONData["StandardError"].as_string();
                 TestCase.Result = (JUDGE_RESULT)JSONData["Result"].as_integer();
                 TestCase.Description = JSONData["Description"].as_string();
                 TestCase.Time = JSONData["Time"].as_integer();

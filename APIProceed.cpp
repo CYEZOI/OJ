@@ -32,6 +32,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Users.hpp"
 #include "Utilities.hpp"
 #include "WebDataProceed.hpp"
+#include <minizip/unzip.h>
 
 bool API_PROCEED::CheckTypes(configor::json JSON, std::vector<std::pair<std::string, configor::config_value_type>> Types) {
     for (auto i : Types)
@@ -42,7 +43,7 @@ bool API_PROCEED::CheckTypes(configor::json JSON, std::vector<std::pair<std::str
 
 configor::json API_PROCEED::CheckTokenAvailable(std::string Token) {
     TOKENS::CheckToken(Token);
-    CREATE_JSON(true, "Token available");
+    RETURN_SUCCESS("Token available");
 }
 
 configor::json API_PROCEED::Login(std::string Username, std::string Password) {
@@ -62,19 +63,19 @@ configor::json API_PROCEED::Login(std::string Username, std::string Password) {
 configor::json API_PROCEED::CheckUsernameAvailable(std::string Username) {
     REGEXES::CheckUsername(Username);
     USERS::CheckUsernameAvailable(Username);
-    CREATE_JSON(true, "Username available");
+    RETURN_SUCCESS("Username available");
 }
 configor::json API_PROCEED::CheckEmailAvailable(std::string EmailAddress) {
     REGEXES::CheckEmailAddress(EmailAddress);
     USERS::CheckEmailAvailable(EmailAddress);
-    CREATE_JSON(true, "Email available");
+    RETURN_SUCCESS("Email available");
 }
 configor::json API_PROCEED::SendVerificationCode(std::string EmailAddress) {
     REGEXES::CheckEmailAddress(EmailAddress);
     std::string VerificationCode;
     EMAIL_VERIFICATION_CODES::CreateEmailVerificationCode(EmailAddress, VerificationCode);
     UTILITIES::SendEmail(EmailAddress, "Email verification Code", "Hello, here is your verification code. Your Verification code is " + VerificationCode + ". Thanks.");
-    CREATE_JSON(true, "Send verification code succeeds")
+    RETURN_SUCCESS("Send verification code succeeds")
 }
 configor::json API_PROCEED::Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode) {
     REGEXES::CheckUsername(Username);
@@ -87,7 +88,7 @@ configor::json API_PROCEED::Register(std::string Username, std::string Nickname,
     USERS::CheckUsernameAvailable(Username);
     USERS::CheckEmailAvailable(EmailAddress);
     USERS::AddUser(Username, Nickname, USERS::HashPassword(Password), EmailAddress, USER_ROLE::USER_ROLE_USER);
-    CREATE_JSON(true, "Register succeeds");
+    RETURN_SUCCESS("Register succeeds");
 }
 configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password) {
     REGEXES::CheckEmailAddress(EmailAddress);
@@ -95,28 +96,29 @@ configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string 
     EMAIL_VERIFICATION_CODES::CheckEmailVerificationCode(EmailAddress, VerificationCode);
     EMAIL_VERIFICATION_CODES::DeleteEmailVerificationCode(EmailAddress);
     USERS::UpdateUserPassword(USERS::GetUIDByEmailAddress(EmailAddress), USERS::HashPassword(Password));
-    CREATE_JSON(true, "Reset password succeeds");
+    RETURN_SUCCESS("Reset password succeeds");
 }
 
 configor::json API_PROCEED::CreatePasskeyChallenge() {
     std::string ChallengeChallengeID = PASSKEY::CreateChallenge();
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Create passkey challenge succeeds";
     ResponseJSON["Data"]["Challenge"] = ChallengeChallengeID;
     return ResponseJSON;
 }
 configor::json API_PROCEED::DeletePasskeyChallenge(std::string Challenge) {
     PASSKEY::DeleteChallenge(Challenge);
-    CREATE_JSON(true, "Delete passkey challenge succeeds");
+    RETURN_SUCCESS("Delete passkey challenge succeeds");
 }
 configor::json API_PROCEED::CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey) {
     PASSKEY::CreatePasskey(UID, Challenge, CredentialID, CredentialPublicKey);
-    CREATE_JSON(true, "Create passkey succeeds");
+    RETURN_SUCCESS("Create passkey succeeds");
 }
 configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature) {
     std::string PublicKey = PASSKEY::GetPasskey(UserHandle, CredentialID);
     if (PublicKey == "")
-        CREATE_JSON(false, "Invalid credential");
+        throw EXCEPTION("Invalid credential");
     DATABASE::SELECT("PasskeyChallenges")
         .Select("CreateTime")
         .Where("Challenge", Challenge)
@@ -132,10 +134,11 @@ configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string 
             });
 
     if (!UTILITIES::VerifySignature(CredentialSignature, CredentialID, PublicKey))
-        CREATE_JSON(false, "Invalid credential signature");
+        throw EXCEPTION("Invalid credential signature");
     std::string Token = TOKENS::CreateToken(UserHandle);
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Login with passkey succeeds";
     ResponseJSON["Data"]["Token"] = Token;
     ResponseJSON["Data"]["IsAdmin"] = USERS::IsAdmin(UserHandle);
     ResponseJSON["Data"]["UID"] = UserHandle;
@@ -145,13 +148,13 @@ configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string 
 
 configor::json API_PROCEED::AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     USERS::AddUser(Username, Nickname, USERS::HashPassword(Password), EmailAddress, Role);
-    CREATE_JSON(true, "Add user succeeds");
+    RETURN_SUCCESS("Add user succeeds");
 }
 configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::string Nickname, std::string HashedPassword, std::string EmailAddress, USER_ROLE Role) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     REGEXES::CheckUsername(Username);
     REGEXES::CheckNickname(Nickname);
     REGEXES::CheckEmailAddress(EmailAddress);
@@ -161,19 +164,20 @@ configor::json API_PROCEED::UpdateUser(int UID, std::string Username, std::strin
     if (OriginalUser.EmailAddress != EmailAddress)
         USERS::CheckEmailAvailable(EmailAddress);
     USERS::UpdateUser(UID, Username, Nickname, HashedPassword, EmailAddress, Role);
-    CREATE_JSON(true, "Update user succeeds");
+    RETURN_SUCCESS("Update user succeeds");
 }
 configor::json API_PROCEED::DeleteUser(int UID) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     USERS::DeleteUser(UID);
-    CREATE_JSON(true, "Delete user succeeds");
+    RETURN_SUCCESS("Delete user succeeds");
 }
 configor::json API_PROCEED::GetUser(int UID) {
     configor::json ResponseJSON = BaseJSON;
     USER User;
     User = USERS::GetUser(UID);
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Get user succeeds";
     ResponseJSON["Data"]["Username"] = User.Username;
     ResponseJSON["Data"]["EmailAddress"] = User.EmailAddress;
     ResponseJSON["Data"]["Nickname"] = User.Nickname;
@@ -182,7 +186,7 @@ configor::json API_PROCEED::GetUser(int UID) {
 }
 configor::json API_PROCEED::GetUsers(int Page) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     configor::json ResponseJSON = BaseJSON;
     DATABASE::SELECT("Users")
         .Select("UID")
@@ -196,6 +200,7 @@ configor::json API_PROCEED::GetUsers(int Page) {
         .Execute(
             [&ResponseJSON](auto Data) {
                 ResponseJSON["Success"] = true;
+                ResponseJSON["Message"] = "Get users succeeds";
                 configor::json::array_type Users;
                 for (auto i : Data) {
                     configor::json TempUser;
@@ -218,16 +223,17 @@ configor::json API_PROCEED::GetUsers(int Page) {
 }
 configor::json API_PROCEED::HashPassword(std::string OriginalPassword) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Hash password succeeds";
     ResponseJSON["Data"]["HashedPassword"] = USERS::HashPassword(OriginalPassword);
     return ResponseJSON;
 }
 
 configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     PROBLEM Problem;
     Problem.PID = PID;
     Problem.Title = Title;
@@ -240,13 +246,14 @@ configor::json API_PROCEED::AddProblem(std::string PID, std::string Title, std::
     PROBLEMS::JSONToSamples(Samples, Problem.Samples);
     PROBLEMS::JSONToUnjudgedTestGroups(TestGroups, Problem.TestGroups);
     PROBLEMS::AddProblem(Problem);
-    CREATE_JSON(true, "Add problem succeeds");
+    RETURN_SUCCESS("Add problem succeeds");
 }
 configor::json API_PROCEED::GetProblem(std::string PID) {
     configor::json ResponseJSON = BaseJSON;
     PROBLEM Problem;
     PROBLEMS::GetProblem(PID, Problem);
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Get problem succeeds";
     ResponseJSON["Data"]["PID"] = Problem.PID;
     ResponseJSON["Data"]["Title"] = Problem.Title;
     ResponseJSON["Data"]["Description"] = Problem.Description;
@@ -273,8 +280,8 @@ configor::json API_PROCEED::GetProblem(std::string PID) {
             TempTestCase["MemoryLimit"] = j.MemoryLimit;
             TempTestCase["Score"] = j.Score;
             if (IsAdmin) {
-                TempTestCase["Input"] = j.Input;
-                TempTestCase["Answer"] = j.Answer;
+                TempTestCase["InputFilename"] = j.InputFilename;
+                TempTestCase["AnswerFilename"] = j.AnswerFilename;
             }
             TestCases.push_back(TempTestCase);
         }
@@ -287,9 +294,145 @@ configor::json API_PROCEED::GetProblem(std::string PID) {
     ResponseJSON["Data"]["IOFilename"] = Problem.IOFilename;
     return ResponseJSON;
 }
+configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
+    if (Data.find(",") == std::string::npos)
+        throw EXCEPTION("Data not available");
+    Data = Data.substr(Data.find(",") + 1);
+
+    static const std::string base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
+
+    int in_len = Data.size();
+    int i = 0;
+    int j = 0;
+    int in_ = 0;
+    unsigned char char_array_4[4], char_array_3[3];
+    std::string Result;
+
+    while (in_len-- && (Data[in_] != '=')) {
+        char_array_4[i++] = Data[in_];
+        in_++;
+        if (i == 4) {
+            for (i = 0; i < 4; i++)
+                char_array_4[i] = base64_chars.find(char_array_4[i]);
+
+            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+            for (i = 0; (i < 3); i++)
+                Result += char_array_3[i];
+            i = 0;
+        }
+    }
+
+    if (i) {
+        for (j = i; j < 4; j++)
+            char_array_4[j] = 0;
+
+        for (j = 0; j < 4; j++)
+            char_array_4[j] = base64_chars.find(char_array_4[j]);
+
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+        for (j = 0; (j < i - 1); j++)
+            Result += char_array_3[j];
+    }
+
+    std::string ZipFilename = "/tmp/" + PID + ".zip";
+    FILE *FilePointer = fopen(ZipFilename.c_str(), "w");
+    if (FilePointer == NULL) throw EXCEPTION("Can not open zip file");
+    if (fwrite(Result.c_str(), 1, Result.size(), FilePointer) != Result.size())
+        throw EXCEPTION("Can not write to zip file");
+    fclose(FilePointer);
+
+    std::string JudgeUsername;
+    SETTINGS::GetSettings("JudgeUsername", JudgeUsername);
+    std::string IODataDir = "/home/" + JudgeUsername + "/IOData/" + PID;
+    UTILITIES::MakeDir(IODataDir);
+    UTILITIES::RemoveDir(IODataDir);
+    UTILITIES::MakeDir(IODataDir);
+
+    std::vector<std::string> InputFilenames;
+    std::vector<std::string> AnswerFilenames;
+    unzFile ZipFile = unzOpen(ZipFilename.c_str());
+    if (!ZipFile) throw EXCEPTION("Can not open zip file");
+    int ZipStatus = unzGoToFirstFile(ZipFile);
+    while (true) {
+        char FilenameBuffer[256];
+        memset(FilenameBuffer, 0, 256 * sizeof(char));
+        unz_file_info FileInfo;
+        if (unzGetCurrentFileInfo(ZipFile, &FileInfo, FilenameBuffer, sizeof(FilenameBuffer), NULL, 0, NULL, 0) != UNZ_OK) {
+            unzClose(ZipFile);
+            throw EXCEPTION("Unzip file get info failed");
+        }
+        std::string Filename = FilenameBuffer;
+        if (Filename.find_last_of("/") != std::string::npos)
+            Filename = Filename.substr(Filename.find_last_of("/") + 1);
+        if (Filename.find(".in") != std::string::npos)
+            InputFilenames.push_back(Filename);
+        else if (Filename.find(".out") != std::string::npos || Filename.find(".ans") != std::string::npos)
+            AnswerFilenames.push_back(Filename);
+        else {
+            unzClose(ZipFile);
+            throw EXCEPTION("Filename " + Filename + " not recognized");
+        }
+        if (unzOpenCurrentFile(ZipFile) != UNZ_OK) {
+            unzClose(ZipFile);
+            throw EXCEPTION("Unzip file open file failed");
+        }
+        char *FileDataBuffer = new char[FileInfo.uncompressed_size];
+        memset(FileDataBuffer, 0, FileInfo.uncompressed_size * sizeof(char));
+        if (unzReadCurrentFile(ZipFile, FileDataBuffer, FileInfo.uncompressed_size) < 0) {
+            unzCloseCurrentFile(ZipFile);
+        }
+        std::string FullFilePath = IODataDir + "/" + Filename;
+        FILE *FilePointer = fopen(FullFilePath.c_str(), "w");
+        if (FilePointer == NULL)
+            throw EXCEPTION("Can not open output file " + FullFilePath);
+        if (fwrite(FileDataBuffer, 1, FileInfo.uncompressed_size, FilePointer) != FileInfo.uncompressed_size) {
+            fclose(FilePointer);
+            unzClose(ZipFile);
+            throw EXCEPTION("Can not write to file " + FullFilePath);
+        }
+        delete[] FileDataBuffer;
+        fclose(FilePointer);
+        unzCloseCurrentFile(ZipFile);
+        ZipStatus = unzGoToNextFile(ZipFile);
+        if (ZipStatus == UNZ_END_OF_LIST_OF_FILE) {
+            break;
+        } else if (ZipStatus != UNZ_OK) {
+            throw EXCEPTION("Can not read zip file " + ZipFilename);
+        }
+    }
+    unzClose(ZipFile);
+
+    sort(InputFilenames.begin(), InputFilenames.end());
+    sort(AnswerFilenames.begin(), AnswerFilenames.end());
+    if (InputFilenames.size() != AnswerFilenames.size())
+        throw EXCEPTION("Input and output file size not match");
+    configor::json::array_type IOFilenames;
+    for (size_t i = 0; i < InputFilenames.size(); i++) {
+        std::string InputFilename = InputFilenames[i].substr(0, InputFilenames[i].size() - 3);
+        std::string AnswerFilename = AnswerFilenames[i].substr(0, AnswerFilenames[i].size() - 4);
+        if (InputFilename != AnswerFilename)
+            throw EXCEPTION("Input filename " + InputFilenames[i] + " and output filename " + AnswerFilenames[i] + " not match");
+        IOFilenames.push_back({{"InputFilename", InputFilenames[i]},
+                               {"AnswerFilename", AnswerFilenames[i]}});
+    }
+    configor::json ResponseJSON = BaseJSON;
+    ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Upload test case succeeds";
+    ResponseJSON["Data"]["IOFilenames"] = IOFilenames;
+    return ResponseJSON;
+}
 configor::json API_PROCEED::UpdateProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     PROBLEM Problem;
     Problem.PID = PID;
     Problem.Title = Title;
@@ -300,15 +443,20 @@ configor::json API_PROCEED::UpdateProblem(std::string PID, std::string Title, st
     Problem.Range = Range;
     Problem.Hint = Hint;
     PROBLEMS::JSONToSamples(Samples, Problem.Samples);
-    PROBLEMS::JSONToUnjudgedTestGroups(TestGroups, Problem.TestGroups);
     PROBLEMS::UpdateProblem(Problem);
-    CREATE_JSON(true, "Update problem succeeds");
+    RETURN_SUCCESS("Update problem succeeds");
+}
+configor::json API_PROCEED::UpdateTestCase(std::string PID, std::string TestCase) {
+    if (!IsAdmin)
+        throw EXCEPTION("Not admin");
+    PROBLEMS::UpdateTestCase(PID, TestCase);
+    RETURN_SUCCESS("Update test case succeeds");
 }
 configor::json API_PROCEED::DeleteProblem(std::string PID) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     PROBLEMS::DeleteProblem(PID);
-    CREATE_JSON(true, "Delete problem succeeds");
+    RETURN_SUCCESS("Delete problem succeeds");
 }
 configor::json API_PROCEED::GetProblems(int Page) {
     configor::json ResponseJSON = BaseJSON;
@@ -320,6 +468,7 @@ configor::json API_PROCEED::GetProblems(int Page) {
         .Execute(
             [&ResponseJSON](auto Data) {
                 ResponseJSON["Success"] = true;
+                ResponseJSON["Message"] = "Get problem succeeds";
                 configor::json::array_type Problems;
                 for (auto i : Data) {
                     configor::json TempProblem;
@@ -355,6 +504,7 @@ configor::json API_PROCEED::GetSubmission(int SID) {
     SUBMISSIONS::GetSubmission(SID, Submission);
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Get submission succeeds";
     ResponseJSON["Data"]["EnableO2"] = Submission.EnableO2;
     ResponseJSON["Data"]["Result"] = (int)Submission.Result;
     ResponseJSON["Data"]["Description"] = Submission.Description;
@@ -389,7 +539,7 @@ configor::json API_PROCEED::GetSubmission(int SID) {
 }
 configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, std::string Code, int Result, std::string Description, int Time, int TimeSum, int Memory, int Score, bool EnableO2, std::string TestGroups) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     SUBMISSION Submission;
     Submission.SID = SID;
     Submission.PID = PID;
@@ -404,11 +554,11 @@ configor::json API_PROCEED::UpdateSubmission(int SID, std::string PID, int UID, 
     Submission.EnableO2 = EnableO2;
     SUBMISSIONS::JSONToTestGroups(TestGroups, Submission.TestGroups, PID, SID);
     SUBMISSIONS::UpdateSubmission(Submission);
-    CREATE_JSON(true, "Update problem succeeds");
+    RETURN_SUCCESS("Update problem succeeds");
 }
 configor::json API_PROCEED::RejudgeSubmission(int SID) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     SUBMISSION Submission;
     SUBMISSIONS::GetSubmission(SID, Submission);
     Submission.Result = JUDGE_RESULT::WAITING;
@@ -418,19 +568,19 @@ configor::json API_PROCEED::RejudgeSubmission(int SID) {
         i.Time = i.TimeSum = i.Memory = i.TestCasesPassed = i.Score = 0;
         for (auto &j : i.TestCases) {
             j.Result = JUDGE_RESULT::WAITING;
-            j.Output = j.StandardOutput = j.StandardError = j.Description = "";
+            j.Description = "";
             j.Time = j.Memory = j.Score = 0; // TODO: Score here is not correct
         }
     }
     SUBMISSIONS::UpdateSubmission(Submission);
     JudgingList.Add(Submission);
-    CREATE_JSON(true, "Rejudge submission succeeds");
+    RETURN_SUCCESS("Rejudge submission succeeds");
 }
 configor::json API_PROCEED::DeleteSubmission(int SID) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     SUBMISSIONS::DeleteSubmission(SID);
-    CREATE_JSON(true, "Delete submission succeeds");
+    RETURN_SUCCESS("Delete submission succeeds");
 }
 configor::json API_PROCEED::GetSubmissions(int Page, int Problem, int User, int Result) {
     configor::json ResponseJSON = BaseJSON;
@@ -448,6 +598,7 @@ configor::json API_PROCEED::GetSubmissions(int Page, int Problem, int User, int 
         .Execute(
             [&ResponseJSON, Problem, User, Result](auto Data) {
                 ResponseJSON["Success"] = true;
+                ResponseJSON["Message"] = "Get submissions succeeds";
                 configor::json::array_type Submissions;
                 for (auto i : Data) {
                     if (Problem != -1 && i["PID"] != std::to_string(Problem))
@@ -478,24 +629,25 @@ configor::json API_PROCEED::GetSubmissions(int Page, int Problem, int User, int 
 
 configor::json API_PROCEED::GetSettings() {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
+    ResponseJSON["Message"] = "Get settings succeeds";
     SETTINGS::GetSettings(ResponseJSON["Data"]["Settings"]);
     return ResponseJSON;
 }
 configor::json API_PROCEED::SetSettings(configor::json Settings) {
     if (!IsAdmin)
-        CREATE_JSON(false, "Not admin");
+        throw EXCEPTION("Not admin");
     SETTINGS::SetSettings(Settings);
-    CREATE_JSON(true, "Set settings succeeds");
+    RETURN_SUCCESS("Set settings succeeds");
 }
 
 configor::json API_PROCEED::Proceed(configor::json Request) {
     configor::json ResponseJSON = BaseJSON;
     try {
         if (!CheckTypes(Request, {{"Action", configor::config_value_type::string}}))
-            CREATE_JSON(false, "Invalid parameters");
+            throw EXCEPTION("Invalid parameters");
         Action = Request["Action"].as_string();
         Data = Request["Data"];
         if (Action == "CheckTokenAvailable") {
@@ -570,10 +722,10 @@ configor::json API_PROCEED::Proceed(configor::json Request) {
                                                 Data["CredentialSignature"].as_string());
         } else {
             if (!CheckTypes(Data, {{"Token", configor::config_value_type::string}}))
-                CREATE_JSON(false, "Invalid parameters");
+                throw EXCEPTION("Invalid parameters");
             Token = Data["Token"].as_string();
             if (!CheckTokenAvailable(Token)["Success"].as_bool())
-                CREATE_JSON(false, "Invalid token");
+                throw EXCEPTION("Invalid token");
 
             UID = TOKENS::GetUID(Token);
             IsAdmin = USERS::IsAdmin(UID);
@@ -658,6 +810,20 @@ configor::json API_PROCEED::Proceed(configor::json Request) {
                                               Data["Hint"].as_string(),
                                               Data["Samples"].as_string(),
                                               Data["TestGroups"].as_string());
+            } else if (Action == "UploadTestCase") {
+                if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
+                                       {"Data", configor::config_value_type::string}}))
+                    ResponseJSON["Message"] = "Invalid parameters";
+                else
+                    ResponseJSON = UploadTestCase(Data["PID"].as_string(),
+                                                  Data["Data"].as_string());
+            } else if (Action == "UpdateTestCase") {
+                if (!CheckTypes(Data, {{"PID", configor::config_value_type::string},
+                                       {"TestCase", configor::config_value_type::string}}))
+                    ResponseJSON["Message"] = "Invalid parameters";
+                else
+                    ResponseJSON = UpdateTestCase(Data["PID"].as_string(),
+                                                  Data["TestCase"].as_string());
             } else if (Action == "GetProblem") {
                 if (!CheckTypes(Data, {{"PID", configor::config_value_type::string}}))
                     ResponseJSON["Message"] = "Invalid parameters";

@@ -132,6 +132,7 @@ const RequestAPI = async (Action, Data, CallBack, SuccessCallback, FailCallback,
         if (Response.status == 200) {
             Response.json().then(Response => {
                 if (Response.Success) {
+                    ShowSuccess(Response.Message);
                     SuccessCallback(Response.Data);
                 } else {
                     ShowError(Response.Message);
@@ -390,40 +391,29 @@ const CreatePlaceHolder = () => {
     PlaceHolder.classList.add("col-" + (Math.floor(Math.random() * 12) + 1));
     return PlaceHolder;
 };
-const CreateHorizontalLine = () => {
-    let HorizontalLine = document.createElement("hr");
-    HorizontalLine.classList.add("border");
-    HorizontalLine.classList.add("border-2");
-    HorizontalLine.classList.add("border-primary");
-    HorizontalLine.classList.add("rounded");
-    return HorizontalLine;
-};
-const CreateVditorEditor = (Editor, Content) => {
-    return new Vditor(Editor, {
-        "cache": { "enable": false },
-        "lang": "en_US",
-        "placeholder": "Input the markdown here...",
-        "preview": { "actions": [] },
-        "value": Content,
-        "upload": {
-            "url": "/api",
-            "token": localStorage.getItem("Token")
-        }
-    })
-}
-const CreateMarkdownEditor = (Title, Content, Parent) => {
-    let VditorEditor;
+const CreateMarkdownEditor = (Parent, Content = "", Onchange = null) => {
     let Container = document.createElement("div"); Parent.appendChild(Container);
-    Container.classList.add("form-group");
+    Container.classList.add("input-group");
     {
-        let Label = document.createElement("label"); Container.appendChild(Label);
-        Label.classList.add("col-form-label");
-        Label.innerHTML = Title;
-        let Editor = document.createElement("div"); Container.appendChild(Editor);
-        VditorEditor = CreateVditorEditor(Editor, Content);
-        Container.appendChild(CreateHorizontalLine());
+        let Editor = document.createElement("textarea"); Container.appendChild(Editor);
+        Editor.classList.add("form-control");
+        let Previewer = document.createElement("div"); Container.appendChild(Previewer);
+        Previewer.classList.add("form-control");
+        Editor.oninput = () => {
+            Previewer.innerHTML = marked.parse(Editor.value.trim());
+            if (Onchange) {
+                Onchange(Editor);
+            }
+        };
+        Editor.value = Content.trim();
+        Parent.setValue = (NewValue) => {
+            Editor.value = NewValue;
+            Editor.oninput();
+        };
+        Parent.getValue = () => {
+            return Editor.value;
+        };
     }
-    return VditorEditor;
 };
 const CreateCodeMirrorText = (ElementData) => {
     return CodeMirror.fromTextArea(ElementData, {

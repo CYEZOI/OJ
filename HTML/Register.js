@@ -92,7 +92,6 @@ RegisterEmailVerificationCodeButton.onclick = () => {
     }, () => {
         RemoveLoading(RegisterEmailVerificationCodeButton);
     }, () => {
-        ShowSuccess("Verification code has been sent");
         RegisterEmailVerificationCodeInput.focus();
         RegisterEmailVerificationCodeButton.dataset.time = 60;
         RegisterEmailVerificationCodeButton.disabled = true;
@@ -132,7 +131,6 @@ RegisterButton.onclick = () => {
     }, () => {
         RemoveLoading(RegisterButton);
     }, () => {
-        ShowSuccess("Register success");
         setTimeout(() => {
             SwitchPage("Login");
         }, 1000);

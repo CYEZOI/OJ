@@ -267,17 +267,14 @@ bool UTILITIES::VerifySignature(std::string Data, std::string Signature, std::st
     return true;
 }
 std::string UTILITIES::HashData(std::string Data) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, Data.c_str(), Data.size());
-    SHA256_Final(hash, &sha256);
-
-    std::stringstream ss;
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-        ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    unsigned char Buffer[SHA256_DIGEST_LENGTH];
+    if (SHA256((const unsigned char *)Data.c_str(), Data.length(), Buffer) == NULL) {
+        throw EXCEPTION("SHA256 failed");
     }
-
-    std::string Hash = ss.str();
+    std::stringstream StringStream;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        StringStream << std::hex << std::setw(2) << std::setfill('0') << (int)Buffer[i];
+    }
+    std::string Hash = StringStream.str();
     return Hash;
 }

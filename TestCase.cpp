@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Submissions.hpp"
 #include "TempTestData.hpp"
 #include "Utilities.hpp"
+#include <filesystem>
 #include <fstream>
 #include <map>
 #include <math.h>
@@ -287,11 +288,9 @@ void TEST_CASE::ParentProcess() {
     }
 }
 void TEST_CASE::Run() {
-    std::ofstream InputFile(WorkDir + "/" + Problem->IOFilename + ".in");
-    if (!InputFile.is_open())
-        throw EXCEPTION("Can not open data file");
-    InputFile << UnjudgedTestCase->Input;
-    InputFile.close();
+    if (!std::filesystem::copy_file(IODataDir + "/" + UTILITIES::RemoveSpaces(UnjudgedTestCase->InputFilename), WorkDir + "/" + Problem->IOFilename + ".in", std::filesystem::copy_options::overwrite_existing)) {
+        throw EXCEPTION("Can not copy input file");
+    }
 
     if (chown((WorkDir + "/" + Problem->IOFilename + ".in").c_str(), JudgeUserID, JudgeUserGroupID) == -1)
         throw EXCEPTION("Can not change group of input file");
@@ -312,12 +311,12 @@ void TEST_CASE::Run() {
 
     std::ofstream StandardOutputFile(WorkDir + "/std.out");
     if (!StandardOutputFile.is_open())
-        throw EXCEPTION("Can not open data file");
+        throw EXCEPTION("Can not open standard output data file");
     StandardOutputFile.close();
 
     std::ofstream StandardErrorFile(WorkDir + "/std.err");
     if (!StandardErrorFile.is_open())
-        throw EXCEPTION("Can not open data file");
+        throw EXCEPTION("Can not open standard error data file");
     StandardErrorFile.close();
 
     pid_t ProcessID = fork();
@@ -333,41 +332,111 @@ void TEST_CASE::Run() {
 }
 void TEST_CASE::Compare() {
     if (Result != JUDGE_RESULT::JUDGED)
-
         Result = JUDGE_RESULT::COMPARING;
 
     std::string Line;
+
+    std::string Output;
     std::ifstream OutputFile(WorkDir + "/" + Problem->IOFilename + ".out");
     if (!OutputFile.is_open())
-        throw EXCEPTION("Can not open data file");
+        throw EXCEPTION("Can not open output data file");
     while (std::getline(OutputFile, Line))
         Output += Line + "\n";
     OutputFile.close();
 
+    std::string StandardOutput;
     std::ifstream StandardOutputFile(WorkDir + "/std.out");
     if (!StandardOutputFile.is_open())
-        throw EXCEPTION("Can not open data file");
+        throw EXCEPTION("Can not open standard output data file");
     while (std::getline(StandardOutputFile, Line))
         StandardOutput += Line + "\n";
     StandardOutputFile.close();
 
+    std::string StandardError;
     std::ifstream StandardErrorFile(WorkDir + "/std.err");
     if (!StandardErrorFile.is_open())
-        throw EXCEPTION("Can not open data file");
+        throw EXCEPTION("Can not open standard error data file");
     while (std::getline(StandardErrorFile, Line))
         StandardError += Line + "\n";
     StandardErrorFile.close();
 
+    std::string Input;
+    std::ifstream InputFile(IODataDir + "/" + UTILITIES::RemoveSpaces(UnjudgedTestCase->InputFilename));
+    if (!InputFile.is_open())
+        throw EXCEPTION("Can not open input data file");
+    while (std::getline(InputFile, Line))
+        Input += Line + "\n";
+    InputFile.close();
+
+    std::string Answer;
+    std::ifstream AnswerFile(IODataDir + "/" + UTILITIES::RemoveSpaces(UnjudgedTestCase->AnswerFilename));
+    if (!AnswerFile.is_open())
+        throw EXCEPTION("Can not open answer data file");
+    while (std::getline(AnswerFile, Line))
+        Answer += Line + "\n";
+    AnswerFile.close();
+
+    Input = UTILITIES::RemoveSpaces(Input);
     Output = UTILITIES::RemoveSpaces(Output);
-    UnjudgedTestCase->Answer = UTILITIES::RemoveSpaces(UnjudgedTestCase->Answer);
+    Answer = UTILITIES::RemoveSpaces(Answer);
     StandardOutput = UTILITIES::RemoveSpaces(StandardOutput);
     StandardError = UTILITIES::RemoveSpaces(StandardError);
+
+    std::istringstream InputStream(Input);
+    std::istringstream UserStream(Output);
+    std::istringstream OutputStream(Answer);
+    int n, m;
+    InputStream >> n >> m;
+    char str;
+    OutputStream >> str;
+    if (str == 'N') {
+        char str2;
+        UserStream >> str2;
+        if (str == str2) {
+            Result = JUDGE_RESULT::ACCEPTED;
+            return;
+        } else {
+            Result = JUDGE_RESULT::WRONG_ANSWER;
+            Description = "WA0";
+            return;
+        }
+    }
+    bool chos[100009] = {0};
+    for (long long i = 1; i <= n; i++) {
+        long long x;
+        UserStream >> x;
+        chos[x] = 1;
+    }
+    const auto lst = [](long long x) {
+        if (x & 1)
+            return x + 1;
+        else
+            return x - 1;
+    };
+    for (long long i = 1; i <= 2 * n; i++) {
+        if (chos[i] + chos[lst(i)] != 1) {
+            Result = JUDGE_RESULT::WRONG_ANSWER;
+            Description = "WA1";
+            return;
+        }
+    }
+    for (long long i = 1; i <= m; i++) {
+        long long a, b;
+        InputStream >> a >> b;
+        if (chos[a] && chos[b]) {
+            Result = JUDGE_RESULT::WRONG_ANSWER;
+            Description = "WA2";
+            return;
+        }
+    }
+    Result = JUDGE_RESULT::ACCEPTED;
+    return;
 
     std::string FixedOutput = UTILITIES::StringReplaceAll(Output, "\r", "");
     FixedOutput = UTILITIES::StringReplaceAll(FixedOutput, "\n", "");
     FixedOutput = UTILITIES::StringReplaceAll(FixedOutput, "\t", "");
     FixedOutput = UTILITIES::StringReplaceAll(FixedOutput, " ", "");
-    std::string FixedAnswer = UTILITIES::StringReplaceAll(UnjudgedTestCase->Answer, "\r", "");
+    std::string FixedAnswer = UTILITIES::StringReplaceAll(Answer, "\r", "");
     FixedAnswer = UTILITIES::StringReplaceAll(FixedAnswer, "\n", "");
     FixedAnswer = UTILITIES::StringReplaceAll(FixedAnswer, "\t", "");
     FixedAnswer = UTILITIES::StringReplaceAll(FixedAnswer, " ", "");
@@ -375,7 +444,7 @@ void TEST_CASE::Compare() {
     if (StandardError != "") {
         Result = JUDGE_RESULT::RUNTIME_ERROR;
         Description = "Do not output to stderr if you do so. ";
-    } else if (Output == UnjudgedTestCase->Answer)
+    } else if (Output == Answer)
         Result = JUDGE_RESULT::ACCEPTED;
     else {
         if (FixedOutput == FixedAnswer)
@@ -402,6 +471,7 @@ void TEST_CASE::Judge() {
         SystemCallList.push_back(std::stoi(SystemCall));
 
     WorkDir = "/home/" + JudgeUsername + "/Run/" + std::to_string(SID) + "-" + std::to_string(TGID) + "-" + std::to_string(TCID);
+    IODataDir = "/home/" + JudgeUsername + "/IOData/" + PID;
     UTILITIES::MakeDir(WorkDir);
     UTILITIES::CopyFile("/home/" + JudgeUsername + "/Run/" + std::to_string(SID) + "/main", WorkDir + "/main");
 
@@ -437,7 +507,7 @@ void TEST_CASE::Judge() {
     }
 
     Score = Result == JUDGE_RESULT::ACCEPTED ? Score : 0;
-    UTILITIES::RemoveDir(WorkDir);
+    // UTILITIES::RemoveDir(WorkDir);
 
     UpdateDatabaseSignal = false;
     UpdateDatabase.join();

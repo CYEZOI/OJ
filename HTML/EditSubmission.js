@@ -208,10 +208,7 @@ RequestAPI("GetSubmission", {
                     "Time": Number(CurrentRow.children[3].children[0].children[0].value),
                     "Memory": Number(CurrentRow.children[4].children[0].children[0].value * 1024),
                     "Score": Number(CurrentRow.children[5].children[0].children[0].value),
-                    "Description": String(CurrentRow.children[6].children[0].value),
-                    "Output": String(Response.TestGroups[i].TestCases[j].Output),
-                    "StandardOutput": String(Response.TestGroups[i].TestCases[j].StandardOutput),
-                    "StandardError": String(Response.TestGroups[i].TestCases[j].StandardError)
+                    "Description": String(CurrentRow.children[6].children[0].value)
                 });
             }
         }
@@ -230,7 +227,6 @@ RequestAPI("GetSubmission", {
             "EnableO2": Boolean(EditSubmissionEnableO2.checked),
             "TestGroups": JSON.stringify(SubmitTestGroupsData)
         }, () => { }, () => {
-            ShowSuccess("Update Submission Success");
             setTimeout(() => {
                 SwitchPage("Submission", {
                     "SID": Data.SID

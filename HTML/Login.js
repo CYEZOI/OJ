@@ -44,7 +44,6 @@ LoginButton.onclick = () => {
         if (!Response.IsAdmin) {
             AddonStyle.innerHTML += ".AdminOnly { display: none; }";
         }
-        ShowSuccess("Login success");
         setTimeout(() => {
             if (new URLSearchParams(window.location.search).get("Callback") !== null) {
                 location.href = new URLSearchParams(window.location.search).get("Callback");

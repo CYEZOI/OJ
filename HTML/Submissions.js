@@ -153,7 +153,6 @@ RequestAPI("GetSubmissions", {
                             RequestAPI("DeleteSubmission", {
                                 "SID": Number(Response.Submissions[i].SID)
                             }, () => { }, () => {
-                                ShowSuccess("Delete Submission Successfully");
                                 SubmissionRow.remove();
                             }, () => { });
                         });

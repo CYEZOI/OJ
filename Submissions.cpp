@@ -43,9 +43,6 @@ void SUBMISSIONS::JSONToTestGroups(std::string JSONData, std::vector<TEST_GROUP>
                 TestGroups[TGID].TestCases[TCID].TCID = TCID;
                 TestGroups[TGID].TestCases[TCID].PID = PID;
                 TestGroups[TGID].TestCases[TCID].SID = SID;
-                TestGroups[TGID].TestCases[TCID].Output = TestCase["Output"].as_string();
-                TestGroups[TGID].TestCases[TCID].StandardOutput = TestCase["StandardOutput"].as_string();
-                TestGroups[TGID].TestCases[TCID].StandardError = TestCase["StandardError"].as_string();
                 TestGroups[TGID].TestCases[TCID].Result = (JUDGE_RESULT)TestCase["Result"].as_integer();
                 TestGroups[TGID].TestCases[TCID].Description = TestCase["Description"].as_string();
                 TestGroups[TGID].TestCases[TCID].Time = TestCase["Time"].as_integer();
@@ -71,9 +68,6 @@ void SUBMISSIONS::TestGroupsToJSON(std::vector<TEST_GROUP> TestGroups, std::stri
             NewTestGroup["TestCases"] = configor::json::array({});
             for (auto &TestCase : TestGroup.TestCases)
                 NewTestGroup["TestCases"].push_back({{"TCID", TestCase.TCID},
-                                                     {"Output", TestCase.Output},
-                                                     {"StandardOutput", TestCase.StandardOutput},
-                                                     {"StandardError", TestCase.StandardError},
                                                      {"Result", (int)TestCase.Result},
                                                      {"Description", TestCase.Description},
                                                      {"Time", TestCase.Time},

@@ -99,7 +99,7 @@ function InstallPackages() {
     fi
     
     Wait "Installing packages..."
-    apt-get install dialog g++ make cmake git libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev mount libssl-dev -y >/dev/null 2>&1
+    apt-get install g++ make cmake git libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev mount libssl-dev libminizip-dev -y >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         Error "Failed to install packages."
         EndSection
@@ -162,6 +162,9 @@ function CreateJudgeUser() {
     mkdir /home/Judger/Run
     chown -R Judger /home/Judger/Run
     chgrp -R judge /home/Judger/Run
+    mkdir /home/Judger/IOData
+    chown -R Judger /home/Judger/IOData
+    chgrp -R judge /home/Judger/IOData
     if [ $? -ne 0 ]; then
         Error "Failed to create judge user."
         EndSection

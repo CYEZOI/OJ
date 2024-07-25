@@ -28,13 +28,11 @@ class TEST_CASE {
   private:
     int TCID = 0;
     pid_t ProcessID = 0;
-    std::string Output;
-    std::string StandardOutput;
-    std::string StandardError;
     int SID = 0;
     std::string PID;
     int TGID = 0;
     std::string WorkDir;
+    std::string IODataDir;
     JUDGE_RESULT Result = JUDGE_RESULT::WAITING;
     std::string Description;
     int Time = 0;

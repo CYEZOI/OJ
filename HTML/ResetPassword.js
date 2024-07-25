@@ -26,7 +26,6 @@ ResetPasswordEmailVerificationCodeButton.onclick = () => {
     }, () => {
         RemoveLoading(ResetPasswordEmailVerificationCodeButton);
     }, () => {
-        ShowSuccess("Verification code has been sent");
         ResetPasswordEmailVerificationCodeInput.focus();
         ResetPasswordEmailVerificationCodeButton.dataset.time = 60;
         ResetPasswordEmailVerificationCodeButton.disabled = true;
@@ -90,7 +89,6 @@ ResetPasswordButton.onclick = () => {
     }, () => {
         RemoveLoading(ResetPasswordButton);
     }, () => {
-        ShowSuccess("Reset password success");
         setTimeout(() => {
             SwitchPage("Login");
         }, 1000);

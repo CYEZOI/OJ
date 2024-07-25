@@ -54,7 +54,6 @@ SubmissionDeleteButton.onclick = () => {
             {
                 "SID": Number(Data.SID)
             }, () => { }, (Response) => {
-                ShowSuccess("Delete Submission Success");
                 SwitchPage("Submissions");
             }, () => { }, () => { });
     }, () => { });

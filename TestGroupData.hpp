@@ -33,5 +33,5 @@ class TEST_GROUP_DATA {
     friend class API_PROCEED;
 
   public:
-    void AddTestCase(std::string Input, std::string Answer, int TimeLimit, int MemoryLimit, int Score);
+    void AddTestCase(std::string InputFilename, std::string AnswerFilename, int TimeLimit, int MemoryLimit, int Score);
 };

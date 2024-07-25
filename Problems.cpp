@@ -46,8 +46,8 @@ void PROBLEMS::JSONToUnjudgedTestGroups(std::string JSONData, std::vector<TEST_G
             for (auto &TestCase : TestGroup["TestCases"]) {
                 TEST_CASE_DATA NewTestCase;
                 NewTestCase.TCID = TestCase["TCID"].as_integer();
-                NewTestCase.Input = TestCase["Input"].as_string();
-                NewTestCase.Answer = TestCase["Answer"].as_string();
+                NewTestCase.InputFilename = TestCase["InputFilename"].as_string();
+                NewTestCase.AnswerFilename = TestCase["AnswerFilename"].as_string();
                 NewTestCase.TimeLimit = TestCase["TimeLimit"].as_integer();
                 NewTestCase.MemoryLimit = TestCase["MemoryLimit"].as_integer();
                 NewTestCase.Score = TestCase["Score"].as_integer();
@@ -80,8 +80,8 @@ void PROBLEMS::UnjudgedTestGroupsToJSON(std::vector<TEST_GROUP_DATA> UnjudgedTes
             NewTestGroup["TestCases"] = configor::json::array({});
             for (auto &TestCase : TestGroup.TestCases)
                 NewTestGroup["TestCases"].push_back({{"TCID", TestCase.TCID},
-                                                     {"Input", TestCase.Input},
-                                                     {"Answer", TestCase.Answer},
+                                                     {"InputFilename", TestCase.InputFilename},
+                                                     {"AnswerFilename", TestCase.AnswerFilename},
                                                      {"TimeLimit", TestCase.TimeLimit},
                                                      {"MemoryLimit", TestCase.MemoryLimit},
                                                      {"Score", TestCase.Score}});
@@ -141,7 +141,6 @@ void PROBLEMS::GetProblem(std::string PID, PROBLEM &Problem) {
 void PROBLEMS::UpdateProblem(PROBLEM Problem) {
     std::string SamplesJSON, TestGroupsJSON;
     SamplesToJSON(Problem.Samples, SamplesJSON);
-    UnjudgedTestGroupsToJSON(Problem.TestGroups, TestGroupsJSON);
     DATABASE::UPDATE("Problems")
         .Set("Title", Problem.Title)
         .Set("IOFilename", Problem.IOFilename)
@@ -153,6 +152,12 @@ void PROBLEMS::UpdateProblem(PROBLEM Problem) {
         .Set("Samples", SamplesJSON)
         .Set("TestGroups", TestGroupsJSON)
         .Where("PID", Problem.PID)
+        .Execute();
+}
+void PROBLEMS::UpdateTestCase(std::string PID, std::string TestCase) {
+    DATABASE::UPDATE("Problems")
+        .Set("TestGroups", TestCase)
+        .Where("PID", PID)
         .Execute();
 }
 void PROBLEMS::DeleteProblem(std::string PID) {

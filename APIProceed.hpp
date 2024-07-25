@@ -18,10 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#define CREATE_JSON(Success, Message)             \
+#define RETURN_SUCCESS(Message)                   \
     {                                             \
         configor::json _ResponseJSON;             \
-        _ResponseJSON["Success"] = (Success);     \
+        _ResponseJSON["Success"] = true;          \
         _ResponseJSON["Message"] = (Message);     \
         _ResponseJSON["Data"] = configor::json(); \
         return _ResponseJSON;                     \
@@ -65,7 +65,9 @@ class API_PROCEED {
 
     configor::json AddProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups);
     configor::json GetProblem(std::string PID);
+    configor::json UploadTestCase(std::string PID, std::string Data);
     configor::json UpdateProblem(std::string PID, std::string Title, std::string IOFilename, std::string Description, std::string Input, std::string Output, std::string Range, std::string Hint, std::string Samples, std::string TestGroups);
+    configor::json UpdateTestCase(std::string PID, std::string TestCaseData);
     configor::json DeleteProblem(std::string PID);
     configor::json GetProblems(int Page);
 

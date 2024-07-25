@@ -23,8 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class TEST_CASE_DATA {
   private:
     int TCID = 0;
-    std::string Input;
-    std::string Answer;
+    std::string InputFilename;
+    std::string AnswerFilename;
     int TimeLimit;
     int MemoryLimit;
     int Score;

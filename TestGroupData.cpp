@@ -18,12 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "TestGroupData.hpp"
 
-void TEST_GROUP_DATA::AddTestCase(std::string Input, std::string Answer, int TimeLimit, int MemoryLimit, int Score)
-{
+void TEST_GROUP_DATA::AddTestCase(std::string InputFilename, std::string AnswerFilename, int TimeLimit, int MemoryLimit, int Score) {
     TEST_CASE_DATA NewTestCase;
     NewTestCase.TCID = TestCases.size();
-    NewTestCase.Input = Input;
-    NewTestCase.Answer = Answer;
+    NewTestCase.InputFilename = InputFilename;
+    NewTestCase.AnswerFilename = AnswerFilename;
     NewTestCase.TimeLimit = TimeLimit;
     NewTestCase.MemoryLimit = MemoryLimit;
     NewTestCase.Score = Score;

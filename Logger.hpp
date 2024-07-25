@@ -41,7 +41,7 @@ class LOGGER {
     void Info(std::string Data);
     void Warning(std::string Data);
     void Error(std::string Data);
-    void Fetal(std::string Data);
+    void Fatal(std::string Data);
 };
 
 extern LOGGER Logger;

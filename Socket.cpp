@@ -87,16 +87,16 @@ SOCKET::SOCKET(CALL_BACK CallBack) {
 
     ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (ListenSocket == -1)
-        Logger.Fetal("Can not create socket");
+        Logger.Fatal("Can not create socket");
 
     int OptionValue = 1;
     setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &OptionValue, sizeof(OptionValue));
 
     if (bind(ListenSocket, (struct sockaddr *)&ServerAddress, sizeof(ServerAddress)) == -1)
-        Logger.Fetal("Can not bind port " + std::to_string(Port));
+        Logger.Fatal("Can not bind port " + std::to_string(Port));
 
     if (listen(ListenSocket, 1024) == -1)
-        Logger.Fetal("Can not listen");
+        Logger.Fatal("Can not listen");
     Logger.Warning("Listening on port " + std::to_string(Port));
 
     while (true) {

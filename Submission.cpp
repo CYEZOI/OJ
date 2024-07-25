@@ -196,6 +196,7 @@ void SUBMISSION::ChildProcess() {
 
     execvp(Compiler.c_str(), CompileArguments);
 
+    delete[] CompileArguments;
     throw EXCEPTION("Can not execute program");
 }
 void SUBMISSION::ParentProcess() {

@@ -36,7 +36,6 @@ LoginWithPasskeyReady.onclick = async () => {
                     if (!Response.IsAdmin) {
                         AddonStyle.innerHTML += ".AdminOnly { display: none; }";
                     }
-                    ShowSuccess("Login success");
                     setTimeout(() => {
                         SwitchPage("Home");
                     }, 1000);
