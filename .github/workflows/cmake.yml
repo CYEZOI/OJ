@@ -12,7 +12,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install g++ make cmake libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev mount libssl-dev -y
+        sudo apt install g++ make cmake libcurl4-gnutls-dev mysql-client mysql-server libmysqlcppconn-dev mount libssl-dev libminizip-dev -y
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build
