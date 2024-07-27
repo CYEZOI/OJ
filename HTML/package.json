@@ -1,0 +1,11 @@
+{
+  "name": "CYEZOJ-client",
+  "version": "1.0.0",
+  "main": "webpack.config.js",
+  "author": "langningchen",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "react-bootstrap": "^2.10.4",
+    "webpack": "^5.93.0"
+  }
+}

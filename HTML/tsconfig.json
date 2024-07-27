@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "jsx": "react",
+        "module": "ESNext",
+        "target": "ESNext",
+        "sourceMap": true,
+        "removeComments": true,
+        "strict": true,
+        "allowSyntheticDefaultImports": true
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+    ],
+    "compileOnSave": true,
+}

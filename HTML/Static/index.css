@@ -1,0 +1,16 @@
+@font-face {
+    font-family: "CascadiaCode";
+    src: url("CascadiaCode.ttf");
+}
+
+@font-face {
+    font-family: "KaiTi";
+    src: url("KaiTi.ttf");
+}
+
+html,
+body,
+#Content {
+    height: 100%;
+    font-family: "CascadiaCode", "KaiTi";
+}
