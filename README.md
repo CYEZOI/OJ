@@ -8,7 +8,7 @@ An online judge server written with only C++ and MySQL.
 
 ## Installation
 
-`curl https://raw.githubusercontent.com/langningchen/OJ/master/Install.bash | bash`
+`curl https://raw.githubusercontent.com/langningchen/OJ/master/Install.bash | sudo bash`
 
 ## License
 
