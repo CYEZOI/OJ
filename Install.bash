@@ -113,7 +113,7 @@ function CloneRepo() {
     BeginSection "Clone repo"
     if [ -d ./OJ ]; then
         git config --global safe.directory '*' >/dev/null 2>&1
-        if [ $(git -C ./OJ remote -v | grep -c "langningchen/OJ.git") -gt 0 ]; then
+        if [ $(git -C ./OJ remote -v | grep -c "CYEZOI/OJ.git") -gt 0 ]; then
             Wait "Updating repo..."
             git -C ./OJ pull --depth 1  >/dev/null 2>&1
             if [ $? -ne 0 ]; then
@@ -132,7 +132,7 @@ function CloneRepo() {
         fi
     fi
     Wait "Cloning repo..."
-    git clone https://github.com/langningchen/OJ.git --depth 1 >/dev/null 2>&1
+    git clone https://github.com/CYEZOI/OJ.git --depth 1 >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         Error "Failed to clone repo."
         EndSection
@@ -388,9 +388,9 @@ ConfigureSettings
 
 echo -e "\033[4;5;32mInstallation complete\033[0m"
 echo -e "\033[33mThe server is installed in the folder \"./OJ\". You can start the server by running \"./OJ/Run.bash\".\033[0m"
-echo -e "Please go to \"https://github.com/langningchen/OJ\" for more information or to report bugs."
+echo -e "Please go to \"https://github.com/CYEZOI/OJ\" for more information or to report bugs."
 echo "We strongly recommend you to install the dbeaver database management tool at \"https://dbeaver.io/\"."
 echo ""
-echo "Thank you for using this OJ."
+echo "Thank you for installing this OJ."
 echo "Have a nice day!"
 echo -e "\033[?25h"
