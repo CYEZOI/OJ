@@ -199,7 +199,7 @@ const CheckTokenAvailable = () => {
     var Token = localStorage.getItem("Token");
     if (Token == null) {
         SwitchPage("Login", {
-            CallBack: location.href
+            CallBack: location.pathname + location.search
         });
         return;
     }
@@ -208,7 +208,7 @@ const CheckTokenAvailable = () => {
     }, () => { }, () => { }, () => {
         localStorage.removeItem("Token");
         SwitchPage("Login", {
-            CallBack: location.href
+            CallBack: location.pathname + location.search
         });
     }, () => { }, false);
 };

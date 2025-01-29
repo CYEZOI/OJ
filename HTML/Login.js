@@ -46,7 +46,7 @@ LoginButton.onclick = () => {
         }
         setTimeout(() => {
             if (new URLSearchParams(window.location.search).get("Callback") !== null) {
-                location.href = new URLSearchParams(window.location.search).get("Callback");
+                location.href = location.origin + new URLSearchParams(window.location.search).get("Callback");
             }
             else {
                 SwitchPage("Home");
