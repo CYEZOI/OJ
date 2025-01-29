@@ -1,5 +1,4 @@
 const NavigateBar = document.getElementById("NavigateBar");
-const MainContainer = document.getElementById("MainContainer");
 const PageTitle = document.getElementById("PageTitle");
 const PageContent = document.getElementById("PageContent");
 const AlertList = document.getElementById("AlertList");
@@ -188,8 +187,6 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
                 }).then((JSResponse) => {
                     PageTitle.innerText = PathToName(Path);
                     PageContent.innerHTML = HTMLResponse;
-                    // MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
-                    //     + HTMLResponse;
                     window.Data = Data;
                     eval(JSResponse);
                 });
@@ -468,7 +465,7 @@ const CreateCodeMirrorSourceEditor = (ElementData, SubmitCallback = () => { }) =
     }
 
     if (SubmissionResultShortTexts.length != SubmissionResultTexts.length || SubmissionResultShortTexts.length != SubmissionResultColors.length) {
-        MainContainer.innerHTML = "System error: SubmissionResultShortTexts, SubmissionResultTexts and SubmissionResultColors have different length";
+        PageContent.innerHTML = "System error: SubmissionResultShortTexts, SubmissionResultTexts and SubmissionResultColors have different length";
         return;
     }
     for (let i = 0; i < NavigateBar.children[0].children.length; i++) {
