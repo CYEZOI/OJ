@@ -371,7 +371,7 @@ function ConfigureSettings() {
 
 echo -e "\033[?25l"
 echo -e "\033[33m"
-echo "OJ  Copyright (C) 2024  langningchen"
+echo "OJ  Copyright (C) 2025  langningchen"
 echo "This program comes with ABSOLUTELY NO WARRANTY."
 echo "This is free software, and you are welcome to redistribute it under certain conditions."
 echo -e "\033[0m"
@@ -738,7 +738,7 @@ function ConfigureSettings() {
 
 echo -e "\033[?25l"
 echo -e "\033[33m"
-echo "OJ  Copyright (C) 2024  langningchen"
+echo "OJ  Copyright (C) 2025  langningchen"
 echo "This program comes with ABSOLUTELY NO WARRANTY."
 echo "This is free software, and you are welcome to redistribute it under certain conditions."
 echo -e "\033[0m"
