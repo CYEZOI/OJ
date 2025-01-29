@@ -186,7 +186,7 @@ const SwitchPage = async (Path, Data = {}, PushState = true) => {
                 .then((JSResponse) => {
                     return JSResponse.text();
                 }).then((JSResponse) => {
-                    PageTitle.innerHTML = PathToName(Path);
+                    PageTitle.innerText = PathToName(Path);
                     PageContent.innerHTML = HTMLResponse;
                     // MainContainer.innerHTML = "<h4>" + PathToName(Path) + "</h4>"
                     //     + HTMLResponse;
