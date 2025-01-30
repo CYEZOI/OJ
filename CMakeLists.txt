@@ -7,33 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O2")
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_executable(OJ
-    APIProceed.cpp
-    Database.cpp
-    EmailVerificationCodes.cpp
-    Exception.cpp
-    Files.cpp
-    HTTPRequest.cpp
-    HTTPResponse.cpp
-    JudgingList.cpp
-    Logger.cpp
-    Passkey.cpp
-    Problem.cpp
-    Problems.cpp
-    Regexes.cpp
-    Settings.cpp
-    Socket.cpp
-    Submission.cpp
-    Submissions.cpp
-    TempTestData.cpp
-    TestCase.cpp
-    TestGroup.cpp
-    TestGroupData.cpp
-    Tokens.cpp
-    Users.cpp
-    Utilities.cpp
-    WebDataProceed.cpp
-    main.cpp)
+file(GLOB SRCS CONFIGURE_DEPENDS *.cpp)
+add_executable(OJ ${SRCS})
 
 set(LIBS
     pthread
