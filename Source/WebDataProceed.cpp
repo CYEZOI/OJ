@@ -33,9 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest) {
-    auto CurrentFolder = UTILITIES::StringSplit(__FILE__, "/");
-    CurrentFolder.pop_back(), CurrentFolder.pop_back();
-    std::string BasicFolder = UTILITIES::StringJoin(CurrentFolder, "/") + "/HTML";
+    std::string BasicFolder = "HTML";
     std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
     std::string RequestPath = HTTPRequest.Path;
@@ -165,7 +163,8 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest) {
         try {
             char *RequestPathBuffer = new char[4096];
             if (realpath((BasicFolder + RequestPath).c_str(), RequestPathBuffer) == nullptr) {
-                throw EXCEPTION("Failed to resolve real path");
+                delete[] RequestPathBuffer;
+                throw EXCEPTION("No such file: " + RequestPath);
             }
             std::string RequestFile = RequestPathBuffer;
             delete[] RequestPathBuffer;

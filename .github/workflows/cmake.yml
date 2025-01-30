@@ -17,8 +17,12 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    - name: Package
+      run: |
+        mv ${{github.workspace}}/build/OJ ${{github.workspace}}/OJ
+        zip -r OJ.zip ${{github.workspace}}/OJ ${{github.workspace}}/HTML
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: OJ
-        path: ${{github.workspace}}/build/OJ
+        path: ${{github.workspace}}/OJ.zip
