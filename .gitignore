@@ -1,4 +1,3 @@
-# Ingore generated and temp files
+# Ignore generated and temp files
 build/
-Build/
 **/*.log
