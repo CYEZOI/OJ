@@ -37,10 +37,6 @@ class UTILITIES {
     static std::string StringReplaceAll(std::string Data, std::string Search, std::string Replace);
     static std::vector<std::string> StringSplit(std::string Data, std::string Delimiter);
     static std::string StringJoin(std::vector<std::string> Data, std::string Delimiter);
-    static void MakeDir(std::string Dir);
-    static void RemoveDir(std::string Dir);
-    static void CopyFile(std::string Source, std::string Destination);
-    static void CopyDir(std::string Source, std::string Destination);
     static void LoadFile(std::string Filename, std::string &Output);
     static void LoadFile(std::string Filename, int &Output);
     static void SaveFile(std::string Filename, std::string Data);

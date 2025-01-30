@@ -98,7 +98,7 @@ void TEST_CASE::SetupEnvrionment() {
             throw EXCEPTION("Can not create symlink for the new root");
     }
 
-    UTILITIES::CopyDir("/etc/alternatives", "./etc/alternatives");
+    std::filesystem::copy("/etc/alternatives", "./etc/alternatives", std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 
     if (chroot(WorkDir.c_str()) != 0)
         throw EXCEPTION("Can not change root dir");
@@ -132,7 +132,7 @@ void TEST_CASE::RemoveEnvrionment() {
         "tmp",
         "usr"};
     for (int i = 0; i < 6; i++)
-        UTILITIES::RemoveDir(DirsToRemove[i].c_str());
+        std::filesystem::remove_all(DirsToRemove[i]);
 }
 void TEST_CASE::ChangeUser() {
     if (setgid(JudgeUserGroupID) != 0)
@@ -472,8 +472,8 @@ void TEST_CASE::Judge() {
 
     WorkDir = "/home/" + JudgeUsername + "/Run/" + std::to_string(SID) + "-" + std::to_string(TGID) + "-" + std::to_string(TCID);
     IODataDir = "/home/" + JudgeUsername + "/IOData/" + PID;
-    UTILITIES::MakeDir(WorkDir);
-    UTILITIES::CopyFile("/home/" + JudgeUsername + "/Run/" + std::to_string(SID) + "/main", WorkDir + "/main");
+    std::filesystem::create_directories(WorkDir);
+    std::filesystem::copy_file("/home/" + JudgeUsername + "/Run/" + std::to_string(SID) + "/main", WorkDir + "/main");
 
     bool UpdateDatabaseSignal = true;
     std::thread UpdateDatabase(
@@ -507,7 +507,7 @@ void TEST_CASE::Judge() {
     }
 
     Score = Result == JUDGE_RESULT::ACCEPTED ? Score : 0;
-    // UTILITIES::RemoveDir(WorkDir);
+    // std::filesystem::remove_all(WorkDir);
 
     UpdateDatabaseSignal = false;
     UpdateDatabase.join();

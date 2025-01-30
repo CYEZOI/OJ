@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include <algorithm>
 #include <dirent.h>
+#include <filesystem>
 #include <fstream>
 #include <math.h>
 #include <signal.h>
@@ -95,7 +96,7 @@ void SUBMISSION::SetupEnvrionment() {
             throw EXCEPTION("Can not create symlink for the new root");
     }
 
-    UTILITIES::CopyDir("/etc/alternatives", "./etc/alternatives");
+    std::filesystem::copy("/etc/alternatives", "./etc/alternatives", std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 
     if (chroot(WorkDir.c_str()) != 0)
         throw EXCEPTION("Can not change root dir");
@@ -128,7 +129,7 @@ void SUBMISSION::RemoveEnvrionment() {
         "tmp",
         "usr"};
     for (int i = 0; i < 6; i++)
-        UTILITIES::RemoveDir(DirsToRemove[i].c_str());
+        std::filesystem::remove_all(DirsToRemove[i]);
 }
 void SUBMISSION::ChangeUser() {
     if (setgid(JudgeUserGroupID) != 0)
@@ -345,7 +346,7 @@ void SUBMISSION::Judge() {
     UpdateAllResults(JUDGE_RESULT::FETCHED);
 
     WorkDir = "/home/" + JudgeUsername + "/Run/" + std::to_string(SID);
-    UTILITIES::MakeDir(WorkDir);
+    std::filesystem::create_directories(WorkDir);
 
     std::ofstream SourceFile = std::ofstream(WorkDir + "/main.cpp");
     if (!SourceFile.is_open())
@@ -362,6 +363,6 @@ void SUBMISSION::Judge() {
         Description = ErrorData.Message;
     }
 
-    UTILITIES::RemoveDir(WorkDir);
+    std::filesystem::remove_all(WorkDir);
     SUBMISSIONS::UpdateSubmission(*this);
 }

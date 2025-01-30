@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "Settings.hpp"
 #include <curl/curl.h>
+#include <filesystem>
 #include <openssl/sha.h>
 #include <random>
 #include <string.h>
@@ -62,102 +63,6 @@ std::string UTILITIES::StringJoin(std::vector<std::string> Data, std::string Del
             Result += Delimiter;
     }
     return Result;
-}
-void UTILITIES::MakeDir(std::string Dir) {
-    if (access(Dir.c_str(), F_OK) == -1)
-        if (mkdir(Dir.c_str(), 0755) != 0)
-            throw EXCEPTION("Can not create working directory " + Dir);
-}
-void UTILITIES::RemoveDir(std::string Dir) {
-    DIR *DirPtr = opendir(Dir.c_str());
-    if (DirPtr == nullptr)
-        throw EXCEPTION("Can not open directory " + Dir);
-    struct dirent *Entry = readdir(DirPtr);
-    while (Entry != nullptr) {
-        if (Entry->d_type == DT_DIR) {
-            if (strcmp(Entry->d_name, ".") != 0 && strcmp(Entry->d_name, "..") != 0)
-                RemoveDir(Dir + "/" + Entry->d_name);
-        } else {
-            if (remove((Dir + "/" + Entry->d_name).c_str()) != 0)
-                Logger.Error("Can not remove file " + Dir + "/" + Entry->d_name);
-        }
-        Entry = readdir(DirPtr);
-    }
-    closedir(DirPtr);
-    if (rmdir(Dir.c_str()) != 0)
-        throw EXCEPTION("Can not remove directory " + Dir);
-}
-void UTILITIES::CopyFile(std::string Source, std::string Destination) {
-    FILE *SourceFile = fopen(Source.c_str(), "rb");
-    if (SourceFile == nullptr) {
-        int ErrorCount = 1;
-        while (errno == ETXTBSY && ErrorCount <= 5) {
-            sleep(1);
-            SourceFile = fopen(Source.c_str(), "rb");
-            if (SourceFile != nullptr)
-                break;
-            ErrorCount++;
-        }
-        if (SourceFile == nullptr)
-            throw EXCEPTION("Can not open source file " + Source);
-    }
-    FILE *DestinationFile = fopen(Destination.c_str(), "wb");
-    if (DestinationFile == nullptr) {
-        fclose(SourceFile);
-        int ErrorCount = 1;
-        while (errno == ETXTBSY && ErrorCount <= 5) {
-            sleep(1);
-            DestinationFile = fopen(Destination.c_str(), "wb");
-            if (DestinationFile != nullptr)
-                break;
-            ErrorCount++;
-        }
-        if (DestinationFile == nullptr)
-            throw EXCEPTION("Can not open destination file " + Destination);
-    }
-    char Buffer[1024];
-    size_t ReadSize = fread(Buffer, 1, 1024, SourceFile);
-    while (ReadSize > 0) {
-        if (fwrite(Buffer, 1, ReadSize, DestinationFile) != ReadSize) {
-            fclose(SourceFile);
-            fclose(DestinationFile);
-            throw EXCEPTION("Can not write to destination file " + Destination);
-        }
-        ReadSize = fread(Buffer, 1, 1024, SourceFile);
-    }
-    fclose(SourceFile);
-    fclose(DestinationFile);
-
-    struct stat FileStatus;
-    if (lstat(Source.c_str(), &FileStatus) == -1)
-        throw EXCEPTION("Can not get source file \"" + Source + "\" attributions");
-    if (chmod(Destination.c_str(), FileStatus.st_mode) == -1)
-        throw EXCEPTION("Can not set destination file \"" + Destination + "\" attributions");
-}
-void UTILITIES::CopyDir(std::string Source, std::string Destination) {
-    DIR *DirPtr = opendir(Source.c_str());
-    if (DirPtr == nullptr)
-        throw EXCEPTION("Can not open directory " + Source);
-    struct dirent *Entry = readdir(DirPtr);
-    while (Entry != nullptr) {
-        if (Entry->d_type == DT_DIR) {
-            if (strcmp(Entry->d_name, ".") != 0 && strcmp(Entry->d_name, "..") != 0) {
-                struct stat FileStatus;
-                if (lstat((Source + "/" + Entry->d_name).c_str(), &FileStatus) == -1) {
-                    closedir(DirPtr);
-                    throw EXCEPTION("Can not get directory " + Source + "/" + Entry->d_name + " attributions");
-                }
-                if (mkdir((Destination + "/" + Entry->d_name).c_str(), FileStatus.st_mode) == -1) {
-                    closedir(DirPtr);
-                    throw EXCEPTION("Can not create directory " + Destination + "/" + Entry->d_name);
-                }
-                CopyDir(Source + "/" + Entry->d_name, Destination + "/" + Entry->d_name);
-            }
-        } else
-            CopyFile(Source + "/" + Entry->d_name, Destination + "/" + Entry->d_name);
-        Entry = readdir(DirPtr);
-    }
-    closedir(DirPtr);
 }
 void UTILITIES::LoadFile(std::string Filename, std::string &Output) {
     FILE *File = fopen(Filename.c_str(), "rb");

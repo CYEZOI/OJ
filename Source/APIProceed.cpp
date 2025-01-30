@@ -32,6 +32,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Users.hpp"
 #include "Utilities.hpp"
 #include "WebDataProceed.hpp"
+#include <filesystem>
 #include <minizip/unzip.h>
 
 bool API_PROCEED::CheckTypes(configor::json JSON, std::vector<std::pair<std::string, configor::config_value_type>> Types) {
@@ -353,9 +354,8 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
     std::string JudgeUsername;
     SETTINGS::GetSettings("JudgeUsername", JudgeUsername);
     std::string IODataDir = "/home/" + JudgeUsername + "/IOData/" + PID;
-    UTILITIES::MakeDir(IODataDir);
-    UTILITIES::RemoveDir(IODataDir);
-    UTILITIES::MakeDir(IODataDir);
+    std::filesystem::remove_all(IODataDir);
+    std::filesystem::create_directories(IODataDir);
 
     std::vector<std::string> InputFilenames;
     std::vector<std::string> AnswerFilenames;
