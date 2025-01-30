@@ -34,7 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest) {
     auto CurrentFolder = UTILITIES::StringSplit(__FILE__, "/");
-    CurrentFolder.pop_back();
+    CurrentFolder.pop_back(), CurrentFolder.pop_back();
     std::string BasicFolder = UTILITIES::StringJoin(CurrentFolder, "/") + "/HTML";
     std::string Initial = "";
     HTTP_RESPONSE HTTPResponse;
