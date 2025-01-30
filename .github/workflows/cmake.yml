@@ -22,5 +22,5 @@ jobs:
       with:
         name: OJ
         path: |
-          ${{github.workspace}}/OJ
-          ${{github.workspace}}/HTML
+          ${{github.workspace}}/build/OJ
+          ${{github.workspace}}/HTML/
