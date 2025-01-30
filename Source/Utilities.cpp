@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Settings.hpp"
 #include <curl/curl.h>
 #include <openssl/sha.h>
+#include <random>
 #include <string.h>
 #include <sys/dir.h>
 #include <sys/stat.h>
@@ -28,8 +29,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 std::string UTILITIES::RandomToken() {
     const std::string Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::string Token;
+    std::mt19937 Generator(std::random_device());
+    std::uniform_int_distribution<int> Distribution(0, Characters.length() - 1);
     for (int i = 0; i < 32; i++)
-        Token += Characters[rand() % Characters.length()];
+        Token += Characters[Distribution(Generator)];
     return Token;
 }
 std::string UTILITIES::StringReplaceAll(std::string Data, std::string Search, std::string Replace) {
