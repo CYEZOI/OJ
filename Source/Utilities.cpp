@@ -30,7 +30,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 std::string UTILITIES::RandomToken() {
     const std::string Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::string Token;
-    std::mt19937 Generator(std::random_device());
+    std::random_device RandomDevice;
+    std::mt19937 Generator(RandomDevice());
     std::uniform_int_distribution<int> Distribution(0, Characters.length() - 1);
     for (int i = 0; i < 32; i++)
         Token += Characters[Distribution(Generator)];

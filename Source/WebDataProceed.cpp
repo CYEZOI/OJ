@@ -164,7 +164,9 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest) {
         std::string Data;
         try {
             char *RequestPathBuffer = new char[4096];
-            realpath((BasicFolder + RequestPath).c_str(), RequestPathBuffer);
+            if (realpath((BasicFolder + RequestPath).c_str(), RequestPathBuffer) == nullptr) {
+                throw EXCEPTION("Failed to resolve real path");
+            }
             std::string RequestFile = RequestPathBuffer;
             delete[] RequestPathBuffer;
             UTILITIES::LoadFile(RequestFile, Data);
