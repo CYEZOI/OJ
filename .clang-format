@@ -1,0 +1,12 @@
+BasedOnStyle: Google
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 0
+AccessModifierOffset: -2
+SpacesInLineCommentPrefix:
+  Minimum: 1
+SpacesBeforeTrailingComments: 1
+IncludeCategories:
+  - Regex: '.*'
+    Priority: 1
+IncludeBlocks: Preserve

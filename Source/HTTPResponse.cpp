@@ -23,7 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <sstream>
 
 HTTP_RESPONSE::HTTP_RESPONSE() {
-
     std::stringstream Temp;
     std::time_t now_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     Temp << std::put_time(std::localtime(&now_time_t), "%a, %d %b %Y %H:%M:%S %z");
