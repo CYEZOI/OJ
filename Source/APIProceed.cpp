@@ -395,7 +395,6 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
         std::string FullFilePath = IODataDir + "/" + Filename;
         FILE *FilePointer = fopen(FullFilePath.c_str(), "w");
         if (FilePointer == NULL) {
-            fclose(FilePointer);
             unzClose(ZipFile);
             delete[] FileDataBuffer;
             throw EXCEPTION("Can not open output file " + FullFilePath);
