@@ -161,13 +161,11 @@ HTTP_RESPONSE WEB_DATA_PROCEED::Proceed(HTTP_REQUEST HTTPRequest) {
     } else {
         std::string Data;
         try {
-            char *RequestPathBuffer = new char[4096];
+            char RequestPathBuffer[4096];
             if (realpath((BasicFolder + RequestPath).c_str(), RequestPathBuffer) == nullptr) {
-                delete[] RequestPathBuffer;
                 throw EXCEPTION("No such file: " + RequestPath);
             }
             std::string RequestFile = RequestPathBuffer;
-            delete[] RequestPathBuffer;
             UTILITIES::LoadFile(RequestFile, Data);
         } catch (EXCEPTION ErrorData) {
             HTTPResponse.SetCode(404);

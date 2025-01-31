@@ -254,6 +254,7 @@ bool TEST_CASE::CheckMemory() {
             Memory = std::max(Memory, std::stoi(Line.substr(7, Line.find("kB") - 7)) * 1024);
             if (Memory > UnjudgedTestCase->MemoryLimit) {
                 Result = JUDGE_RESULT::MEMORY_LIMIT_EXCEEDED;
+                ProcessStatus.close();
                 return false;
             }
             break;
