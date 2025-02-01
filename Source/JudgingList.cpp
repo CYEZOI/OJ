@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 void JUDGING_LIST::Init() {
-    new std::thread(
+    std::thread(
         [this]() {
             while (true) {
                 while (JudgingList.empty())
@@ -35,7 +35,7 @@ void JUDGING_LIST::Init() {
                 JudgingList.pop();
                 Submission.Judge();
             }
-        });
+        }).detach();
 }
 
 void JUDGING_LIST::Add(SUBMISSION &Submission) {

@@ -30,7 +30,7 @@ int main() {
     srand(time(NULL));
     Settings.Init();
     JudgingList.Init();
-    new SOCKET(
+    SOCKET(
         [](std::string RequestHTTPData) -> std::string {
             WEB_DATA_PROCEED Data;
             HTTP_REQUEST HTTPRequest;
