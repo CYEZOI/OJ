@@ -34,8 +34,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class API_PROCEED {
   private:
     std::string Token;
-    int UID;
-    bool IsAdmin;
+    int UID = -1;
+    bool IsAdmin = 0;
     std::string Action;
     configor::json Data;
 
@@ -51,9 +51,9 @@ class API_PROCEED {
     configor::json Register(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, std::string VerificationCode);
     configor::json ResetPassword(std::string EmailAddress, std::string VerificationCode, std::string Password);
 
-    configor::json CreatePasskeyChallenge();
+    configor::json CreatePasskeyCreateChallenge();
     configor::json DeletePasskeyChallenge(std::string Challenge);
-    configor::json CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey);
+    configor::json CreatePasskey(std::string Credential);
     configor::json LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature);
 
     configor::json AddUser(std::string Username, std::string Nickname, std::string Password, std::string EmailAddress, USER_ROLE Role);

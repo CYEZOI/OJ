@@ -12,20 +12,15 @@ else {
 LoginWithPasskeyReady.onclick = async () => {
     LoginWithPasskeyInformation.innerText = "Contact the server for information...";
     RequestAPI("CreatePasskeyChallenge", {}, () => { }, async (Response) => {
-        const GetOptions = {
-            "challenge": StringToBuffer(Response.Challenge),
-            "rp": { "name": "OJ" },
-            "timeout": 60000
-        };
+        Response.challenge = StringToBuffer(Response.challenge);
         LoginWithPasskeyInformation.innerText = "Please input your passkey.";
         await navigator.credentials.get({ publicKey: GetOptions })
             .then((Credential) => {
                 LoginWithPasskeyInformation.innerText = "Checking passkey...";
+                Credential.response.userHandle = BufferToString(Credential.response.userHandle);
+                Credential.response.signature = btoa(BufferToString(Credential.response.signature));
                 RequestAPI("LoginWithPasskey", {
-                    "Challenge": String(Response.Challenge),
-                    "CredentialID": String(Credential.id),
-                    "UID": Number(BufferToString(Credential.response.userHandle)),
-                    "CredentialSignature": String(btoa(BufferToString(Credential.response.signature)))
+                    "Credential": JSON.stringify(Credential),
                 }, () => { }, (Response) => {
                     localStorage.setItem("Token", Response.Token);
                     localStorage.setItem("IsAdmin", Response.IsAdmin);
