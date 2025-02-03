@@ -105,11 +105,11 @@ SOCKET::SOCKET(CALL_BACK CallBack) {
         int ClientSocket = accept(ListenSocket, (struct sockaddr *)&ClientAddress, &ClientAddressLength);
         if (ClientSocket == -1)
             Logger.Error("Can not accept");
-        new std::thread(
+        std::thread(
             [this, ClientSocket, ClientAddress, CallBack] {
                 this->SubThread(ClientSocket, ClientAddress, CallBack);
                 close(ClientSocket);
-            });
+            }).detach();
     }
 }
 

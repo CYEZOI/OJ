@@ -310,8 +310,10 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
     std::string ZipFilename = "/tmp/" + PID + ".zip";
     FILE* FilePointer = fopen(ZipFilename.c_str(), "w");
     if (FilePointer == NULL) throw EXCEPTION("Can not open zip file");
-    if (fwrite(Result.c_str(), 1, Result.size(), FilePointer) != Result.size())
+    if (fwrite(Result.c_str(), 1, Result.size(), FilePointer) != Result.size()) {
+        fclose(FilePointer);
         throw EXCEPTION("Can not write to zip file");
+    }
     fclose(FilePointer);
 
     std::string JudgeUsername;
@@ -353,13 +355,17 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
         if (unzReadCurrentFile(ZipFile, FileDataBuffer, FileInfo.uncompressed_size) < 0) {
             unzCloseCurrentFile(ZipFile);
         }
-        std::string FullFilePath = IODataDir + "/" + Filename;
-        FILE* FilePointer = fopen(FullFilePath.c_str(), "w");
-        if (FilePointer == NULL)
+        std::string FullFilePath = IODataDir + "/" + Filename
+        FILE *FilePointer = fopen(FullFilePath.c_str(), "w");
+        if (FilePointer == NULL) {
+            unzClose(ZipFile);
+            delete[] FileDataBuffer;
             throw EXCEPTION("Can not open output file " + FullFilePath);
+        }
         if (fwrite(FileDataBuffer, 1, FileInfo.uncompressed_size, FilePointer) != FileInfo.uncompressed_size) {
             fclose(FilePointer);
             unzClose(ZipFile);
+            delete[] FileDataBuffer;
             throw EXCEPTION("Can not write to file " + FullFilePath);
         }
         delete[] FileDataBuffer;
@@ -369,6 +375,7 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
         if (ZipStatus == UNZ_END_OF_LIST_OF_FILE) {
             break;
         } else if (ZipStatus != UNZ_OK) {
+            unzClose(ZipFile);
             throw EXCEPTION("Can not read zip file " + ZipFilename);
         }
     }
