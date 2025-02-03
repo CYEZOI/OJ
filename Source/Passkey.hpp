@@ -19,11 +19,51 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Exception.hpp"
+#include <configor/json.hpp>
+#include <vector>
 
 class PASSKEY {
+  private: // 定义内部数据结构
+    class AuthenticatorFlags {
+      private:
+        bool up;
+        bool uv;
+        bool be;
+        bool bs;
+        bool at;
+        bool ed;
+        uint8_t flagsInt;
+
+        friend class PASSKEY;
+
+      public:
+        AuthenticatorFlags() = default;
+        AuthenticatorFlags(uint8_t flagsInt);
+        std::string toString() const;
+    };
+
+    class ParsedData {
+      private:
+        std::string rpIdHash;
+        std::vector<uint8_t> flagsBuf;
+        AuthenticatorFlags flags;
+        uint32_t counter;
+        std::vector<uint8_t> counterBuf;
+        std::vector<uint8_t> aaguid;
+        std::vector<uint8_t> credentialID;
+        std::vector<uint8_t> credentialPublicKey;
+        std::vector<uint8_t> extensionsDataBuffer;
+
+        friend class PASSKEY;
+
+      public:
+        ParsedData(std::vector<uint8_t> AuthData);
+        void logDebugInfo() const;
+    };
+
   public:
     static std::string CreateChallenge();
     static void DeleteChallenge(std::string Challenge);
-    static void CreatePasskey(int UID, std::string Challenge, std::string Credential, std::string PublicKey);
+    static void CreatePasskey(int UID, configor::json Credential);
     static std::string GetPasskey(int UID, std::string Credential);
 };

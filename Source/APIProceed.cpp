@@ -32,8 +32,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Users.hpp"
 #include "Utilities.hpp"
 #include "WebDataProceed.hpp"
+#include <cbor.h>
 #include <filesystem>
 #include <minizip/unzip.h>
+#include <nlohmann/json.hpp>
 
 bool API_PROCEED::CheckTypes(configor::json JSON, std::vector<std::pair<std::string, configor::config_value_type>> Types) {
     for (auto i : Types)
@@ -100,20 +102,24 @@ configor::json API_PROCEED::ResetPassword(std::string EmailAddress, std::string 
     RETURN_SUCCESS("Reset password succeeds");
 }
 
-configor::json API_PROCEED::CreatePasskeyChallenge() {
+configor::json API_PROCEED::CreatePasskeyCreateChallenge() {
     std::string ChallengeChallengeID = PASSKEY::CreateChallenge();
     configor::json ResponseJSON = BaseJSON;
     ResponseJSON["Success"] = true;
     ResponseJSON["Message"] = "Create passkey challenge succeeds";
-    ResponseJSON["Data"]["Challenge"] = ChallengeChallengeID;
+    ResponseJSON["Data"]["challenge"] = ChallengeChallengeID;
+    ResponseJSON["Data"]["rp"] = configor::json({{"id", "localhost"}, {"name", "OJ"}});
+    ResponseJSON["Data"]["user"] = configor::json({{"id", std::to_string(UID)}, {"name", USERS::GetUser(UID).Username}, {"displayName", USERS::GetUser(UID).Username}});
+    ResponseJSON["Data"]["pubKeyCredParams"] = configor::json::array_type({configor::json({{"alg", -7}, {"type", "public-key"}})});
+    ResponseJSON["Data"]["timeout"] = 60000;
     return ResponseJSON;
 }
 configor::json API_PROCEED::DeletePasskeyChallenge(std::string Challenge) {
     PASSKEY::DeleteChallenge(Challenge);
     RETURN_SUCCESS("Delete passkey challenge succeeds");
 }
-configor::json API_PROCEED::CreatePasskey(std::string Challenge, std::string CredentialID, std::string CredentialPublicKey) {
-    PASSKEY::CreatePasskey(UID, Challenge, CredentialID, CredentialPublicKey);
+configor::json API_PROCEED::CreatePasskey(std::string Credential) {
+    PASSKEY::CreatePasskey(UID, configor::json::parse(Credential));
     RETURN_SUCCESS("Create passkey succeeds");
 }
 configor::json API_PROCEED::LoginWithPasskey(std::string Challenge, std::string CredentialID, int UserHandle, std::string CredentialSignature) {
@@ -300,52 +306,9 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
         throw EXCEPTION("Data not available");
     Data = Data.substr(Data.find(",") + 1);
 
-    static const std::string base64_chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz"
-        "0123456789+/";
-
-    int in_len = Data.size();
-    int i = 0;
-    int j = 0;
-    int in_ = 0;
-    unsigned char char_array_4[4], char_array_3[3];
-    std::string Result;
-
-    while (in_len-- && (Data[in_] != '=')) {
-        char_array_4[i++] = Data[in_];
-        in_++;
-        if (i == 4) {
-            for (i = 0; i < 4; i++)
-                char_array_4[i] = base64_chars.find(char_array_4[i]);
-
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-            for (i = 0; (i < 3); i++)
-                Result += char_array_3[i];
-            i = 0;
-        }
-    }
-
-    if (i) {
-        for (j = i; j < 4; j++)
-            char_array_4[j] = 0;
-
-        for (j = 0; j < 4; j++)
-            char_array_4[j] = base64_chars.find(char_array_4[j]);
-
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-        for (j = 0; (j < i - 1); j++)
-            Result += char_array_3[j];
-    }
-
+    std::string Result = UTILITIES::Base64Decode(Data);
     std::string ZipFilename = "/tmp/" + PID + ".zip";
-    FILE *FilePointer = fopen(ZipFilename.c_str(), "w");
+    FILE* FilePointer = fopen(ZipFilename.c_str(), "w");
     if (FilePointer == NULL) throw EXCEPTION("Can not open zip file");
     if (fwrite(Result.c_str(), 1, Result.size(), FilePointer) != Result.size())
         throw EXCEPTION("Can not write to zip file");
@@ -385,13 +348,13 @@ configor::json API_PROCEED::UploadTestCase(std::string PID, std::string Data) {
             unzClose(ZipFile);
             throw EXCEPTION("Unzip file open file failed");
         }
-        char *FileDataBuffer = new char[FileInfo.uncompressed_size];
+        char* FileDataBuffer = new char[FileInfo.uncompressed_size];
         memset(FileDataBuffer, 0, FileInfo.uncompressed_size * sizeof(char));
         if (unzReadCurrentFile(ZipFile, FileDataBuffer, FileInfo.uncompressed_size) < 0) {
             unzCloseCurrentFile(ZipFile);
         }
         std::string FullFilePath = IODataDir + "/" + Filename;
-        FILE *FilePointer = fopen(FullFilePath.c_str(), "w");
+        FILE* FilePointer = fopen(FullFilePath.c_str(), "w");
         if (FilePointer == NULL)
             throw EXCEPTION("Can not open output file " + FullFilePath);
         if (fwrite(FileDataBuffer, 1, FileInfo.uncompressed_size, FilePointer) != FileInfo.uncompressed_size) {
@@ -563,10 +526,10 @@ configor::json API_PROCEED::RejudgeSubmission(int SID) {
     SUBMISSIONS::GetSubmission(SID, Submission);
     Submission.Result = JUDGE_RESULT::WAITING;
     Submission.Time = Submission.TimeSum = Submission.Memory = Submission.Score = 0;
-    for (auto &i : Submission.TestGroups) {
+    for (auto& i : Submission.TestGroups) {
         i.Result = JUDGE_RESULT::WAITING;
         i.Time = i.TimeSum = i.Memory = i.TestCasesPassed = i.Score = 0;
-        for (auto &j : i.TestCases) {
+        for (auto& j : i.TestCases) {
             j.Result = JUDGE_RESULT::WAITING;
             j.Description = "";
             j.Time = j.Memory = j.Score = 0; // TODO: Score here is not correct
@@ -699,11 +662,6 @@ configor::json API_PROCEED::Proceed(configor::json Request) {
                 ResponseJSON = ResetPassword(Data["EmailAddress"].as_string(),
                                              Data["VerificationCode"].as_string(),
                                              Data["Password"].as_string());
-        } else if (Action == "CreatePasskeyChallenge") {
-            if (!CheckTypes(Data, {}))
-                ResponseJSON["Message"] = "Invalid parameters";
-            else
-                ResponseJSON = CreatePasskeyChallenge();
         } else if (Action == "DeletePasskeyChallenge") {
             if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string}}))
                 ResponseJSON["Message"] = "Invalid parameters";
@@ -730,15 +688,16 @@ configor::json API_PROCEED::Proceed(configor::json Request) {
             UID = TOKENS::GetUID(Token);
             IsAdmin = USERS::IsAdmin(UID);
 
-            if (Action == "CreatePasskey") {
-                if (!CheckTypes(Data, {{"Challenge", configor::config_value_type::string},
-                                       {"CredentialID", configor::config_value_type::string},
-                                       {"CredentialPublicKey", configor::config_value_type::string}}))
+            if (Action == "CreatePasskeyCreateChallenge") {
+                if (!CheckTypes(Data, {}))
                     ResponseJSON["Message"] = "Invalid parameters";
                 else
-                    ResponseJSON = CreatePasskey(Data["Challenge"].as_string(),
-                                                 Data["CredentialID"].as_string(),
-                                                 Data["CredentialPublicKey"].as_string());
+                    ResponseJSON = CreatePasskeyCreateChallenge();
+            } else if (Action == "CreatePasskey") {
+                if (!CheckTypes(Data, {{"Credential", configor::config_value_type::string}}))
+                    ResponseJSON["Message"] = "Invalid parameters";
+                else
+                    ResponseJSON = CreatePasskey(Data["Credential"].as_string());
             } else if (Action == "AddUser") {
                 if (!CheckTypes(Data, {{"Username", configor::config_value_type::string},
                                        {"Nickname", configor::config_value_type::string},

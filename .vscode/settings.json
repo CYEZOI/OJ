@@ -9,6 +9,7 @@
         "TCID",
         "TGID",
         "UNJUDGED",
-        "Vditor"
+        "Vditor",
+        "webauthn"
     ]
 }

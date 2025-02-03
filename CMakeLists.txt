@@ -17,6 +17,7 @@ set(LIBS
     ssl
     crypto
     minizip
+    cbor
 )
 target_link_libraries(OJ PRIVATE ${LIBS})
 target_include_directories(OJ PRIVATE "/usr/include/mysql")
